@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Number Detective</string>
+
+    <!-- Game Activity -->
+    <string name="submit_button">SUBMIT</string>
+    
+    <!-- Level 3 Hints (4 digits) -->
+    <string name="hint_l3_1">1 digit is correct and in the right spot</string>
+    <string name="hint_l3_2">1 digit is correct but in the wrong spot</string>
+    <string name="hint_l3_3">2 digits are correct, 1 is in the right spot</string>
+    <string name="hint_l3_4">2 digits are correct, 1 is in the right spot</string>
+    <string name="hint_l3_5">2 digits are correct, both in right spots</string>
+
+    <!-- Level 1-2 Hints (3 digits) -->
+    <string name="hint_1">1 digit is correct and in the right spot</string>
+    <string name="hint_2">1 digit is correct but in the wrong spot</string>
+    <string name="hint_3">2 digits are correct, both in wrong spots</string>
+    <string name="hint_4">2 digits are correct, both in wrong spots</string>
+    <string name="hint_5">2 digits are correct, 1 is in the right spot</string>
+
+
+    <!-- Game Result Activity -->
+    <string name="score_text">DAILY SCORE: %1$d</string>
+    <string name="share_button">Share</string>
+    <string name="play_again_button">Play Again</string>
+    <string name="win_motivation">Great game! Keep going!</string>
+    <string name="lose_motivation">You can do better! Try again!</string>
+    <!-- Main Activity -->
+    <string name="app_title_1">Number</string>
+    <string name="app_title_2">Detective</string>
+    <string name="start_button">START GAME</string>
+    
+    <string name="back_to_menu">MAIN MENU</string>
+
+    <string-array name="game_quotes">
+        <item>"When you eliminate the impossible, whatever remains must be the truth." – Sherlock Holmes</item>
+        <item>"It is a capital mistake to theorize before one has data." – Sherlock Holmes</item>
+        <item>"The world is full of obvious things which nobody ever observes." – Sherlock Holmes</item>
+        <item>"There is nothing more deceptive than an obvious fact." – Sherlock Holmes</item>
+        <item>"The little things are infinitely the most important." – Sherlock Holmes</item>
+        <item>"You see, but you do not observe. The distinction is clear." – Sherlock Holmes</item>
+        <item>"I never guess. It is destructive to the logical faculty." – Sherlock Holmes</item>
+        <item>"Data! Data! Data! I can\\'t make bricks without clay." – Sherlock Holmes</item>
+        <item>"The game is afoot!" – Sherlock Holmes</item>
+        <item>"Education never ends. It is a series of lessons, with the greatest for the last." – Sherlock Holmes</item>
+        <item>"It is the brain, the little grey cells, on which one must rely." – Hercule Poirot</item>
+        <item>"The impossible could not have happened. Therefore the impossible must be possible." – Hercule Poirot</item>
+        <item>"Instinct is a marvelous thing. It can neither be explained nor ignored." – Agatha Christie</item>
+        <item>"Every case is a puzzle. Fit the pieces and the picture appears." – Agatha Christie</item>
+        <item>"The truth, however ugly, is always better than a beautiful lie." – Agatha Christie</item>
+        <item>"Logic is the beginning of wisdom, not the end." – Leonard Nimoy</item>
+        <item>"The measure of intelligence is the ability to change." – Albert Einstein</item>
+        <item>"Numbers are the highest degree of knowledge." – Plato</item>
+        <item>"Every code is created to be broken — eventually."</item>
+        <item>"A detective is only as good as the clues he refuses to ignore."</item>
+        <item>"The cipher always speaks. You just need to learn its language."</item>
+        <item>"Patience cracks every vault. Haste triggers every alarm."</item>
+        <item>"Every wrong answer eliminates a possibility. That is progress."</item>
+        <item>"Trust the pattern. The numbers never lie."</item>
+        <item>"A sharp mind sees order where others see chaos."</item>
+    </string-array>
+
+    <!-- Result Screen -->
+    <string name="correct_answer">Correct Answer</string>
+    <string name="attempts">Attempts</string>
+    <string name="time">Time</string>
+
+    <string name="share_score_message">I scored %1$d points in Number Detective! Used %2$d attempts in %3$s. Can you beat my score? 🎮</string>
+    <string name="share_score_title">Share Score</string>
+
+    <!-- Home Screen Redesign -->
+    <string name="home_mission_title">Mission Briefing</string>
+    <string name="home_step_1_title">Analyze</string>
+    <string name="home_step_1_desc">Examine hints to track down the secret code.</string>
+    <string name="home_step_2_title">Deduce</string>
+    <string name="home_step_2_desc">Use logic to eliminate impossible numbers.</string>
+    <string name="home_step_3_title">Solve</string>
+    <string name="home_step_3_desc">Enter the correct sequence and win!</string>
+
+    <!-- Onboarding / Tutorial -->
+    <string name="tutorial_title">DETECTIVE MANUAL</string>
+    <string name="tutorial_page1_title">THE MISSION</string>
+    <string name="tutorial_page1_desc">When time runs out, the evidence will be destroyed. To solve the case, you must crack the 3-layer cipher before the evidence disappears. Don\'t panic! All digits in the secret code are unique, which will narrow down your deductions and make decoding easier.</string>
+    <string name="tutorial_page2_title">{ THE CYLINDERS }</string>
+    <string name="tutorial_page2_desc">Use the vertical cylinders to select your digits. Drag or tap them to reveal the combination you wish to test.</string>
+    <string name="tutorial_page3_title">[ CASE ARCHIVE ]</string>
+    <string name="tutorial_page3_desc">Stuck? Tap the top-right \'Attempts\' counter at any time to open your Case Archive. Here you can review all your previous guesses and narrow down the possibilities.</string>
+    <string name="tutorial_page4_title">[ ANALYSIS KEY ]</string>
+    <string name="tutorial_page4_desc">If you enable Assistance Mode from Settings, you will see color-coded feedback for your guesses in the archive:\n\n• GREEN: Correct digit in right spot.\n• YELLOW: Correct digit in wrong spot.</string>
+    <string name="tutorial_page5_title">> PROGRESSION</string>
+    <string name="tutorial_page5_desc">Cracking a layer grants you extra attempt rights and adds more time to the clock. Clear all 3 layers to win the case.</string>
+    <string name="tutorial_page6_title">PERFORMANCE BONUSES</string>
+    <string name="tutorial_page6_desc">Skilled detectives earn extra points for efficiency:\n\n• SHARP DEDUCTION (+500): Solve in 2 or fewer attempts.\n• FLASH CLEARANCE (+300): Solve in under 20 seconds.</string>
+    <string name="tutorial_page7_title">INVESTIGATION COSTS</string>
+    <string name="tutorial_page7_desc">Every assist reduces your score, but your total never drops below zero:\n\n• ARCHIVE CHECK: -50 Points\n• ASSISTED MODE: -150 Points per check in the log.</string>
+    <string name="tutorial_continue_button">CONTINUE</string>
+    <string name="tutorial_finish_button">ACCEPT MISSION</string>
+    <string name="home_manual_button">DETECTION GUIDE</string>
+    <string name="home_about_button">ABOUT THIS GAME</string>
+    <string name="about_dialog_title">A Game for Humanity</string>
+    <string name="about_dialog_body">This game was created without any commercial purpose — a gift to humanity. Its mission: to fight the attention deficit and brain rot fuelled by social media by training short-term memory, strengthening analytical intelligence, and sharpening focus and concentration.\n\nThere are no ads in this game. The reason is simple: ads are one of the very triggers of brain rot.\n\nIf you enjoyed the game, you can support its mission on Patreon 🧡</string>
+    <string name="about_buy_coffee">🧡 Support on Patreon</string>
+    <string name="about_buy_coffee_url">https://www.patreon.com/AntiBrainRot/membership</string>
+
+    <!-- Validation Reports -->
+    <string name="report_duplicate_title">DUPLICATE ENTRY</string>
+    <string name="report_duplicate_msg">This combination has already been tried. Try a different sequence. (No points or attempts deducted)</string>
+    <string name="report_unique_title">PROTOCOL BREACH</string>
+    <string name="report_unique_msg">All digits in the code must be unique. Review your sequence. (No points or attempts deducted)</string>
+
+    <!-- Settings Menu -->
+    <string name="settings_title">MISSION SETTINGS</string>
+    <string name="settings_sound">SOUND EFFECTS</string>
+    <string name="settings_language">LANGUAGE</string>
+    <string name="settings_helper">ASSISTED MODE</string>
+    <string name="settings_helper_desc">Enables color-coded logic feedback for each digit in the interrogation log.</string>
+    <string name="log_analysis_attempt">ANALYSIS ATTEMPT</string>
+    <string name="log_analysis_success">ACCESS GRANTED</string>
+    <string name="label_trials">TRIALS</string>
+    <string name="label_case_archive">CASE ARCHIVE</string>
+    <string name="msg_analysis_active">SIA ANALYSIS ACTIVE</string>
+    <string name="msg_no_evidence_waiting">WAITING FOR INPUT...</string>
+    <string name="label_daily_record">DAILY RECORD</string>
+    <string name="label_all_time_record">ALL-TIME RECORD</string>
+    
+    <string name="label_tab_briefing">BRIEFING</string>
+    <string name="label_tab_archive">CASE ARCHIVE</string>
+
+    <string name="mission_accomplished">MISSION ACCOMPLISHED</string>
+    <string name="mission_failed">MISSION FAILED</string>
+    <string name="final_score">FINAL SCORE</string>
+    <string name="continue_mission">CONTINUE MISSION</string>
+    <string name="initial_intelligence">INITIAL INTELLIGENCE</string>
+    <string name="log_analysis_number">ANALYSIS %1$d</string>
+    <string name="case_file_level">CASE FILE: LEVEL %d</string>
+    <string name="label_lives">LIVES</string>
+    <string name="label_time">TIME</string>
+
+    <string name="report_promotion_title">PROMOTION GRANTED</string>
+    <string name="report_promotion_msg">Level %1$d reached. You gained %2$d extra attempts and %3$d bonus seconds. Ready for the next phase?</string>
+    <string name="score_points">%1$d PTS</string>
+    <string name="report_compromised_title">SECURITY BREACH</string>
+    <string name="report_compromised_msg">Wrong sequence! Security is tightening. You have %d attempts remaining.</string>
+    <string name="final_report">FINAL REPORT</string>
+    <string name="report_pause_title">INVESTIGATION ADJOURNED</string>
+    <string name="report_pause_msg">The countdown has been halted. Your current intelligence is preserved.</string>
+    <string name="exit_mission">ABORT MISSION</string>
+    <string name="resume_mission">RESUME MISSION</string>
+    <string name="countdown_go">GO!</string>
+</resources>
