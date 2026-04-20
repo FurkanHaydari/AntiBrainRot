@@ -99,8 +99,8 @@
     <string name="tutorial_finish_button">GÖREVİ KABUL ET</string>
     <string name="home_manual_button">DEDEKTİF REHBERİ</string>
     <string name="home_about_button">BU OYUN HAKKINDA</string>
-    <string name="about_dialog_title">İnsanlığa Adanmış Bir Oyun</string>
-    <string name="about_dialog_body">Bu oyun, herhangi bir ticari amaç gözetilmeksizin insanlığa bir hediye olarak yaratıldı. Misyonu: Kısa süreli hafızayı eğiterek, analitik zekayı güçlendirerek ve odaklanma yeteneğini keskinleştirerek, sosyal medyanın tetiklediği dikkat eksikliği ve zihin körelmesi (brain rot) ile mücadele etmektir.\n\nBu oyunda reklam yoktur. Sebebi basittir: Reklamlar, zihin körelmesini tetikleyen unsurlardan biridir.\n\nEğer oyunu beğendiyseniz, misyonumuzu Patreon üzerinden destekleyebilirsiniz 🧡</string>
+    <string name="about_dialog_title">Zihin Sağlığı İçin Bir Oyun</string>
+    <string name="about_dialog_body">Bu oyun, herhangi bir ticari amaç gözetilmeksizin zihin sağlığına bir hediye olarak yaratıldı. Misyonu: Kısa süreli hafızayı eğiterek, analitik zekayı güçlendirerek ve odaklanma yeteneğini keskinleştirerek, sosyal medyanın tetiklediği dikkat eksikliği ve zihin körelmesi (brain rot) ile mücadele etmektir.\n\nBu oyunda reklam yoktur. Sebebi basittir: Reklamlar, zihin körelmesini tetikleyen unsurlardan biridir.\n\nEğer oyunu beğendiyseniz, misyonumuzu Patreon üzerinden destekleyebilirsiniz 🧡</string>
     <string name="about_buy_coffee">🧡 Patreon\'da Destek Ol</string>
     <string name="about_buy_coffee_url">https://www.patreon.com/AntiBrainRot/membership</string>
 

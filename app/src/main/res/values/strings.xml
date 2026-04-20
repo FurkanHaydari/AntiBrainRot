@@ -98,8 +98,8 @@
     <string name="tutorial_finish_button">ACCEPT MISSION</string>
     <string name="home_manual_button">DETECTION GUIDE</string>
     <string name="home_about_button">ABOUT THIS GAME</string>
-    <string name="about_dialog_title">A Game for Humanity</string>
-    <string name="about_dialog_body">This game was created without any commercial purpose — a gift to humanity. Its mission: to fight the attention deficit and brain rot fuelled by social media by training short-term memory, strengthening analytical intelligence, and sharpening focus and concentration.\n\nThere are no ads in this game. The reason is simple: ads are one of the very triggers of brain rot.\n\nIf you enjoyed the game, you can support its mission on Patreon 🧡</string>
+    <string name="about_dialog_title">A Game for Brain Health</string>
+    <string name="about_dialog_body">This game was created without any commercial purpose — a gift for brain health. Its mission: to fight the attention deficit and brain rot fuelled by social media by training short-term memory, strengthening analytical intelligence, and sharpening focus and concentration.\n\nThere are no ads in this game. The reason is simple: ads are one of the very triggers of brain rot.\n\nIf you enjoyed the game, you can support its mission on Patreon 🧡</string>
     <string name="about_buy_coffee">🧡 Support on Patreon</string>
     <string name="about_buy_coffee_url">https://www.patreon.com/AntiBrainRot/membership</string>
 

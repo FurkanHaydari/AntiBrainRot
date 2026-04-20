@@ -8,8 +8,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -36,10 +38,14 @@ fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
     onFinish: () -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 7 })
-    val scope = rememberCoroutineScope()
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val maxWidth = maxWidth
+        val maxHeight = maxHeight
+        val scaleFactor = (maxWidth / 360.dp).coerceIn(1f, 2.2f)
+        
+        val pagerState = rememberPagerState(pageCount = { 7 })
+        val scope = rememberCoroutineScope()
 
-    Box(modifier = Modifier.fillMaxSize()) {
         // --- Layer 1: Atmospheric Background ---
         Image(
             painter = painterResource(id = R.drawable.detective_bg),
@@ -59,49 +65,51 @@ fun OnboardingScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = (24.dp * scaleFactor).coerceAtMost(80.dp))
                 .statusBarsPadding()
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(R.string.tutorial_title).uppercase(),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = (12 * scaleFactor).coerceAtMost(20f).sp,
+                    letterSpacing = (4 * scaleFactor).sp
+                ),
                 color = PrimaryCyan.copy(alpha = 0.7f),
-                letterSpacing = 4.sp,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp * scaleFactor)
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp * scaleFactor))
 
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-                TutorialCard(page)
+                TutorialCard(page, scaleFactor, maxWidth)
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp * scaleFactor))
 
             // Page Indicators
             Row(
                 Modifier
                     .wrapContentHeight()
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
+                    .padding(bottom = 24.dp * scaleFactor),
                 horizontalArrangement = Arrangement.Center
             ) {
                 repeat(pagerState.pageCount) { iteration ->
                     val color = if (pagerState.currentPage == iteration) PrimaryCyan else Color.White.copy(alpha = 0.2f)
-                    val width = if (pagerState.currentPage == iteration) 24.dp else 8.dp
+                    val width = if (pagerState.currentPage == iteration) 24.dp * scaleFactor else 8.dp * scaleFactor
                     
                     Box(
                         modifier = Modifier
-                            .padding(horizontal = 4.dp)
+                            .padding(horizontal = 4.dp * scaleFactor)
                             .clip(CircleShape)
                             .background(color)
                             .width(width)
-                            .height(8.dp)
+                            .height(8.dp * scaleFactor)
                             .animateContentSize()
                     )
                 }
@@ -109,6 +117,7 @@ fun OnboardingScreen(
 
             // Navigation Buttons
             val isLastPage = pagerState.currentPage == pagerState.pageCount - 1
+            val buttonHeight = (60.dp * scaleFactor).coerceAtMost(90.dp)
             
             Button(
                 onClick = {
@@ -122,9 +131,10 @@ fun OnboardingScreen(
                     }
                 },
                 modifier = Modifier
+                    .widthIn(max = (400.dp * scaleFactor).coerceAtMost(maxWidth))
                     .fillMaxWidth()
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(20.dp)),
+                    .height(buttonHeight)
+                    .clip(RoundedCornerShape(20.dp * scaleFactor)),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 contentPadding = PaddingValues(0.dp)
             ) {
@@ -136,14 +146,16 @@ fun OnboardingScreen(
                 ) {
                     Text(
                         text = if (isLastPage) stringResource(R.string.tutorial_finish_button).uppercase() else stringResource(R.string.tutorial_continue_button).uppercase(),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.White
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
         }
 
         // --- Layer 4: Close Button ---
@@ -151,9 +163,9 @@ fun OnboardingScreen(
             onClick = onFinish,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
+                .padding(top = 16.dp * scaleFactor, end = 16.dp * scaleFactor)
                 .statusBarsPadding()
-                .size(44.dp)
+                .size(44.dp * scaleFactor)
                 .background(Color.White.copy(alpha = 0.05f), CircleShape)
                 .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), CircleShape)
         ) {
@@ -161,14 +173,14 @@ fun OnboardingScreen(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Close Manual",
                 tint = PrimaryCyan.copy(alpha = 0.7f),
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp * scaleFactor)
             )
         }
     }
 }
 
 @Composable
-fun TutorialCard(page: Int) {
+fun TutorialCard(page: Int, scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp) {
     val title = when (page) {
         0 -> R.string.tutorial_page1_title
         1 -> R.string.tutorial_page2_title
@@ -201,51 +213,55 @@ fun TutorialCard(page: Int) {
 
     Surface(
         color = SurfaceCard,
-        shape = RoundedCornerShape(32.dp),
+        shape = RoundedCornerShape(32.dp * scaleFactor),
         modifier = Modifier
+            .widthIn(max = (440.dp * scaleFactor).coerceAtMost(maxWidth))
             .fillMaxWidth()
-            .fillMaxHeight(0.85f)
-            .padding(horizontal = 8.dp),
+            .fillMaxHeight(if (scaleFactor > 1.2f) 0.75f else 0.85f) // Adjust height on tablets to be more compact
+            .padding(horizontal = 8.dp * scaleFactor),
         border = RowDefaults.CardBorder
     ) {
         Column(
             modifier = Modifier
-                .padding(32.dp)
-                .fillMaxSize(),
+                .padding(horizontal = 32.dp * scaleFactor, vertical = 24.dp * scaleFactor)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size((100.dp * scaleFactor).coerceAtMost(160.dp))
                     .background(Color.White.copy(alpha = 0.05f), CircleShape)
                     .border(2.dp, PrimaryCyan.copy(alpha = 0.3f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = icon, fontSize = 48.sp)
+                Text(text = icon, fontSize = (48 * scaleFactor).coerceAtMost(80f).sp)
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp * scaleFactor))
 
             Text(
                 text = stringResource(title).uppercase(),
                 style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 20.sp,
+                    fontSize = (20 * scaleFactor).coerceAtMost(32f).sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
+                    letterSpacing = (1.5 * scaleFactor).sp
                 ),
                 color = PrimaryCyan,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp * scaleFactor))
 
             Text(
                 text = stringResource(description),
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.8f),
-                textAlign = TextAlign.Center,
-                lineHeight = 28.sp
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = (15 * scaleFactor).coerceAtMost(24f).sp,
+                    lineHeight = (24 * scaleFactor).coerceAtMost(34f).sp
+                ),
+                color = Color.White.copy(alpha = 0.85f),
+                textAlign = TextAlign.Center
             )
         }
     }
