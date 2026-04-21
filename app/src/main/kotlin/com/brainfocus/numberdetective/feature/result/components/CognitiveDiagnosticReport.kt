@@ -31,11 +31,11 @@ fun CognitiveDiagnosticReport(
 ) {
     val reportLines = remember(report) {
         listOf(
-            Triple(R.string.eval_precision_label, getPrecisionText(report.precision), report.precision.numeric),
-            Triple(R.string.eval_velocity_label, getVelocityText(report.velocity), report.velocity.numeric),
-            Triple(R.string.eval_stability_label, getStabilityText(report.stability), report.stability.numeric),
-            Triple(R.string.eval_intuition_label, getIntuitionText(report.intuition), report.intuition.numeric),
-            Triple(R.string.eval_convergence_label, getConvergenceText(report.convergence), report.convergence.numeric),
+            Triple(R.string.eval_precision_label, getPrecisionText(report.precision), report.precision?.numeric ?: 3),
+            Triple(R.string.eval_velocity_label, getVelocityText(report.velocity), report.velocity?.numeric ?: 3),
+            Triple(R.string.eval_stability_label, getStabilityText(report.stability), report.stability?.numeric ?: 3),
+            Triple(R.string.eval_intuition_label, getIntuitionText(report.intuition), report.intuition?.numeric ?: 3),
+            Triple(R.string.eval_convergence_label, getConvergenceText(report.convergence), report.convergence?.numeric ?: 3),
             Triple(
                 R.string.eval_conclusion_label, 
                 if (isWin) R.string.sia_evaluation_win else R.string.sia_evaluation_loss,
@@ -63,47 +63,66 @@ fun CognitiveDiagnosticReport(
         Text(
             text = stringResource(R.string.eval_header),
             style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = (10 * scaleFactor).sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (2 * scaleFactor).sp
+                fontSize = (12 * scaleFactor).sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = (3 * scaleFactor).sp
             ),
-            color = PrimaryCyan.copy(alpha = 0.6f)
+            color = PrimaryCyan.copy(alpha = 0.8f)
         )
         
         Spacer(modifier = Modifier.height(16.dp * scaleFactor))
         
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp * scaleFactor)
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            verticalArrangement = Arrangement.SpaceEvenly // Dynamically spread lines to fill vertical space
         ) {
             reportLines.forEachIndexed { index, (labelRes, valueRes, powerLevel) ->
+                val isConclusion = index == reportLines.size - 1
+                
                 AnimatedVisibility(
                     visible = visibleLinesCount > index,
                     enter = fadeIn(tween(500)) + slideInVertically(tween(500)) { 20 },
                     exit = fadeOut()
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = if (isConclusion) 8.dp * scaleFactor else 0.dp),
+                        horizontalAlignment = if (isConclusion) Alignment.CenterHorizontally else Alignment.Start
+                    ) {
+                        if (!isConclusion) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(labelRes).uppercase(),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = (11 * scaleFactor).sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = (2.5 * scaleFactor).sp
+                                    ),
+                                    color = PrimaryCyan.copy(alpha = 0.85f) // High visibility cyan
+                                )
+                                
+                                NeuralPowerBar(
+                                    powerLevel = powerLevel, 
+                                    scaleFactor = scaleFactor * 1.4f, // Dominant bars
+                                    isWin = isWin,
+                                    isConvergence = index == 4
+                                )
+                            }
+                        } else {
+                             Text(
                                 text = stringResource(labelRes).uppercase(),
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = (8 * scaleFactor).sp,
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.sp
+                                    fontSize = (12 * scaleFactor).sp,
+                                    fontWeight = FontWeight.Black,
+                                    letterSpacing = (4 * scaleFactor).sp
                                 ),
-                                color = PrimaryCyan.copy(alpha = 0.4f)
-                            )
-                            
-                            // Neural Power Bar (Staggered or immediate)
-                            NeuralPowerBar(
-                                powerLevel = powerLevel, 
-                                scaleFactor = scaleFactor, 
-                                isWin = isWin && index == reportLines.size - 1,
-                                isConvergence = index == 4 // Convergence is the 5th line
+                                color = if (isWin) SuccessGreen.copy(alpha = 0.9f) else ErrorRed.copy(alpha = 0.9f),
+                                modifier = Modifier.padding(bottom = 6.dp * scaleFactor)
                             )
                         }
                         
@@ -111,13 +130,19 @@ fun CognitiveDiagnosticReport(
                             text = stringResource(valueRes),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                fontSize = (11 * scaleFactor).coerceAtMost(14f).sp,
-                                fontWeight = if (index == reportLines.size - 1) FontWeight.Bold else FontWeight.Normal
+                                fontSize = (if (isConclusion) (22 * scaleFactor) else (15 * scaleFactor)).coerceAtMost(36f).sp,
+                                fontWeight = if (isConclusion) FontWeight.Black else FontWeight.Medium,
+                                lineHeight = (if (isConclusion) (30 * scaleFactor) else (20 * scaleFactor)).sp,
+                                shadow = androidx.compose.ui.graphics.Shadow(
+                                    color = (if (isConclusion) (if (isWin) SuccessGreen else ErrorRed) else PrimaryCyan).copy(alpha = 0.3f),
+                                    blurRadius = 8f
+                                )
                             ),
-                            color = if (index == reportLines.size - 1) 
+                            color = if (isConclusion) 
                                 (if (isWin) SuccessGreen else ErrorRed) 
-                                else TextSecondary.copy(alpha = 0.8f),
-                            textAlign = TextAlign.Start
+                                else Color(0xFFCAF0F8).copy(alpha = 0.9f), // Cyber-white (Pale Cyan)
+                            textAlign = if (isConclusion) TextAlign.Center else TextAlign.Start,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
@@ -158,7 +183,7 @@ fun NeuralPowerBar(powerLevel: Int, scaleFactor: Float, isWin: Boolean, isConver
     }
 }
 
-private fun getConvergenceText(level: ConvergenceLevel) = when(level) {
+private fun getConvergenceText(level: ConvergenceLevel?) = when(level ?: ConvergenceLevel.DRIFTING) {
     ConvergenceLevel.FOCUSED -> R.string.eval_convergence_focused
     ConvergenceLevel.ALIGNED -> R.string.eval_convergence_aligned
     ConvergenceLevel.DRIFTING -> R.string.eval_convergence_drifting
@@ -166,27 +191,29 @@ private fun getConvergenceText(level: ConvergenceLevel) = when(level) {
     ConvergenceLevel.ERRATIC -> R.string.eval_convergence_erratic
 }
 
-private fun getPrecisionText(level: PrecisionLevel) = when(level) {
+private fun getPrecisionText(level: PrecisionLevel?) = when(level ?: PrecisionLevel.STABLE) {
     PrecisionLevel.ELITE -> R.string.eval_precision_elite
     PrecisionLevel.SHARP -> R.string.eval_precision_sharp
     PrecisionLevel.STABLE -> R.string.eval_precision_standard
     PrecisionLevel.NOVICE -> R.string.eval_precision_novice
 }
 
-private fun getVelocityText(level: VelocityLevel) = when(level) {
+private fun getVelocityText(level: VelocityLevel?) = when(level ?: VelocityLevel.STEADY) {
     VelocityLevel.FLASH -> R.string.eval_velocity_flash
     VelocityLevel.RAPID -> R.string.eval_velocity_rapid
     VelocityLevel.STEADY -> R.string.eval_velocity_steady
     VelocityLevel.DELIBERATE -> R.string.eval_velocity_deliberate
 }
 
-private fun getStabilityText(level: StabilityLevel) = when(level) {
+private fun getStabilityText(level: StabilityLevel?) = when(level ?: StabilityLevel.INTERMITTENT) {
     StabilityLevel.CONSTANT -> R.string.eval_stability_constant
     StabilityLevel.INTERMITTENT -> R.string.eval_stability_intermittent
 }
 
-private fun getIntuitionText(level: IntuitionLevel) = when(level) {
+private fun getIntuitionText(level: IntuitionLevel?) = when(level ?: IntuitionLevel.ANALYTICAL) {
+    IntuitionLevel.ELITE -> R.string.eval_intuition_elite
     IntuitionLevel.STRONG -> R.string.eval_intuition_strong
     IntuitionLevel.ANALYTICAL -> R.string.eval_intuition_analytical
+    IntuitionLevel.BASIC -> R.string.eval_intuition_basic
     IntuitionLevel.MARGINAL -> R.string.eval_intuition_marginal
 }

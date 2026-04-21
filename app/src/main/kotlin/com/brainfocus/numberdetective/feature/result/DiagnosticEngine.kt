@@ -44,7 +44,7 @@ object DiagnosticEngine {
         totalCoins: Int = -1,
         totalMaxCoins: Int = -1
     ): DiagnosticReport {
-        // Zero-effort case detection
+        // Zero-effort case detection: Kullanıcı hiçbir deneme yapmadan oyun biterse düşük profil döndürülür.
         if (totalAttempts == 0) {
             return DiagnosticReport(
                 precision = PrecisionLevel.NOVICE,
@@ -59,7 +59,12 @@ object DiagnosticEngine {
         val avgAttempts = totalAttempts.toFloat() / levelCount
         val avgSeconds = totalTimeSeconds.toFloat() / levelCount
         
-        // --- 1. Precision Logic (Penalized by mistakes) ---
+        /**
+         * 1. DEDUCTIVE PRECISION (Tümdengelimsel Hassasiyet)
+         * Bu metrik, her bölüm için harcanan ortalama deneme sayısına dayalıdır.
+         * Mantıksal hatalar (Logical Mistakes) bu skoru sert bir şekilde cezalandırır.
+         * Elite: Ortalama 4 deneme altı. Sharp: 7 altı. Stable: 10 altı.
+         */
         val mistakePenalty = if (isHelperModeEnabled) 1.5f else 1.0f
         val adjustedAvgAttempts = avgAttempts + (logicalMistakes * mistakePenalty)
         
@@ -71,7 +76,11 @@ object DiagnosticEngine {
             else -> PrecisionLevel.NOVICE
         }
 
-        // --- 2. Velocity Logic ---
+        /**
+         * 2. SYNAPTIC VELOCITY (Sinaptik Hız)
+         * Kullanıcının her bölüm için harcadığı ortalama saniyeye göre hesaplanır.
+         * Flash: 20sn altı. Rapid: 40sn altı. Steady: 60sn altı.
+         */
         val velocity = when {
             !isWin && totalTimeSeconds < 20 -> VelocityLevel.DELIBERATE
             avgSeconds <= 20f -> VelocityLevel.FLASH
@@ -80,19 +89,12 @@ object DiagnosticEngine {
             else -> VelocityLevel.DELIBERATE
         }
 
-        // --- 3. Intuition Logic (Capped by Helper Mode) ---
-        var intuition = when {
-            totalHintsFound == 0 -> IntuitionLevel.MARGINAL
-            totalHintsFound != -1 && (totalHintsFound.toFloat() / totalAttempts) > 1.2f -> IntuitionLevel.STRONG
-            totalHintsFound != -1 && (totalHintsFound.toFloat() / totalAttempts) > 0.5f -> IntuitionLevel.ANALYTICAL
-            else -> IntuitionLevel.MARGINAL
-        }
-        
-        if (isHelperModeEnabled && intuition == IntuitionLevel.STRONG) {
-            intuition = IntuitionLevel.ANALYTICAL
-        }
-
-        // --- 4. Convergence Logic (Heat Map Efficiency) ---
+        /**
+         * 4. LOGICAL CONVERGENCE (Mantıksal Yakınsama)
+         * Isı haritası (Heat Map) verimliliğine dayalıdır. Toplam kazanılan coin miktarının,
+         * o ana kadar yapılabilecek maksimum coin miktarına oranıdır.
+         * Hedefe ne kadar doğrudan/dolambaçsız ulaşıldığını ölçer.
+         */
         val efficiency = if (totalMaxCoins > 0 && totalCoins != -1) {
             totalCoins.toFloat() / totalMaxCoins
         } else if (totalHintsFound != -1) {
@@ -108,7 +110,31 @@ object DiagnosticEngine {
             else -> ConvergenceLevel.ERRATIC
         }
 
+        /**
+         * 3. NUMERICAL INTUITION (Sayısal Sezgi)
+         * Kullanıcının her denemesinde ne kadar "isabetli" veri topladığını (Coin/Efficiency) ölçer.
+         * Sadece bulmaya değil, en az denemede en yüksek isabetle (yeşil/sarı) gitmeye bakar.
+         * Verimlilik sadece ipucu sayısıyla değil, tahminin doğruluğuyla (coin sistemi) ölçülmektedir.
+         */
+        var intuition = when {
+            efficiency >= 0.8f -> IntuitionLevel.ELITE
+            efficiency >= 0.6f -> IntuitionLevel.STRONG
+            efficiency >= 0.4f -> IntuitionLevel.ANALYTICAL
+            efficiency >= 0.2f -> IntuitionLevel.BASIC
+            else -> IntuitionLevel.MARGINAL
+        }
+        
+        // Yardımcı mod kullanımı sezgisel skoru bir nebze kısıtlar.
+        if (isHelperModeEnabled && intuition == IntuitionLevel.ELITE) {
+            intuition = IntuitionLevel.STRONG
+        }
+
         return DiagnosticReport(
+            /**
+             * 5. NEURAL STABILITY (Nöral Stabilite)
+             * Oyunun geneline yayılan tutarlılığı ölçer. Mantıksal hataların azlığı,
+             * ortalama deneme sayısının düşüklüğü ve oyunun kazanılmış olması sabitlik belirtisidir.
+             */
             precision = precision,
             velocity = velocity,
             stability = if (isWin && avgAttempts < 8 && logicalMistakes <= 2) StabilityLevel.CONSTANT else StabilityLevel.INTERMITTENT,

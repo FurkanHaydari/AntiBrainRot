@@ -32,34 +32,150 @@ import androidx.compose.material.icons.filled.Info
 
 @Composable
 fun PaperClip(scaleFactor: Float, modifier: Modifier = Modifier) {
+    // Metalic reflection effect
     Box(
         modifier = modifier
-            .size(width = 12.dp * scaleFactor, height = 32.dp * scaleFactor)
-            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(percent = 50))
-            .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(percent = 50))
+            .size(width = 14.dp * scaleFactor, height = 36.dp * scaleFactor)
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFB0BEC5).copy(alpha = 0.9f),
+                        Color(0xFFCFD8DC).copy(alpha = 0.5f),
+                        Color(0xFFB0BEC5).copy(alpha = 0.9f)
+                    )
+                ), 
+                RoundedCornerShape(percent = 50)
+            )
+            .border(1.5.dp * scaleFactor, Color.White.copy(alpha = 0.4f), RoundedCornerShape(percent = 50))
     )
 }
 
 @Composable
-fun MissionStamp(text: String, color: Color, scaleFactor: Float) {
+fun MissionStamp(text: String, color: Color, scaleFactor: Float, modifier: Modifier = Modifier) {
     Surface(
         color = Color.Transparent,
         shape = RoundedCornerShape(4.dp * scaleFactor),
-        border = androidx.compose.foundation.BorderStroke(2.dp * scaleFactor, color.copy(alpha = 0.6f)),
-        modifier = Modifier
-            .rotate(-15f)
+        border = androidx.compose.foundation.BorderStroke(2.5.dp * scaleFactor, color.copy(alpha = 0.4f)),
+        modifier = modifier
+            .rotate(-12f)
             .padding(8.dp * scaleFactor)
     ) {
-        Text(
-            text = text.uppercase(),
-            modifier = Modifier.padding(horizontal = 12.dp * scaleFactor, vertical = 4.dp * scaleFactor),
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontWeight = FontWeight.Black,
-                fontSize = (22 * scaleFactor).coerceAtMost(32f).sp,
-                fontFamily = FontFamily.Monospace,
-                letterSpacing = (2 * scaleFactor).sp
-            ),
-            color = color.copy(alpha = 0.8f)
+        Column(
+            modifier = Modifier.padding(horizontal = 14.dp * scaleFactor, vertical = 6.dp * scaleFactor),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = text.uppercase(),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Black,
+                    fontSize = (20 * scaleFactor).coerceAtMost(28f).sp,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = (3 * scaleFactor).sp
+                ),
+                color = color.copy(alpha = 0.6f)
+            )
+            Text(
+                text = "SIA OFFICIAL RECORDS",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = (7 * scaleFactor).sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                ),
+                color = color.copy(alpha = 0.4f)
+            )
+        }
+    }
+}
+
+@Composable
+fun DetectiveBriefingSheet(
+    isWin: Boolean,
+    scaleFactor: Float,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "Scanning")
+    val scanProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "ScanLine"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp * scaleFactor))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(SurfaceCard, Color.Black.copy(alpha = 0.95f))
+                )
+            )
+            .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(20.dp * scaleFactor))
+    ) {
+        // 1. Watermark Layer
+        Box(
+            modifier = Modifier.fillMaxSize().padding(24.dp * scaleFactor),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "CLASSIFIED",
+                style = MaterialTheme.typography.displayMedium.copy(
+                    fontWeight = FontWeight.Black,
+                    fontSize = (60 * scaleFactor).sp,
+                    fontFamily = FontFamily.Monospace
+                ),
+                color = Color.White.copy(alpha = 0.015f),
+                modifier = Modifier.rotate(-45f)
+            )
+        }
+
+        // 2. Content Layer
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp * scaleFactor)
+                .padding(bottom = 24.dp * scaleFactor) // Give room for the stamp
+        ) {
+            content()
+        }
+
+        // 3. Artifact Overlay (Scanning Line)
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val height = constraints.maxHeight.toFloat()
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.5.dp * scaleFactor)
+                    .graphicsLayer { translationY = height * scanProgress }
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(Color.Transparent, PrimaryCyan.copy(alpha = 0.12f), Color.Transparent)
+                        )
+                    )
+            )
+        }
+
+        // 4. Paper Clip Accessory (Moved further left)
+        PaperClip(
+            scaleFactor = scaleFactor,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 12.dp * scaleFactor, top = (2).dp * scaleFactor)
+        )
+
+        // 5. Official Stamp (Reduced opacity for better readability of text underneath)
+        MissionStamp(
+            text = if (isWin) "APPROVED" else "COMPROMISED",
+            color = if (isWin) SuccessGreen else ErrorRed,
+            scaleFactor = scaleFactor,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .graphicsLayer { alpha = 0.7f }
+                .padding(end = 8.dp * scaleFactor, bottom = 8.dp * scaleFactor)
         )
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -95,10 +96,10 @@ fun ResultScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(4.dp * scaleFactor))
 
             // Cinematic Header
             AnimatedVisibility(
@@ -131,7 +132,7 @@ fun ResultScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(8.dp * scaleFactor))
 
             // Custom Tab Bar
             Row(
@@ -157,7 +158,7 @@ fun ResultScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(8.dp * scaleFactor))
 
             // Tab Content
             Crossfade(
@@ -185,7 +186,7 @@ fun ResultScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(8.dp * scaleFactor))
 
             // Action Buttons
             Column(
@@ -291,23 +292,36 @@ fun BriefingView(
     maxWidth: androidx.compose.ui.unit.Dp
 ) {
     val context = LocalContext.current
+    val verticalScale = (scaleFactor * 1.1f).coerceIn(1.0f, 2.5f)
+
     Column(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Surface(
-            color = SurfaceCard,
-            shape = RoundedCornerShape(24.dp * scaleFactor),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+        // Digital Intelligence HUD (Transparent Shell)
+        Box(
             modifier = Modifier
-                .widthIn(max = (500.dp * scaleFactor).coerceAtMost(maxWidth))
+                .widthIn(max = (500.dp * verticalScale).coerceAtMost(maxWidth))
                 .fillMaxWidth()
+                .fillMaxHeight(0.92f)
+                .background(Color.White.copy(alpha = 0.02f), RoundedCornerShape(16.dp * verticalScale))
+                .border(
+                    width = 1.dp,
+                    brush = Brush.verticalGradient(
+                        listOf(Color.White.copy(alpha = 0.1f), Color.Transparent)
+                    ),
+                    shape = RoundedCornerShape(16.dp * verticalScale)
+                )
+                .padding(horizontal = 24.dp * verticalScale, vertical = 28.dp * verticalScale)
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp * scaleFactor),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Cognitive diagnostic content starts immediately
+            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                 // Digital Header
+                 SIAOfficialHeader(scaleFactor = verticalScale)
+                 
+                 Spacer(modifier = Modifier.height(16.dp * verticalScale))
+
+                // Cognitive diagnostic content
                 val diagnosticReport = remember(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes) {
                     DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
                 }
@@ -315,7 +329,8 @@ fun BriefingView(
                 com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
                     report = diagnosticReport,
                     isWin = isWin,
-                    scaleFactor = scaleFactor
+                    scaleFactor = verticalScale,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

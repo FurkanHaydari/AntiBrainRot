@@ -149,9 +149,11 @@
     <string name="eval_stability_intermittent">INTERMITTENT (FLUCTUATING SYNC)</string>
     
     <string name="eval_intuition_label">NUMERICAL INTUITION</string>
+    <string name="eval_intuition_elite">ELITE (EXTRAORDINARY PATTERN SENSE)</string>
     <string name="eval_intuition_strong">STRONG (PATTERN DETECTED QUICKLY)</string>
     <string name="eval_intuition_analytical">ANALYTICAL (SYSTEMATIC ELIMINATION)</string>
-    <string name="eval_intuition_marginal">MARGINAL (POSS. POSITIONAL CONFUSION)</string>
+    <string name="eval_intuition_basic">BASIC (OCCASIONAL LOGICAL JUMPS)</string>
+    <string name="eval_intuition_marginal">MARGINAL (NEURAL NOISE DETECTED)</string>
 
     <string name="eval_convergence_label">LOGICAL CONVERGENCE</string>
     <string name="eval_convergence_focused">FOCUSED (OPTIMAL TARGET TRACKING)</string>
