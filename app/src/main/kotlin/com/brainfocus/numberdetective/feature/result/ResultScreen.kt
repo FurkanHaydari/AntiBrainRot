@@ -180,7 +180,8 @@ fun ResultScreen(
                         isHelperModeEnabled = isHelperModeEnabled,
                         logicalMistakes = logicalMistakes,
                         scaleFactor = scaleFactor,
-                        maxWidth = maxWidthDp
+                        maxWidth = maxWidthDp,
+                        session = session
                     )
                     1 -> CaseArchiveView(scaleFactor = scaleFactor)
                 }
@@ -289,7 +290,8 @@ fun BriefingView(
     isHelperModeEnabled: Boolean,
     logicalMistakes: Int,
     scaleFactor: Float,
-    maxWidth: androidx.compose.ui.unit.Dp
+    maxWidth: androidx.compose.ui.unit.Dp,
+    session: GameSession? = null
 ) {
     val context = LocalContext.current
     val verticalScale = (scaleFactor * 1.1f).coerceIn(1.0f, 2.5f)
@@ -297,8 +299,25 @@ fun BriefingView(
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
+        DetectiveHeader(
+            title = stringResource(R.string.final_report),
+            subtitle = stringResource(R.string.correct_answer_label) + ": $correctAnswer",
+            scaleFactor = verticalScale,
+            rightContent = {
+                Text(
+                    text = stringResource(R.string.score_points, score),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = SuccessGreen,
+                        fontSize = (18 * verticalScale).coerceAtMost(26f).sp
+                    )
+                )
+            }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp * verticalScale))
         // Digital Intelligence HUD (Transparent Shell)
         Box(
             modifier = Modifier
@@ -313,17 +332,12 @@ fun BriefingView(
                     ),
                     shape = RoundedCornerShape(16.dp * verticalScale)
                 )
-                .padding(horizontal = 24.dp * verticalScale, vertical = 28.dp * verticalScale)
+                .padding(horizontal = 24.dp * verticalScale, vertical = 12.dp * verticalScale)
         ) {
             Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                 // Digital Header
-                 SIAOfficialHeader(scaleFactor = verticalScale)
-                 
-                 Spacer(modifier = Modifier.height(16.dp * verticalScale))
-
                 // Cognitive diagnostic content
-                val diagnosticReport = remember(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes) {
-                    DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
+                val diagnosticReport = remember(session) {
+                    session?.diagnosticReport ?: DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
                 }
 
                 com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
@@ -362,16 +376,16 @@ fun CaseArchiveView(scaleFactor: Float) {
             item {
                 DetectiveHeader(
                     title = stringResource(R.string.case_file_level, levelResult.levelNumber),
-                    subtitle = stringResource(R.string.score_points, levelResult.scoreGained),
+                    subtitle = stringResource(R.string.correct_answer_label) + ": ${levelResult.secretNumber}",
                     scaleFactor = scaleFactor,
                     rightContent = {
                         Text(
-                            text = levelResult.secretNumber,
+                            text = stringResource(R.string.score_points, levelResult.scoreGained),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = (16 * scaleFactor).coerceAtMost(24f).sp
-                            ),
-                            color = SuccessGreen
+                                color = SuccessGreen,
+                                fontSize = (18 * scaleFactor).coerceAtMost(26f).sp
+                            )
                         )
                     }
                 )

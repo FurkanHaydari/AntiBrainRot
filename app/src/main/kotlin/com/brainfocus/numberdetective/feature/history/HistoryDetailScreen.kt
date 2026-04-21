@@ -30,6 +30,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 import com.brainfocus.numberdetective.core.designsystem.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun HistoryDetailScreen(
@@ -72,7 +75,7 @@ fun HistoryDetailScreen(
                 style = MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = (90 * scaleFactor).sp,
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    fontFamily = Montserrat
                 ),
                 color = Color.White.copy(alpha = 0.04f),
                 modifier = Modifier.rotate(-35f)
@@ -188,34 +191,71 @@ private fun BriefingTabContent(
                         ),
                         shape = RoundedCornerShape(16.dp * verticalScale)
                     )
-                    .padding(horizontal = 24.dp * verticalScale, vertical = 28.dp * verticalScale)
+                    .padding(horizontal = 24.dp * verticalScale, vertical = 12.dp * verticalScale)
             ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    SIAOfficialHeader(scaleFactor = verticalScale)
-                    
-                    Spacer(modifier = Modifier.height(12.dp * verticalScale))
+                Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                // Cognitive diagnostic content
                     
                     Text(
                         text = "INTELLIGENCE FEED: #${session.id.take(12).uppercase()}",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                            fontSize = (9 * verticalScale).sp,
-                            letterSpacing = (2 * verticalScale).sp,
-                            fontWeight = FontWeight.Bold
+                            fontFamily = Montserrat,
+                            fontSize = (10 * verticalScale).sp,
+                            letterSpacing = (1.5 * verticalScale).sp,
+                            fontWeight = FontWeight.Medium
                         ),
-                        color = PrimaryCyan.copy(alpha = 0.4f),
+                        color = TextSecondary.copy(alpha = 0.4f),
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp * verticalScale))
+                    Spacer(modifier = Modifier.height(8.dp * verticalScale))
 
                     val report = session.diagnosticReport ?: DiagnosticEngine.generateReport(session)
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    val coroutineScope = rememberCoroutineScope()
+                    val formattedTime = String.format("%02d:%02d", session.levels.sumOf { it.durationSeconds } / 60, session.levels.sumOf { it.durationSeconds } % 60)
+
                     com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
                         report = report,
                         isWin = session.isWin,
-                        scaleFactor = verticalScale,
+                        scaleFactor = verticalScale * 1.1f, // Büyütülmüş puntolar
                         staggered = false,
                         modifier = Modifier.weight(1f)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp * verticalScale))
+                    
+                    DetectiveButton(
+                        text = stringResource(R.string.share_button),
+                        isPrimary = false,
+                        scaleFactor = verticalScale,
+                        onClick = {
+                             val playStoreLink = "https://play.google.com/store/apps/details?id=${context.packageName}"
+                             val score = session.totalScore
+                             val attempts = session.levels.sumOf { level -> level.hints.count { !it.isSystemHint } }
+                             val baseMessage = context.getString(R.string.share_score_message, score, attempts, formattedTime)
+                             val shareMessage = "$baseMessage\n\n$playStoreLink"
+                             val shareTitle = context.getString(R.string.share_score_title)
+                             
+                             coroutineScope.launch(Dispatchers.IO) {
+                                 val imageUri = com.brainfocus.numberdetective.core.utils.ShareImageGenerator.generateShareImage(context, session.isWin, score)
+                                 
+                                 val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                     if (imageUri != null) {
+                                         type = "image/jpeg"
+                                         putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
+                                         addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                     } else {
+                                         type = "text/plain"
+                                     }
+                                     putExtra(android.content.Intent.EXTRA_TEXT, shareMessage)
+                                 }
+                                 
+                                 withContext(Dispatchers.Main) {
+                                     context.startActivity(android.content.Intent.createChooser(shareIntent, shareTitle))
+                                 }
+                             }
+                        }
                     )
                 }
             }
@@ -238,16 +278,16 @@ private fun ArchiveTabContent(
             item {
                 DetectiveHeader(
                     title = stringResource(R.string.case_file_level, levelResult.levelNumber),
-                    subtitle = stringResource(R.string.score_points, levelResult.scoreGained),
+                    subtitle = stringResource(R.string.correct_answer_label) + ": ${levelResult.secretNumber}",
                     scaleFactor = scaleFactor,
                     rightContent = {
                         Text(
-                            text = levelResult.secretNumber,
+                            text = stringResource(R.string.score_points, levelResult.scoreGained),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
+                                color = SuccessGreen,
                                 fontSize = (18 * scaleFactor).coerceAtMost(26f).sp
-                            ),
-                            color = SuccessGreen
+                            )
                         )
                     }
                 )

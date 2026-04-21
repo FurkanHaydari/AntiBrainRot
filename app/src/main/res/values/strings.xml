@@ -38,6 +38,7 @@
 
     <!-- Result Screen -->
     <string name="correct_answer">Correct Answer</string>
+    <string name="correct_answer_label">Answer</string>
     <string name="attempts">Attempts</string>
     <string name="time">Time</string>
 
@@ -69,9 +70,9 @@
     <string name="tutorial_page5_title">> PROGRESSION</string>
     <string name="tutorial_page5_desc">Cracking a layer grants you extra attempt rights and adds more time to the clock. Clear all 3 layers to win the case.</string>
     <string name="tutorial_page6_title">PERFORMANCE BONUSES</string>
-    <string name="tutorial_page6_desc">Skilled detectives earn extra points for efficiency:\n\n• SHARP DEDUCTION (+500): Solve in 2 or fewer attempts.\n• FLASH CLEARANCE (+300): Solve in under 20 seconds.</string>
+    <string name="tutorial_page6_desc">Performance is evaluated across 5 Neural Pillars:\n\n• PRECISION  • VELOCITY\n• STABILITY  • INTUITION\n• CONVERGENCE\n\nEach pillar grants up to 100 PTS based on your rank. Flawless deduction and extreme speed are required for a perfect score.</string>
     <string name="tutorial_page7_title">INVESTIGATION COSTS</string>
-    <string name="tutorial_page7_desc">Every assist reduces your score, but your total never drops below zero:\n\n• ARCHIVE CHECK: -50 Points\n• ASSISTED MODE: -300 Points per check in the log.</string>
+    <string name="tutorial_page7_desc">Operational inefficiencies reduce your ranks and points:\n\n• MEMORY ERROR: Repeating a previous guess heavily destabilizes your score.\n• ARCHIVE RELIANCE: Checking logs reduces pure intuition.\n• LOGICAL MISTAKES: Incorrect pattern tracking reduces precision.</string>
     <string name="tutorial_continue_button">CONTINUE</string>
     <string name="tutorial_finish_button">ACCEPT MISSION</string>
     <string name="home_manual_button">DETECTION GUIDE</string>
@@ -163,5 +164,11 @@
     <string name="eval_convergence_erratic">ERRATIC (RANDOM INPUT DETECTED)</string>
 
     <string name="eval_conclusion_label">FINAL DIAGNOSTIC</string>
+
+    <string name="sia_sync_optimal">COGNITIVE SYNC: OPTIMAL. PATTERN RECOGNITION WITHIN EXPECTED PARAMETERS.</string>
+    <string name="sia_sync_stable">COGNITIVE SYNC: STABLE. NEURAL COMPREHENSION IS WITHIN SECURE RANGE.</string>
+    <string name="sia_sync_standard">COGNITIVE SYNC: STANDARD. OPERATIONAL STABILITY MAINTAINED AT BASE LEVEL.</string>
+    <string name="sia_sync_suboptimal">COGNITIVE SYNC: SUB-OPTIMAL. SIGNAL NOISE DETECTED. SYSTEM OVERHEAD OBSERVED.</string>
+    <string name="sia_sync_critical">COGNITIVE SYNC: CRITICAL. NEURAL CALIBRATION RECOMMENDED FOR NEXT PHASE.</string>
 
 </resources>

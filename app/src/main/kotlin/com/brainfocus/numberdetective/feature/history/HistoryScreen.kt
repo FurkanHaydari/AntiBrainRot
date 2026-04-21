@@ -177,9 +177,9 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                             text = "CASE #$caseNumber",
                             modifier = Modifier.padding(horizontal = 8.dp * scaleFactor, vertical = 2.dp * scaleFactor),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Black,
+                                fontWeight = FontWeight.Bold,
                                 fontSize = (14 * scaleFactor).coerceAtMost(20f).sp,
-                                fontFamily = FontFamily.Monospace
+                                fontFamily = Montserrat
                             ),
                             color = PrimaryCyan
                         )
@@ -199,9 +199,10 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                 Text(
                     text = dateString.uppercase(),
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = (14 * scaleFactor).coerceAtMost(22f).sp,
-                        fontFamily = FontFamily.Monospace,
-                        letterSpacing = (1.2f * scaleFactor).sp
+                        fontSize = (12 * scaleFactor).coerceAtMost(20f).sp,
+                        fontFamily = Montserrat,
+                        letterSpacing = (2 * scaleFactor).sp,
+                        fontWeight = FontWeight.Medium
                     ),
                     color = TextSecondary.copy(alpha = 0.5f)
                 )

@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.util.Log
 import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
+import kotlin.math.max
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -33,6 +34,7 @@ class GameViewModel @Inject constructor(
     private var _attemptsInLevel = 0
     private var _levelStartSeconds = 0
     private var _archiveChecksInLevel = 0
+    private var _duplicateGuessesInLevel = 0
     private val _logicalMistakesCount = MutableStateFlow(0)
     val logicalMistakesCount: StateFlow<Int> = _logicalMistakesCount
     
@@ -122,6 +124,7 @@ class GameViewModel @Inject constructor(
         
         _attemptsInLevel = 0
         _archiveChecksInLevel = 0
+        _duplicateGuessesInLevel = 0
         _levelStartSeconds = getTimeInSeconds()
         _guesses.value = emptyList()
         game.startNewGame(_currentLevel.value)
@@ -133,20 +136,20 @@ class GameViewModel @Inject constructor(
         val hintList = mutableListOf<Hint>()
         if (_currentLevel.value == 3) {
             hintList.addAll(listOf(
-                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(3, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value)),
-                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(3, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value)),
-                Hint(game.thirdHint, 1, 1, descriptionRes = getHintResId(3, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value)),
-                Hint(game.fourthHint, 1, 1, descriptionRes = getHintResId(3, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value)),
-                Hint(game.fifthHint, 2, 0, descriptionRes = getHintResId(3, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value))
+                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(3, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(3, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.thirdHint, 1, 1, descriptionRes = getHintResId(3, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.fourthHint, 1, 1, descriptionRes = getHintResId(3, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.fifthHint, 2, 0, descriptionRes = getHintResId(3, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value), isSystemHint = true)
             ))
             _hints.value = hintList
         } else {
             val h = listOf(
-                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(_currentLevel.value, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value)),
-                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(_currentLevel.value, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value)),
-                Hint(game.thirdHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value)),
-                Hint(game.fourthHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value)),
-                Hint(game.fifthHint, 1, 1, descriptionRes = getHintResId(_currentLevel.value, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value))
+                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(_currentLevel.value, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(_currentLevel.value, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.thirdHint, 1, 1, descriptionRes = getHintResId(_currentLevel.value, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.fourthHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value), isSystemHint = true),
+                Hint(game.fifthHint, 1, 1, descriptionRes = getHintResId(_currentLevel.value, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value), isSystemHint = true)
             )
             _hints.value = if (_currentLevel.value == 2) h.shuffled() else h
         }
@@ -202,21 +205,37 @@ class GameViewModel @Inject constructor(
             secretNumber = _correctAnswer.value,
             hints = _hints.value,
             durationSeconds = levelDuration,
-            scoreGained = levelScore
+            scoreGained = levelScore,
+            archiveChecks = _archiveChecksInLevel,
+            duplicateGuesses = _duplicateGuessesInLevel
         )
         GameResultStorage.currentSessionLevels.add(levelResult)
     }
 
     private fun finalizeGameSession(isWin: Boolean) {
         saveCurrentLevelToHistory()
+        val sessionLevels = GameResultStorage.currentSessionLevels.toList()
+        
+        // Let the motor handle all the "math" of aggregating metrics
+        val partialSession = com.brainfocus.numberdetective.data.storage.GameSession(
+            id = "", 
+            timestamp = 0L, 
+            levels = sessionLevels, 
+            totalScore = 0, 
+            isWin = isWin
+        )
+        val metrics = DiagnosticEngine.calculateSessionMetrics(partialSession)
+
         val session = com.brainfocus.numberdetective.data.storage.GameSession(
             id = java.util.UUID.randomUUID().toString(),
             timestamp = System.currentTimeMillis(),
-            levels = GameResultStorage.currentSessionLevels.toList(),
+            levels = sessionLevels,
             totalScore = _score.value,
             isWin = isWin,
             isHelperMode = isHelperModeEnabledLocal,
-            logicalMistakes = _logicalMistakesCount.value
+            logicalMistakes = _logicalMistakesCount.value,
+            totalArchiveChecks = metrics.first,
+            totalDuplicateGuesses = metrics.second
         )
         // Inject final diagnostic report into the session itself
         val finalSession = session.copy(
@@ -252,6 +271,7 @@ class GameViewModel @Inject constructor(
 
         // Analysis Check: Duplicate Guess
         if (_guesses.value.contains(guess)) {
+            _duplicateGuessesInLevel++
             _currentReport.value = FieldReport.Validation(
                 title = R.string.report_duplicate_title,
                 message = R.string.report_duplicate_msg
@@ -422,33 +442,32 @@ class GameViewModel @Inject constructor(
     }
 
     private fun calculateLevelScore(): Int {
-        val baseScore = when (_currentLevel.value) {
-            1 -> 1000
-            2 -> 2500
-            3 -> 5000
-            else -> 1000
-        }
+        // Generate a localized report for just this level
+        val levelTime = getTimeInSeconds() - _levelStartSeconds
         
-        val timeTakenInLevel = getTimeInSeconds() - _levelStartSeconds
-        val timePenalty = timeTakenInLevel * 5 // 5 points per second
-        val attemptsPenalty = _attemptsInLevel * 100 // 100 points per attempt
-        
-        // --- Archive & Assistance Penalties ---
-        val perCheckPenalty = if (isHelperModeEnabledLocal) 300 else 50
-        val archivePenalty = _archiveChecksInLevel * perCheckPenalty
-        
-        var levelScore = if (_attemptsInLevel == 0) 0 else maxOf(0, baseScore - timePenalty - attemptsPenalty - archivePenalty)
-        
-        // --- Skill Bonuses (Added after zero-floor protection) ---
-        // 1. Deduction Bonus: Solved in 2 or fewer attempts (but at least 1 attempt)
-        if (_attemptsInLevel in 1..2) {
-            levelScore += 500
-        }
-        
-        // 2. Flash Clearance: Solved in under 20 seconds (only if actually solved/attempts > 0)
-        if (_attemptsInLevel > 0 && timeTakenInLevel < 20) {
-            levelScore += 300
-        }
+        // Verimlilik (Sezgi/Yakınsama) verisini hesapla
+        val coins = DiagnosticEngine.calculateCoinsForLevel(_hints.value, _currentLevel.value)
+        val digits = if (_currentLevel.value == 3) 4 else 3
+        val efficiencyIdx = (coins.first.toFloat() / (max(1.0f, _attemptsInLevel.toFloat()) * digits.toFloat() * 1.5f))
+            .coerceIn(0.1f, 1.2f)
+
+        val levelReport = DiagnosticEngine.generateReport(
+            isWin = true,
+            totalAttempts = _attemptsInLevel,
+            totalTimeSeconds = levelTime,
+            totalHintsFound = -1,
+            isHelperModeEnabled = isHelperModeEnabledLocal,
+            logicalMistakes = _logicalMistakesCount.value,
+            totalArchiveChecks = _archiveChecksInLevel,
+            totalDuplicateGuesses = _duplicateGuessesInLevel,
+            totalCoins = coins.first,
+            totalMaxCoins = coins.second,
+            levelsPlayed = 1,
+            levelNumber = _currentLevel.value,
+            efficiencyIdx = efficiencyIdx
+        )
+
+        val levelScore = levelReport.score
         
         _score.value += levelScore
         return levelScore

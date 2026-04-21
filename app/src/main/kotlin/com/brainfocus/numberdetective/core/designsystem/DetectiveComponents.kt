@@ -67,10 +67,10 @@ fun MissionStamp(text: String, color: Color, scaleFactor: Float, modifier: Modif
             Text(
                 text = text.uppercase(),
                 style = MaterialTheme.typography.labelLarge.copy(
+                    fontFamily = Montserrat,
                     fontWeight = FontWeight.Black,
                     fontSize = (20 * scaleFactor).coerceAtMost(28f).sp,
-                    fontFamily = FontFamily.Monospace,
-                    letterSpacing = (3 * scaleFactor).sp
+                    letterSpacing = (2 * scaleFactor).sp
                 ),
                 color = color.copy(alpha = 0.6f)
             )
@@ -116,7 +116,6 @@ fun DetectiveBriefingSheet(
             )
             .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(20.dp * scaleFactor))
     ) {
-        // 1. Watermark Layer
         Box(
             modifier = Modifier.fillMaxSize().padding(24.dp * scaleFactor),
             contentAlignment = Alignment.Center
@@ -124,11 +123,11 @@ fun DetectiveBriefingSheet(
             Text(
                 text = "CLASSIFIED",
                 style = MaterialTheme.typography.displayMedium.copy(
+                    fontFamily = Montserrat,
                     fontWeight = FontWeight.Black,
-                    fontSize = (60 * scaleFactor).sp,
-                    fontFamily = FontFamily.Monospace
+                    fontSize = (60 * scaleFactor).sp
                 ),
-                color = Color.White.copy(alpha = 0.015f),
+                color = Color.White.copy(alpha = 0.02f),
                 modifier = Modifier.rotate(-45f)
             )
         }
@@ -591,41 +590,12 @@ fun DetectiveStatItem(
                 fontWeight = FontWeight.Black
             ), 
             color = color,
-            fontFamily = FontFamily.Monospace
+            fontFamily = Montserrat,
+            fontWeight = FontWeight.Black
         )
     }
 }
 
-@Composable
-fun SIAOfficialHeader(scaleFactor: Float) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp * scaleFactor),
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text(
-            text = "STRATEGIC INTELLIGENCE AGENCY",
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Black,
-                letterSpacing = (2 * scaleFactor).sp,
-                fontSize = (10 * scaleFactor).coerceAtMost(14f).sp
-            ),
-            color = PrimaryCyan
-        )
-        Text(
-            text = "DIVISION: LOGIC & CRYPTOGRAPHY",
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = (8 * scaleFactor).coerceAtMost(12f).sp,
-                fontWeight = FontWeight.Medium
-            ),
-            color = TextSecondary.copy(alpha = 0.5f)
-        )
-        HorizontalDivider(
-            modifier = Modifier.padding(top = 4.dp * scaleFactor),
-            color = PrimaryCyan.copy(alpha = 0.2f),
-            thickness = 1.dp
-        )
-    }
-}
 
 /**
  * Shared layout defaults for rows and cards across the app.

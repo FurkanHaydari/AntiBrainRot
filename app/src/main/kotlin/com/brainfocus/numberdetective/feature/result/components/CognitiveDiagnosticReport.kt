@@ -4,6 +4,8 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,8 +40,8 @@ fun CognitiveDiagnosticReport(
             Triple(R.string.eval_convergence_label, getConvergenceText(report.convergence), report.convergence?.numeric ?: 3),
             Triple(
                 R.string.eval_conclusion_label, 
-                if (isWin) R.string.sia_evaluation_win else R.string.sia_evaluation_loss,
-                if (isWin) 5 else 2
+                getSyncLevelText(report.syncLevel),
+                (report.syncLevel ?: SyncLevel.STANDARD).numeric
             )
         )
     }
@@ -57,12 +59,15 @@ fun CognitiveDiagnosticReport(
     }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(R.string.eval_header),
             style = MaterialTheme.typography.labelSmall.copy(
+                fontFamily = Montserrat,
                 fontSize = (12 * scaleFactor).sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = (3 * scaleFactor).sp
@@ -70,11 +75,11 @@ fun CognitiveDiagnosticReport(
             color = PrimaryCyan.copy(alpha = 0.8f)
         )
         
-        Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+        Spacer(modifier = Modifier.height(8.dp * scaleFactor))
         
         Column(
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            verticalArrangement = Arrangement.SpaceEvenly // Dynamically spread lines to fill vertical space
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp * scaleFactor)
         ) {
             reportLines.forEachIndexed { index, (labelRes, valueRes, powerLevel) ->
                 val isConclusion = index == reportLines.size - 1
@@ -91,24 +96,61 @@ fun CognitiveDiagnosticReport(
                         horizontalAlignment = if (isConclusion) Alignment.CenterHorizontally else Alignment.Start
                     ) {
                         if (!isConclusion) {
+                            Text(
+                                text = stringResource(labelRes).uppercase(),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontFamily = Montserrat,
+                                    fontSize = (11 * scaleFactor).sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = (1.5 * scaleFactor).sp
+                                ),
+                                color = PrimaryCyan.copy(alpha = 0.7f)
+                            )
+                            
+                            Spacer(modifier = Modifier.height(2.dp * scaleFactor))
+                            
+                            val fullText = stringResource(valueRes)
+                            val mainValue = fullText.substringBefore(" (")
+                            val subInfo = if (fullText.contains(" (")) "(" + fullText.substringAfter(" (") else ""
+                            
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = stringResource(labelRes).uppercase(),
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = (11 * scaleFactor).sp,
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = (2.5 * scaleFactor).sp
-                                    ),
-                                    color = PrimaryCyan.copy(alpha = 0.85f) // High visibility cyan
-                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = mainValue.uppercase(),
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontFamily = Montserrat,
+                                            fontSize = (16 * scaleFactor).sp,
+                                            fontWeight = FontWeight.Black,
+                                            letterSpacing = (0.5 * scaleFactor).sp,
+                                            shadow = androidx.compose.ui.graphics.Shadow(
+                                                color = PrimaryCyan.copy(alpha = 0.3f),
+                                                blurRadius = (8 * scaleFactor)
+                                            )
+                                        ),
+                                        color = Color.White.copy(alpha = 0.95f)
+                                    )
+                                    
+                                    if (subInfo.isNotEmpty()) {
+                                        Text(
+                                            text = subInfo.uppercase(),
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontFamily = Montserrat,
+                                                fontSize = (10 * scaleFactor).sp,
+                                                fontWeight = FontWeight.Medium,
+                                                letterSpacing = (0.5 * scaleFactor).sp
+                                            ),
+                                            color = TextSecondary.copy(alpha = 0.5f)
+                                        )
+                                    }
+                                }
                                 
                                 NeuralPowerBar(
                                     powerLevel = powerLevel, 
-                                    scaleFactor = scaleFactor * 1.4f, // Dominant bars
+                                    scaleFactor = scaleFactor * 1.3f,
                                     isWin = isWin,
                                     isConvergence = index == 4
                                 )
@@ -117,33 +159,32 @@ fun CognitiveDiagnosticReport(
                              Text(
                                 text = stringResource(labelRes).uppercase(),
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = (12 * scaleFactor).sp,
+                                    fontFamily = Montserrat,
+                                    fontSize = (13 * scaleFactor).sp,
                                     fontWeight = FontWeight.Black,
-                                    letterSpacing = (4 * scaleFactor).sp
+                                    letterSpacing = (3 * scaleFactor).sp
                                 ),
-                                color = if (isWin) SuccessGreen.copy(alpha = 0.9f) else ErrorRed.copy(alpha = 0.9f),
-                                modifier = Modifier.padding(bottom = 6.dp * scaleFactor)
+                                color = getSyncLevelColor(report.syncLevel, isWin).copy(alpha = 0.7f),
+                                modifier = Modifier.padding(bottom = 4.dp * scaleFactor)
+                            )
+                            
+                            Text(
+                                text = stringResource(valueRes),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = Montserrat,
+                                    fontSize = (22 * scaleFactor).coerceAtMost(34f).sp,
+                                    fontWeight = FontWeight.Black,
+                                    lineHeight = (30 * scaleFactor).sp,
+                                    shadow = androidx.compose.ui.graphics.Shadow(
+                                        color = getSyncLevelColor(report.syncLevel, isWin).copy(alpha = 0.6f),
+                                        blurRadius = (16 * scaleFactor)
+                                    )
+                                ),
+                                color = getSyncLevelColor(report.syncLevel, isWin),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        
-                        Text(
-                            text = stringResource(valueRes),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                fontSize = (if (isConclusion) (22 * scaleFactor) else (15 * scaleFactor)).coerceAtMost(36f).sp,
-                                fontWeight = if (isConclusion) FontWeight.Black else FontWeight.Medium,
-                                lineHeight = (if (isConclusion) (30 * scaleFactor) else (20 * scaleFactor)).sp,
-                                shadow = androidx.compose.ui.graphics.Shadow(
-                                    color = (if (isConclusion) (if (isWin) SuccessGreen else ErrorRed) else PrimaryCyan).copy(alpha = 0.3f),
-                                    blurRadius = 8f
-                                )
-                            ),
-                            color = if (isConclusion) 
-                                (if (isWin) SuccessGreen else ErrorRed) 
-                                else Color(0xFFCAF0F8).copy(alpha = 0.9f), // Cyber-white (Pale Cyan)
-                            textAlign = if (isConclusion) TextAlign.Center else TextAlign.Start,
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
                 }
             }
@@ -216,4 +257,20 @@ private fun getIntuitionText(level: IntuitionLevel?) = when(level ?: IntuitionLe
     IntuitionLevel.ANALYTICAL -> R.string.eval_intuition_analytical
     IntuitionLevel.BASIC -> R.string.eval_intuition_basic
     IntuitionLevel.MARGINAL -> R.string.eval_intuition_marginal
+}
+
+private fun getSyncLevelText(level: SyncLevel?) = when(level ?: SyncLevel.STANDARD) {
+    SyncLevel.OPTIMAL -> R.string.sia_sync_optimal
+    SyncLevel.STABLE -> R.string.sia_sync_stable
+    SyncLevel.STANDARD -> R.string.sia_sync_standard
+    SyncLevel.SUBOPTIMAL -> R.string.sia_sync_suboptimal
+    SyncLevel.CRITICAL -> R.string.sia_sync_critical
+}
+
+private fun getSyncLevelColor(level: SyncLevel?, isWin: Boolean): Color = when(level ?: SyncLevel.STANDARD) {
+    SyncLevel.OPTIMAL -> SuccessGreen
+    SyncLevel.STABLE -> PrimaryCyan
+    SyncLevel.STANDARD -> SecondaryBlue
+    SyncLevel.SUBOPTIMAL -> if (isWin) WarningYellow else ErrorRed
+    SyncLevel.CRITICAL -> ErrorRed
 }

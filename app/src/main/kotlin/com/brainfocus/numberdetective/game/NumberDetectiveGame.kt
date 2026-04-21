@@ -5,7 +5,7 @@ import kotlin.random.Random
 class NumberDetectiveGame {
     companion object {
         private const val MAX_ATTEMPTS = 3
-        private const val INITIAL_SCORE = 1000
+        private const val INITIAL_SCORE = 100
         private const val DIGITS_LEVEL_1_2 = 3
         private const val DIGITS_LEVEL_3 = 4
         

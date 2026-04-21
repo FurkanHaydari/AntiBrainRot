@@ -41,9 +41,35 @@ Our game is designed using approaches from cognitive psychology and neuroscience
 - **Optimal Difficulty**: Balanced challenge levels to stimulate brain activity without causing burnout.
 - **Cognitive Training**: Increasing mental agility through regular practice.
 - **Instant Feedback**: Accelerating the learning process through real-time logic analysis.
+- **Neural Resilience**: Tracking and penalizing "Memory Errors" (Duplicate Guesses) to foster mental discipline.
 
 ### 🚫 Why No Ads?
 Ads are engineered to interrupt, distract, and trigger impulsive brain activity. Since this game is an antidote to attention deficit, **advertisements are treated as a toxin and are strictly excluded.**
+
+---
+
+## 🧠 SİA Unified Intelligence System
+
+The SİA (Strategic Intelligence Agency) Diagnostic Engine is the centralized authority governing both scoring and cognitive assessments. It analyzes every synaptic decision made during an operation.
+
+### 🧩 The Five Cognitive Pillars
+The performance is evaluated across five specialized metrics, each determining a major portion of the operational score:
+
+1. **Deductive Precision**: Measures the mathematical accuracy of your guesses and logical mistakes.
+2. **Synaptic Velocity**: Analyzes the speed of decision-making under pressure.
+3. **Numerical Intuition**: Evaluates information-gathering efficiency (achieving more results with fewer moves).
+4. **Logical Convergence**: Measures strategic alignment—how quickly your guesses narrow down the target cipher.
+5. **Neural Stability**: Assesses memory consistency. Relying too heavily on archives (Logs) or repeating previous guesses (Memory Errors) reduces this score.
+
+### 📊 Performance-Driven Scoring
+Scoring is no longer arbitrary—it is a direct reflection of your intelligence report. Each level provides up to **500 points** (100 per pillar).
+
+| Rank | Points | Description |
+| :--- | :--- | :--- |
+| **Elite / Flash / Constant** | 100 | Peak performance. Minimum mistakes and maximum speed. |
+| **Sharp / Rapid / Aligned** | 70-80 | Strong analytical capability with minor inefficiencies. |
+| **Stable / Steady / Drifting** | 40-60 | Functional deduction but over-reliant on time or assistance. |
+| **Novice / Marginal / Erratic** | 10 | High cognitive load, frequent memory gaps, or logical errors. |
 
 ---
 

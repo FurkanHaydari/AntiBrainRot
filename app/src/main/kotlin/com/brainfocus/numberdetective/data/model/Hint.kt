@@ -16,5 +16,6 @@ data class Hint(
     @StringRes val descriptionRes: Int? = null,
     val descriptionArgs: List<Any> = emptyList(),
     val digitStatuses: List<DigitStatus>? = null,
-    val timestamp: Int? = null
+    val timestamp: Int? = null,
+    val isSystemHint: Boolean = false
 )
