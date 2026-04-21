@@ -145,12 +145,39 @@ fun DetectiveHintCard(
     scaleFactor: Float,
     label: String,
     labelColor: Color = PrimaryCyan.copy(alpha = 0.7f),
-    maxWidth: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.Dp.Unspecified
+    maxWidth: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.Dp.Unspecified,
+    isInterrogation: Boolean = false
 ) {
+    val isLevel3 = hint.guess.length == 4
+    val coins = (hint.correct * 2) + hint.misplaced
+    
+    val dynamicColor = if (isInterrogation) {
+        if (isLevel3) {
+            when {
+                coins == 0 -> HeatMap0
+                coins <= 2 -> HeatMap1_2
+                coins <= 5 -> HeatMap3_4
+                coins <= 7 -> HeatMap5
+                else -> HeatMap6
+            }
+        } else {
+            when {
+                coins == 0 -> HeatMap0
+                coins <= 2 -> HeatMap1_2
+                coins <= 4 -> HeatMap3_4
+                coins == 5 -> HeatMap5
+                else -> HeatMap6
+            }
+        }
+    } else labelColor
+
     Surface(
         color = SurfaceCard,
         shape = RoundedCornerShape(16.dp * scaleFactor),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+        border = androidx.compose.foundation.BorderStroke(
+            if (isInterrogation) 1.5.dp * scaleFactor else 1.dp, 
+            if (isInterrogation) dynamicColor.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f)
+        ),
         modifier = Modifier
             .then(if (maxWidth != androidx.compose.ui.unit.Dp.Unspecified) Modifier.widthIn(max = maxWidth) else Modifier)
             .fillMaxWidth()
@@ -166,7 +193,7 @@ fun DetectiveHintCard(
                     fontSize = (11 * scaleFactor).coerceAtMost(16f).sp,
                     letterSpacing = (1.5f * scaleFactor).sp
                 ),
-                color = labelColor,
+                color = if (isInterrogation) dynamicColor else labelColor,
                 modifier = Modifier.padding(bottom = 8.dp * scaleFactor)
             )
 

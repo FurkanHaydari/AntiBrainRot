@@ -153,6 +153,13 @@
     <string name="eval_intuition_analytical">ANALYTICAL (SYSTEMATIC ELIMINATION)</string>
     <string name="eval_intuition_marginal">MARGINAL (POSS. POSITIONAL CONFUSION)</string>
 
+    <string name="eval_convergence_label">LOGICAL CONVERGENCE</string>
+    <string name="eval_convergence_focused">FOCUSED (OPTIMAL TARGET TRACKING)</string>
+    <string name="eval_convergence_aligned">ALIGNED (CONSISTENT PROGRESSION)</string>
+    <string name="eval_convergence_drifting">DRIFTING (REDUNDANT SIGNALS DETECTED)</string>
+    <string name="eval_convergence_dispersed">DISPERSED (WEAK LOGICAL COHESION)</string>
+    <string name="eval_convergence_erratic">ERRATIC (RANDOM INPUT DETECTED)</string>
+
     <string name="eval_conclusion_label">FINAL DIAGNOSTIC</string>
 
 </resources>

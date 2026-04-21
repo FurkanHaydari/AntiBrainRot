@@ -35,6 +35,7 @@ fun CognitiveDiagnosticReport(
             Triple(R.string.eval_velocity_label, getVelocityText(report.velocity), report.velocity.numeric),
             Triple(R.string.eval_stability_label, getStabilityText(report.stability), report.stability.numeric),
             Triple(R.string.eval_intuition_label, getIntuitionText(report.intuition), report.intuition.numeric),
+            Triple(R.string.eval_convergence_label, getConvergenceText(report.convergence), report.convergence.numeric),
             Triple(
                 R.string.eval_conclusion_label, 
                 if (isWin) R.string.sia_evaluation_win else R.string.sia_evaluation_loss,
@@ -98,7 +99,12 @@ fun CognitiveDiagnosticReport(
                             )
                             
                             // Neural Power Bar (Staggered or immediate)
-                            NeuralPowerBar(powerLevel = powerLevel, scaleFactor = scaleFactor, isWin = isWin && index == reportLines.size - 1)
+                            NeuralPowerBar(
+                                powerLevel = powerLevel, 
+                                scaleFactor = scaleFactor, 
+                                isWin = isWin && index == reportLines.size - 1,
+                                isConvergence = index == 4 // Convergence is the 5th line
+                            )
                         }
                         
                         Text(
@@ -121,7 +127,7 @@ fun CognitiveDiagnosticReport(
 }
 
 @Composable
-fun NeuralPowerBar(powerLevel: Int, scaleFactor: Float, isWin: Boolean) {
+fun NeuralPowerBar(powerLevel: Int, scaleFactor: Float, isWin: Boolean, isConvergence: Boolean = false) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(2.dp * scaleFactor),
         verticalAlignment = Alignment.CenterVertically
@@ -134,6 +140,13 @@ fun NeuralPowerBar(powerLevel: Int, scaleFactor: Float, isWin: Boolean) {
                     .background(
                         color = when {
                             !isActive -> Color.White.copy(alpha = 0.05f)
+                            isConvergence -> when {
+                                powerLevel <= 1 -> HeatMap0.copy(alpha = 0.8f)
+                                powerLevel <= 2 -> HeatMap1_2.copy(alpha = 0.8f)
+                                powerLevel <= 3 -> HeatMap3_4.copy(alpha = 0.8f)
+                                powerLevel <= 4 -> HeatMap5.copy(alpha = 0.8f)
+                                else -> HeatMap6.copy(alpha = 0.8f)
+                            }
                             isWin -> SuccessGreen.copy(alpha = 0.8f)
                             powerLevel <= 2 -> ErrorRed.copy(alpha = 0.8f)
                             else -> PrimaryCyan.copy(alpha = 0.8f)
@@ -143,6 +156,14 @@ fun NeuralPowerBar(powerLevel: Int, scaleFactor: Float, isWin: Boolean) {
             )
         }
     }
+}
+
+private fun getConvergenceText(level: ConvergenceLevel) = when(level) {
+    ConvergenceLevel.FOCUSED -> R.string.eval_convergence_focused
+    ConvergenceLevel.ALIGNED -> R.string.eval_convergence_aligned
+    ConvergenceLevel.DRIFTING -> R.string.eval_convergence_drifting
+    ConvergenceLevel.DISPERSED -> R.string.eval_convergence_dispersed
+    ConvergenceLevel.ERRATIC -> R.string.eval_convergence_erratic
 }
 
 private fun getPrecisionText(level: PrecisionLevel) = when(level) {

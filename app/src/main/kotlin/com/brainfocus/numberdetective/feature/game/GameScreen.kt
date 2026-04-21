@@ -366,7 +366,8 @@ fun GameScreen(
                                     isHelperModeEnabled = isHelperModeEnabled, 
                                     scaleFactor = scaleFactor,
                                     label = stringResource(R.string.log_interrogation_number, index + 1),
-                                    labelColor = PrimaryCyan.copy(alpha = 0.7f)
+                                    labelColor = PrimaryCyan.copy(alpha = 0.7f),
+                                    isInterrogation = true
                                 )
                             }
                         }

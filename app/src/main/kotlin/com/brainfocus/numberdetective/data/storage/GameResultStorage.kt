@@ -14,12 +14,14 @@ enum class PrecisionLevel(val numeric: Int) { ELITE(5), SHARP(4), STABLE(3), NOV
 enum class VelocityLevel(val numeric: Int) { FLASH(5), RAPID(4), STEADY(3), DELIBERATE(1) }
 enum class StabilityLevel(val numeric: Int) { CONSTANT(5), INTERMITTENT(2) }
 enum class IntuitionLevel(val numeric: Int) { STRONG(5), ANALYTICAL(4), MARGINAL(2) }
+enum class ConvergenceLevel(val numeric: Int) { FOCUSED(5), ALIGNED(4), DRIFTING(3), DISPERSED(2), ERRATIC(1) }
 
 data class DiagnosticReport(
     val precision: PrecisionLevel,
     val velocity: VelocityLevel,
     val stability: StabilityLevel,
-    val intuition: IntuitionLevel
+    val intuition: IntuitionLevel,
+    val convergence: ConvergenceLevel
 )
 
 data class GameSession(

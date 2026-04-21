@@ -9,11 +9,16 @@ object DiagnosticEngine {
         
         var totalCorrectPos = 0
         var totalMisplaced = 0
+        var totalCoins = 0
+        var totalMaxCoins = 0
         
         session.levels.forEach { level ->
+            val maxPerHint = if (level.levelNumber == 3) 8 else 6
             level.hints.forEach { hint ->
                 totalCorrectPos += hint.correct
                 totalMisplaced += hint.misplaced
+                totalCoins += (hint.correct * 2) + hint.misplaced
+                totalMaxCoins += maxPerHint
             }
         }
         
@@ -23,7 +28,9 @@ object DiagnosticEngine {
             totalTimeSeconds = totalTime,
             totalHintsFound = totalCorrectPos + totalMisplaced,
             isHelperModeEnabled = session.isHelperMode,
-            logicalMistakes = session.logicalMistakes
+            logicalMistakes = session.logicalMistakes,
+            totalCoins = totalCoins,
+            totalMaxCoins = totalMaxCoins
         )
     }
 
@@ -33,7 +40,9 @@ object DiagnosticEngine {
         totalTimeSeconds: Int, 
         totalHintsFound: Int = -1,
         isHelperModeEnabled: Boolean = false,
-        logicalMistakes: Int = 0
+        logicalMistakes: Int = 0,
+        totalCoins: Int = -1,
+        totalMaxCoins: Int = -1
     ): DiagnosticReport {
         // Zero-effort case detection
         if (totalAttempts == 0) {
@@ -41,7 +50,8 @@ object DiagnosticEngine {
                 precision = PrecisionLevel.NOVICE,
                 velocity = VelocityLevel.DELIBERATE,
                 stability = StabilityLevel.INTERMITTENT,
-                intuition = IntuitionLevel.MARGINAL
+                intuition = IntuitionLevel.MARGINAL,
+                convergence = ConvergenceLevel.ERRATIC
             )
         }
 
@@ -78,17 +88,32 @@ object DiagnosticEngine {
             else -> IntuitionLevel.MARGINAL
         }
         
-        // If helper mode is ON, max intuition is capped at Analytical (4 bars) 
-        // because the user is being given visual hints that reduce pure intuition effort.
         if (isHelperModeEnabled && intuition == IntuitionLevel.STRONG) {
             intuition = IntuitionLevel.ANALYTICAL
+        }
+
+        // --- 4. Convergence Logic (Heat Map Efficiency) ---
+        val efficiency = if (totalMaxCoins > 0 && totalCoins != -1) {
+            totalCoins.toFloat() / totalMaxCoins
+        } else if (totalHintsFound != -1) {
+            // Fallback estimation if raw coins are missing
+            (totalHintsFound.toFloat() / (totalAttempts * 1.5f)).coerceIn(0f, 1f)
+        } else 0f
+
+        val convergence = when {
+            efficiency >= 0.8f -> ConvergenceLevel.FOCUSED
+            efficiency >= 0.6f -> ConvergenceLevel.ALIGNED
+            efficiency >= 0.4f -> ConvergenceLevel.DRIFTING
+            efficiency >= 0.2f -> ConvergenceLevel.DISPERSED
+            else -> ConvergenceLevel.ERRATIC
         }
 
         return DiagnosticReport(
             precision = precision,
             velocity = velocity,
             stability = if (isWin && avgAttempts < 8 && logicalMistakes <= 2) StabilityLevel.CONSTANT else StabilityLevel.INTERMITTENT,
-            intuition = intuition
+            intuition = intuition,
+            convergence = convergence
         )
     }
 }

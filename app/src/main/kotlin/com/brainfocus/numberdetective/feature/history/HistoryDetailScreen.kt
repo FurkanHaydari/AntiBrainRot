@@ -194,6 +194,7 @@ fun HistoryDetailScreen(
                                 labelColor = if (hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success) SuccessGreen 
                                              else if (isUserGuess) PrimaryCyan 
                                              else TextSecondary.copy(alpha = 0.6f),
+                                isInterrogation = isUserGuess || hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success,
                                 maxWidth = 550.dp * scaleFactor
                             )
                         }

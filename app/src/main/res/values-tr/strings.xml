@@ -153,6 +153,13 @@
     <string name="eval_intuition_analytical">ANALİTİK (SİSTEMATİK ELEME)</string>
     <string name="eval_intuition_marginal">SINIRDA (MUHT. KONUMSAL KARIŞIKLIK)</string>
 
+    <string name="eval_convergence_label">MANTIKSAL YAKINSAMA</string>
+    <string name="eval_convergence_focused">ODAKLANMIŞ (OPTİMAL HEDEF TAKİBİ)</string>
+    <string name="eval_convergence_aligned">HİZALANMIŞ (İSTİKRARLI İLERLEME)</string>
+    <string name="eval_convergence_drifting">SAPMIŞ (GEREKSİZ SİNYALLER İZLENDİ)</string>
+    <string name="eval_convergence_dispersed">DAĞINIK (ZAYIF MANTIKSAL BAĞLAM)</string>
+    <string name="eval_convergence_erratic">KARARSIZ (RASTGELE VERİ GİRİŞİ)</string>
+
     <string name="eval_conclusion_label">NİHAİ TEŞHİS</string>
 
 </resources>

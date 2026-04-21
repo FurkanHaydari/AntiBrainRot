@@ -21,6 +21,13 @@ val WarningYellow = Color(0xFFFFC107)
 val ErrorRed = Color(0xFFF44336)
 val GlowCyan = Color(0x6600E5FF)
 
+// --- Heat Map Palette for Interrogations ---
+val HeatMap0 = Color(0xFFB71C1C) // Deep Dark Red (Cold)
+val HeatMap1_2 = Color(0xFFEF5350) // Brighter Red
+val HeatMap3_4 = Color(0xFFFB8C00) // Dark Orange
+val HeatMap5 = Color(0xFF66BB6A) // Light Green
+val HeatMap6 = Color(0xFF43A047) // Solid Green (Hot)
+
 // --- Gradients for "Metro-Catching" Effect ---
 val PlayButtonGradient = Brush.horizontalGradient(
     colors = listOf(PrimaryCyan, Color(0xFF00B0FF), PrimaryBlue)
