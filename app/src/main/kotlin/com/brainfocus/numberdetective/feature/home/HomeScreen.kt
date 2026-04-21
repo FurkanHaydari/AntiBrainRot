@@ -31,9 +31,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Search
 
 @Composable
 fun HomeScreen(
@@ -298,7 +298,7 @@ fun HomeHeader(
                     .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), CircleShape)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    imageVector = Icons.Default.Folder,
                     contentDescription = "Archive",
                     tint = PrimaryCyan,
                     modifier = Modifier.size((22.dp * scaleFactor).coerceAtMost(40.dp))

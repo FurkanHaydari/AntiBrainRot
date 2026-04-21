@@ -10,8 +10,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.activity.compose.BackHandler
@@ -21,6 +22,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -68,6 +70,7 @@ fun GameScreen(
 
     val sheetState = rememberModalBottomSheetState()
     var showHistorySheet by remember { mutableStateOf(false) }
+    var isHintsFullscreen by remember { mutableStateOf(false) }
 
     val expectedLength = if (currentLevel == 3) 4 else 3
     var pickerValues by remember(currentLevel) {
@@ -88,8 +91,12 @@ fun GameScreen(
         }
     }
 
-    BackHandler(enabled = gameState is GameState.Playing && currentReport == null) {
-        viewModel.pauseGame()
+    BackHandler(enabled = (gameState is GameState.Playing && currentReport == null) || isHintsFullscreen) {
+        if (isHintsFullscreen) {
+            isHintsFullscreen = false
+        } else {
+            viewModel.pauseGame()
+        }
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -184,29 +191,44 @@ fun GameScreen(
                             .padding(bottom = 6.dp)
                             .blur(if (countdownValue != null) 20.dp else 0.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-                        val alpha by infiniteTransition.animateFloat(
-                            initialValue = 0.3f,
-                            targetValue = 0.7f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(2000, easing = LinearEasing),
-                                repeatMode = RepeatMode.Reverse
-                            ),
-                            label = "alpha"
-                        )
-                        Icon(Icons.Default.Search, contentDescription = null, tint = PrimaryCyan.copy(alpha = alpha), modifier = Modifier.size(18.dp * scaleFactor))
-                        Spacer(modifier = Modifier.width(8.dp * scaleFactor))
-                        Text(
-                            text = stringResource(R.string.msg_analysis_active),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = (11 * scaleFactor).coerceAtMost(16f).sp,
-                                fontFamily = Montserrat
-                            ),
-                            color = PrimaryCyan.copy(alpha = alpha),
-                            letterSpacing = (2 * scaleFactor).sp
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+                            val alpha by infiniteTransition.animateFloat(
+                                initialValue = 0.3f,
+                                targetValue = 0.7f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(2000, easing = LinearEasing),
+                                    repeatMode = RepeatMode.Reverse
+                                ),
+                                label = "alpha"
+                            )
+                            Icon(Icons.Default.Search, contentDescription = null, tint = PrimaryCyan.copy(alpha = alpha), modifier = Modifier.size(18.dp * scaleFactor))
+                            Spacer(modifier = Modifier.width(8.dp * scaleFactor))
+                            Text(
+                                text = stringResource(R.string.msg_analysis_active).uppercase(),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = (11 * scaleFactor).coerceAtMost(16f).sp,
+                                    fontFamily = Montserrat,
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = PrimaryCyan.copy(alpha = alpha),
+                                letterSpacing = (2 * scaleFactor).sp
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { if (!isPaused) isHintsFullscreen = true },
+                            modifier = Modifier.size(24.dp * scaleFactor)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Fullscreen,
+                                contentDescription = "Focus Mode",
+                                tint = PrimaryCyan,
+                                modifier = Modifier.size(20.dp * scaleFactor)
+                            )
+                        }
                     }
 
                     val evidenceListState = rememberLazyListState()
@@ -391,6 +413,153 @@ fun GameScreen(
                     onExit = onNavigateBack,
                     remainingTime = remainingTime
                 )
+            }
+        }
+
+        // --- Layer 4: Fullscreen Analysis Mode ---
+        AnimatedVisibility(
+            visible = isHintsFullscreen,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.92f))
+                    .padding(horizontal = 24.dp * scaleFactor, vertical = 20.dp * scaleFactor),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                // Background Watermark Layer
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().rotate(-20f),
+                        verticalArrangement = Arrangement.spacedBy(100.dp * scaleFactor)
+                    ) {
+                        repeat(8) {
+                            Text(
+                                text = "SIA - TOP SECRET - CLASSIFIED - ANALYZING".repeat(3),
+                                color = Color.White.copy(alpha = 0.03f),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontSize = (40 * scaleFactor).sp,
+                                maxLines = 1,
+                                fontWeight = FontWeight.Black
+                            )
+                        }
+                    }
+                }
+
+                // CRT / Scanline Effect Overlay (Moved here to be behind the sheet)
+                androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+                    val lineSpacing = 4.dp.toPx()
+                    var y = 0f
+                    while (y < size.height) {
+                        drawLine(
+                            color = Color.White.copy(alpha = 0.03f),
+                            start = androidx.compose.ui.geometry.Offset(0f, y),
+                            end = androidx.compose.ui.geometry.Offset(size.width, y),
+                            strokeWidth = 1.dp.toPx()
+                        )
+                        y += lineSpacing
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp * scaleFactor),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Folder,
+                                contentDescription = null,
+                                tint = PrimaryCyan,
+                                modifier = Modifier.size(24.dp * scaleFactor).padding(end = 8.dp * scaleFactor)
+                            )
+                            Text(
+                                text = stringResource(R.string.msg_analysis_active).uppercase(),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Black,
+                                    letterSpacing = (3 * scaleFactor).sp,
+                                    fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
+                                    fontFamily = Montserrat
+                                ),
+                                color = PrimaryCyan
+                            )
+                        }
+                        
+                        IconButton(
+                            onClick = { isHintsFullscreen = false },
+                            modifier = Modifier
+                                .size(36.dp * scaleFactor)
+                                .background(Color.White.copy(alpha = 0.05f), CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FullscreenExit,
+                                contentDescription = "Exit Focus Mode",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp * scaleFactor)
+                            )
+                        }
+                    }
+                    
+                    // Unified Briefing Sheet
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        color = SurfaceCard.copy(alpha = 0.95f),
+                        shape = RoundedCornerShape(12.dp * scaleFactor),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryCyan.copy(alpha = 0.2f))
+                    ) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            // Single PaperClip for the whole sheet
+                            PaperClip(
+                                scaleFactor = scaleFactor,
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(start = 16.dp * scaleFactor)
+                                    .offset(y = (-8).dp * scaleFactor)
+                            )
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp * scaleFactor),
+                                verticalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                evidenceHints.forEachIndexed { index, hint ->
+                                    DetectiveHintCard(
+                                        hint = hint,
+                                        isHelperModeEnabled = isHelperModeEnabled,
+                                        scaleFactor = scaleFactor,
+                                        label = stringResource(R.string.log_analysis_number, index + 1),
+                                        isFullscreenMode = true
+                                    )
+                                    
+                                    if (index < evidenceHints.size - 1) {
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(vertical = 4.dp * scaleFactor),
+                                            color = Color.White.copy(alpha = 0.05f),
+                                            thickness = 0.5.dp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    Text(
+                        text = "SIA CONFIDENTIAL // DO NOT DISTRIBUTE",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White.copy(alpha = 0.2f),
+                        modifier = Modifier.padding(top = 12.dp * scaleFactor),
+                        letterSpacing = (2 * scaleFactor).sp
+                    )
+                }
             }
         }
     }

@@ -146,7 +146,8 @@ fun DetectiveHintCard(
     label: String,
     labelColor: Color = PrimaryCyan.copy(alpha = 0.7f),
     maxWidth: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.Dp.Unspecified,
-    isInterrogation: Boolean = false
+    isInterrogation: Boolean = false,
+    isFullscreenMode: Boolean = false
 ) {
     val isLevel3 = hint.guess.length == 4
     val coins = (hint.correct * 2) + hint.misplaced
@@ -171,30 +172,30 @@ fun DetectiveHintCard(
         }
     } else labelColor
 
-    Surface(
-        color = SurfaceCard,
-        shape = RoundedCornerShape(16.dp * scaleFactor),
-        border = androidx.compose.foundation.BorderStroke(
-            if (isInterrogation) 1.5.dp * scaleFactor else 1.dp, 
-            if (isInterrogation) dynamicColor.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f)
-        ),
-        modifier = Modifier
-            .then(if (maxWidth != androidx.compose.ui.unit.Dp.Unspecified) Modifier.widthIn(max = maxWidth) else Modifier)
-            .fillMaxWidth()
-    ) {
+    val cardPadding = if (isFullscreenMode) 20.dp * scaleFactor else 14.dp * scaleFactor
+    val labelFontSize = if (isFullscreenMode) (14 * scaleFactor).coerceAtMost(22f).sp else (11 * scaleFactor).coerceAtMost(16f).sp
+    val digitBoxSize = if (isFullscreenMode) 52.dp * scaleFactor else 38.dp * scaleFactor
+    val digitFontSize = if (isFullscreenMode) (24 * scaleFactor).coerceAtMost(36f).sp else (18 * scaleFactor).coerceAtMost(26f).sp
+    val descriptionFontSize = if (isFullscreenMode) (18 * scaleFactor).coerceAtMost(28f).sp else (15 * scaleFactor).coerceAtMost(22f).sp
+    val descriptionLineHeight = if (isFullscreenMode) (24 * scaleFactor).coerceAtMost(34f).sp else (20 * scaleFactor).coerceAtMost(28f).sp
+
+    if (isFullscreenMode) {
+        // Fullscreen mode: No separate card Surface, just a compact vertical unit for the unified sheet
         Column(
-            modifier = Modifier.padding(14.dp * scaleFactor),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp * scaleFactor),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = (11 * scaleFactor).coerceAtMost(16f).sp,
+                    fontWeight = FontWeight.Black,
+                    fontSize = (10 * scaleFactor).coerceAtMost(14f).sp,
                     letterSpacing = (1.5f * scaleFactor).sp
                 ),
-                color = if (isInterrogation) dynamicColor else labelColor,
-                modifier = Modifier.padding(bottom = 8.dp * scaleFactor)
+                color = if (isInterrogation) dynamicColor else labelColor.copy(alpha = 0.5f),
+                modifier = Modifier.padding(bottom = 4.dp * scaleFactor)
             )
 
             Row(
@@ -202,7 +203,7 @@ fun DetectiveHintCard(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp * scaleFactor)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp * scaleFactor)) {
                     hint.guess.forEachIndexed { digitIndex, char ->
                         val status = if (isHelperModeEnabled) hint.digitStatuses?.getOrNull(digitIndex) else null
                         val bgColor = when (status) {
@@ -220,7 +221,7 @@ fun DetectiveHintCard(
 
                         Box(
                             modifier = Modifier
-                                .size(38.dp * scaleFactor)
+                                .size(digitBoxSize * 0.9f) // Slightly more compact digits
                                 .background(bgColor, RoundedCornerShape(8.dp * scaleFactor))
                                 .border(1.dp, borderColor, RoundedCornerShape(8.dp * scaleFactor)),
                             contentAlignment = Alignment.Center
@@ -228,7 +229,7 @@ fun DetectiveHintCard(
                             Text(
                                 text = char.toString(),
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontSize = (18 * scaleFactor).coerceAtMost(26f).sp,
+                                    fontSize = digitFontSize,
                                     fontWeight = FontWeight.Bold
                                 ),
                                 color = if (status != null) Color.White else PrimaryCyan
@@ -238,25 +239,112 @@ fun DetectiveHintCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp * scaleFactor))
-
             val hintText = if (hint.descriptionRes != null) {
                 stringResource(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
             } else {
-                hint.description
+                hint.description ?: ""
             }
             
             Text(
                 text = hintText, 
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = (15 * scaleFactor).coerceAtMost(22f).sp,
-                    lineHeight = (20 * scaleFactor).coerceAtMost(28f).sp,
+                    fontSize = descriptionFontSize,
+                    lineHeight = descriptionLineHeight,
                     fontWeight = FontWeight.Medium
                 ), 
-                color = TextPrimary,
-                modifier = Modifier.fillMaxWidth(),
+                color = Color.White.copy(alpha = 0.95f),
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp * scaleFactor),
                 textAlign = TextAlign.Center
             )
+        }
+    } else {
+        Surface(
+            color = SurfaceCard,
+            shape = RoundedCornerShape(16.dp * scaleFactor),
+            border = androidx.compose.foundation.BorderStroke(
+                if (isInterrogation) 1.5.dp * scaleFactor else 1.dp, 
+                if (isInterrogation) dynamicColor.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f)
+            ),
+            modifier = Modifier
+                .then(if (maxWidth != androidx.compose.ui.unit.Dp.Unspecified) Modifier.widthIn(max = maxWidth) else Modifier)
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(cardPadding / 1.5f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = labelFontSize,
+                        letterSpacing = (2f * scaleFactor).sp
+                    ),
+                    color = if (isInterrogation) dynamicColor else labelColor,
+                    modifier = Modifier.padding(bottom = 8.dp * scaleFactor)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp * scaleFactor)) {
+                        hint.guess.forEachIndexed { digitIndex, char ->
+                            val status = if (isHelperModeEnabled) hint.digitStatuses?.getOrNull(digitIndex) else null
+                            val bgColor = when (status) {
+                                DigitStatus.CORRECT_POS -> SuccessGreen.copy(alpha = 0.2f)
+                                DigitStatus.WRONG_POS -> WarningYellow.copy(alpha = 0.2f)
+                                DigitStatus.INCORRECT -> ErrorRed.copy(alpha = 0.2f)
+                                else -> Color.White.copy(alpha = 0.05f)
+                            }
+                            val borderColor = when (status) {
+                                DigitStatus.CORRECT_POS -> SuccessGreen
+                                DigitStatus.WRONG_POS -> WarningYellow
+                                DigitStatus.INCORRECT -> ErrorRed
+                                else -> Color.White.copy(alpha = 0.1f)
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .size(digitBoxSize)
+                                    .background(bgColor, RoundedCornerShape(8.dp * scaleFactor))
+                                    .border(1.dp, borderColor, RoundedCornerShape(8.dp * scaleFactor)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = char.toString(),
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontSize = digitFontSize,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = if (status != null) Color.White else PrimaryCyan
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp * scaleFactor))
+
+                val hintText = if (hint.descriptionRes != null) {
+                    stringResource(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
+                } else {
+                    hint.description ?: ""
+                }
+                
+                Text(
+                    text = hintText, 
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = descriptionFontSize,
+                        lineHeight = descriptionLineHeight,
+                        fontWeight = FontWeight.Medium
+                    ), 
+                    color = Color.White,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
