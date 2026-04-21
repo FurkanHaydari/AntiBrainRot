@@ -13,6 +13,7 @@ import java.util.Locale
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.brainfocus.numberdetective.data.storage.GameSession
+import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -183,11 +184,14 @@ class DataStoreManager @Inject constructor(
             }
 
             // Add new session at the beginning
-            currentHistory.add(0, session)
+            val diagnosticReport = DiagnosticEngine.generateReport(session)
+            val sessionWithReport = session.copy(diagnosticReport = diagnosticReport)
+            
+            currentHistory.add(0, sessionWithReport)
 
-            // Keep only the last 50 games
-            val limitedHistory = if (currentHistory.size > 50) {
-                currentHistory.take(50)
+            // Keep only the last 20 games
+            val limitedHistory = if (currentHistory.size > 20) {
+                currentHistory.take(20)
             } else {
                 currentHistory
             }

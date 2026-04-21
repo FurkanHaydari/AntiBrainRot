@@ -42,6 +42,9 @@ fun ResultScreen(
     timeInSeconds: Int,
     dailyHighScore: Int,
     allTimeHighScore: Int,
+    totalHintsFound: Int,
+    isHelperModeEnabled: Boolean,
+    logicalMistakes: Int,
     onPlayAgain: () -> Unit,
     onGoHome: () -> Unit
 ) {
@@ -134,7 +137,7 @@ fun ResultScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .widthIn(max = 450.dp * scaleFactor)
+                    .widthIn(max = 500.dp * scaleFactor)
                     .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp * scaleFactor))
                     .padding(4.dp * scaleFactor)
             ) {
@@ -168,9 +171,13 @@ fun ResultScreen(
                         score = score,
                         correctAnswer = correctAnswer,
                         attempts = attempts,
+                        timeInSeconds = timeInSeconds,
                         formattedTime = formattedTime,
                         dailyHighScore = dailyHighScore,
                         allTimeHighScore = allTimeHighScore,
+                        totalHintsFound = totalHintsFound,
+                        isHelperModeEnabled = isHelperModeEnabled,
+                        logicalMistakes = logicalMistakes,
                         scaleFactor = scaleFactor,
                         maxWidth = maxWidthDp
                     )
@@ -273,9 +280,13 @@ fun BriefingView(
     score: Int,
     correctAnswer: String,
     attempts: Int,
+    timeInSeconds: Int,
     formattedTime: String,
     dailyHighScore: Int,
     allTimeHighScore: Int,
+    totalHintsFound: Int,
+    isHelperModeEnabled: Boolean,
+    logicalMistakes: Int,
     scaleFactor: Float,
     maxWidth: androidx.compose.ui.unit.Dp
 ) {
@@ -289,76 +300,23 @@ fun BriefingView(
             shape = RoundedCornerShape(24.dp * scaleFactor),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
             modifier = Modifier
-                .widthIn(max = (450.dp * scaleFactor).coerceAtMost(maxWidth))
+                .widthIn(max = (500.dp * scaleFactor).coerceAtMost(maxWidth))
                 .fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(16.dp * scaleFactor),
+                modifier = Modifier.padding(24.dp * scaleFactor),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(R.string.final_score).uppercase(),
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = (10 * scaleFactor).coerceAtMost(14f).sp
-                    ),
-                    color = TextSecondary,
-                    letterSpacing = (2 * scaleFactor).sp
-                )
-                Text(
-                    text = score.toString(),
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = (42 * scaleFactor).coerceAtMost(60f).sp,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = PrimaryCyan
-                )
-                
-                // Records Summary
-                Spacer(modifier = Modifier.height(8.dp * scaleFactor))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.03f), RoundedCornerShape(10.dp * scaleFactor))
-                        .padding(8.dp * scaleFactor),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    DetectiveStatItem(label = stringResource(R.string.label_daily_record), value = dailyHighScore.toString(), color = Color.White.copy(alpha = 0.9f), scaleFactor = scaleFactor * 0.9f)
-                    DetectiveStatItem(label = stringResource(R.string.label_all_time_record), value = allTimeHighScore.toString(), color = Color.White.copy(alpha = 0.9f), scaleFactor = scaleFactor * 0.9f)
+                // Cognitive diagnostic content starts immediately
+                val diagnosticReport = remember(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes) {
+                    DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
                 }
-                
-                // SIA Evaluation Section (Integrated)
-                Spacer(modifier = Modifier.height(16.dp * scaleFactor))
-                HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
-                Spacer(modifier = Modifier.height(12.dp * scaleFactor))
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.03f), RoundedCornerShape(10.dp * scaleFactor))
-                        .padding(10.dp * scaleFactor),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "SIA-7 COGNITIVE EVALUATION",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = (9 * scaleFactor).sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = (2 * scaleFactor).sp
-                        ),
-                        color = PrimaryCyan.copy(alpha = 0.5f)
-                    )
-                    Spacer(modifier = Modifier.height(6.dp * scaleFactor))
-                    Text(
-                        text = stringResource(if (isWin) R.string.sia_evaluation_win else R.string.sia_evaluation_loss),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                            fontSize = (11 * scaleFactor).coerceAtMost(15f).sp,
-                            lineHeight = (16 * scaleFactor).coerceAtMost(22f).sp
-                        ),
-                        color = TextSecondary.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Center
-                    )
-                }
+                com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
+                    report = diagnosticReport,
+                    isWin = isWin,
+                    scaleFactor = scaleFactor
+                )
             }
         }
     }

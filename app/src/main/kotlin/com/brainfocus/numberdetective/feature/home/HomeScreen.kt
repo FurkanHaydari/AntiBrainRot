@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -100,6 +101,8 @@ fun HomeScreen(
                 onSettingsClick = { showSettings = true }
             )
 
+            Spacer(modifier = Modifier.height(16.dp * scaleFactor)) // Space below the score bar
+
             if (showSettings) {
                 SettingsDialog(
                     onDismiss = { showSettings = false },
@@ -119,12 +122,15 @@ fun HomeScreen(
                 Row(
                     modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.spacedBy(32.dp * scaleFactor, Alignment.CenterHorizontally)
                 ) {
                     // Left: Title & Status
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .padding(vertical = 16.dp * scaleFactor)
                     ) {
                         Text(
                             text = stringResource(R.string.app_title_1).uppercase(),
@@ -149,15 +155,42 @@ fun HomeScreen(
                             textAlign = TextAlign.Center
                         )
                         
-                        Spacer(modifier = Modifier.height(30.dp * scaleFactor))
+                        Spacer(modifier = Modifier.weight(1f)) // Push button to bottom
                         
+                        // --- ACTION BUTTONS WITH ANIMATION ---
+                        val infiniteTransition = rememberInfiniteTransition(label = "StartButtonAnim")
+                        val pulseScale by infiniteTransition.animateFloat(
+                            initialValue = 1f,
+                            targetValue = 1.05f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1200, easing = FastOutSlowInEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "PulseScale"
+                        )
+                        val glowAlpha by infiniteTransition.animateFloat(
+                            initialValue = 0.4f,
+                            targetValue = 0.9f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1200, easing = LinearEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "GlowAlpha"
+                        )
+
                         DetectiveButton(
                             text = stringResource(R.string.start_button),
                             isPrimary = true,
                             scaleFactor = scaleFactor,
                             onClick = onPlayClick,
-                            modifier = Modifier.widthIn(max = 240.dp)
+                            pulseScale = pulseScale,
+                            glowAlpha = glowAlpha,
+                            modifier = Modifier
+                                .widthIn(max = if (maxWidth > 600.dp) 400.dp else 240.dp)
+                                .fillMaxWidth(if (maxWidth > 600.dp) 0.85f else 0.9f)
                         )
+                        
+                        Spacer(modifier = Modifier.height(20.dp * scaleFactor)) // Bottom margin
                     }
 
                     // Right: Briefing
@@ -199,20 +232,43 @@ fun HomeScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.weight(1.2f)) // Centering weight
+                    Spacer(modifier = Modifier.weight(1.5f)) // Decompressed title area
 
                     MissionBriefingPanel(scaleFactor, maxWidth)
 
-                    Spacer(modifier = Modifier.weight(1.5f)) // Centering weight
+                    Spacer(modifier = Modifier.weight(0.9f))
+
+                    // --- ACTION BUTTONS WITH ANIMATION ---
+                    val infiniteTransition = rememberInfiniteTransition(label = "StartButtonAnim")
+                    val pulseScale by infiniteTransition.animateFloat(
+                        initialValue = 1f,
+                        targetValue = 1.05f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1200, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "PulseScale"
+                    )
+                    val glowAlpha by infiniteTransition.animateFloat(
+                        initialValue = 0.4f,
+                        targetValue = 0.9f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1200, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "GlowAlpha"
+                    )
 
                     DetectiveButton(
                         text = stringResource(R.string.start_button),
                         isPrimary = true,
                         scaleFactor = scaleFactor,
                         onClick = onPlayClick,
+                        pulseScale = pulseScale,
+                        glowAlpha = glowAlpha,
                         modifier = Modifier
-                            .widthIn(max = 300.dp)
-                            .fillMaxWidth(0.85f)
+                            .widthIn(max = if (maxWidth > 600.dp) 750.dp else 500.dp)
+                            .fillMaxWidth(if (maxWidth > 600.dp) 0.95f else 0.9f)
                             .padding(bottom = (32.dp * scaleFactor).coerceAtLeast(16.dp))
                     )
                 }
@@ -265,7 +321,7 @@ fun HomeHeader(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+        Spacer(modifier = Modifier.height(10.dp * scaleFactor))
 
         // Case Status Badge
         AnimatedVisibility(
@@ -331,8 +387,8 @@ fun HomeHeader(
 fun MissionBriefingPanel(scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp) {
     Surface(
         modifier = Modifier
-            .widthIn(max = 500.dp)
-            .fillMaxWidth(0.9f),
+            .widthIn(max = if (maxWidth > 600.dp) 750.dp else 500.dp)
+            .fillMaxWidth(if (maxWidth > 600.dp) 0.95f else 0.9f),
         color = Color.White.copy(alpha = 0.03f),
         shape = RoundedCornerShape(20.dp * scaleFactor),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))

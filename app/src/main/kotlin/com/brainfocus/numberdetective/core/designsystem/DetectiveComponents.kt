@@ -244,17 +244,25 @@ fun DetectiveButton(
     modifier: Modifier = Modifier,
     isPrimary: Boolean = true,
     enabled: Boolean = true,
+    pulseScale: Float = 1f,
+    glowAlpha: Float = 0f,
     height: androidx.compose.ui.unit.Dp = 56.dp
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
         modifier = modifier
             .fillMaxWidth()
             .height(height * scaleFactor)
+            .graphicsLayer {
+                scaleX = pulseScale
+                scaleY = pulseScale
+            }
             .border(
-                1.dp,
-                if (isPrimary && enabled) PrimaryCyan.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f),
+                (1.dp * scaleFactor) + (0.5.dp * glowAlpha * scaleFactor),
+                if (isPrimary && enabled) PrimaryCyan.copy(alpha = 0.5f + (glowAlpha * 0.5f)) 
+                else Color.White.copy(alpha = 0.1f),
                 RoundedCornerShape(16.dp * scaleFactor)
             ),
         shape = RoundedCornerShape(16.dp * scaleFactor),

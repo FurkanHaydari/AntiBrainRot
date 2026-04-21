@@ -115,7 +115,7 @@
     <string name="log_interrogation_number">INTERROGATION %1$d</string>
     <string name="case_file_level">CASE FILE: LEVEL %d</string>
     <string name="label_lives">LIVES</string>
-    <string name="label_time">TIME</string>
+    <string name="label_time">TIME REMAINING</string>
 
     <string name="report_promotion_title">PROMOTION GRANTED</string>
     <string name="report_promotion_msg">Level %1$d reached. You gained %2$d extra attempts and %3$d bonus seconds. Ready for the next phase?</string>
@@ -128,4 +128,31 @@
     <string name="exit_mission">ABORT MISSION</string>
     <string name="resume_mission">RESUME MISSION</string>
     <string name="countdown_go">GO!</string>
+
+    <!-- Cognitive Evaluation Metrics (Result Screen) -->
+    <string name="eval_header">SIA-7 NEURAL DIAGNOSTIC REPORT</string>
+    
+    <string name="eval_precision_label">DEDUCTIVE PRECISION</string>
+    <string name="eval_precision_elite">ELITE (MINIMAL SIGNAL WASTE)</string>
+    <string name="eval_precision_sharp">SHARP (EFFICIENT PATTERN TRACKING)</string>
+    <string name="eval_precision_standard">STABLE (STANDARD COGNITIVE LOAD)</string>
+    <string name="eval_precision_novice">TRIAL ERROR DETECTED (HIGH NOISE)</string>
+
+    <string name="eval_velocity_label">SYNAPTIC VELOCITY</string>
+    <string name="eval_velocity_flash">FLASH (NEURAL OVERDRIVE ACTIVE)</string>
+    <string name="eval_velocity_rapid">RAPID (OPTIMAL PROCESSING SPEED)</string>
+    <string name="eval_velocity_steady">STEADY (DELIBERATE ANALYSIS)</string>
+    <string name="eval_velocity_deliberate">MARGINAL (NEURAL LAG OBSERVED)</string>
+
+    <string name="eval_stability_label">NEURAL STABILITY</string>
+    <string name="eval_stability_constant">CONSTANT (FIXED FOCUS LOCK)</string>
+    <string name="eval_stability_intermittent">INTERMITTENT (FLUCTUATING SYNC)</string>
+    
+    <string name="eval_intuition_label">NUMERICAL INTUITION</string>
+    <string name="eval_intuition_strong">STRONG (PATTERN DETECTED QUICKLY)</string>
+    <string name="eval_intuition_analytical">ANALYTICAL (SYSTEMATIC ELIMINATION)</string>
+    <string name="eval_intuition_marginal">MARGINAL (POSS. POSITIONAL CONFUSION)</string>
+
+    <string name="eval_conclusion_label">FINAL DIAGNOSTIC</string>
+
 </resources>

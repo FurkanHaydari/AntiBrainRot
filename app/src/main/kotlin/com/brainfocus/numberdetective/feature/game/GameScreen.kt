@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -20,6 +21,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -42,7 +44,7 @@ import com.brainfocus.numberdetective.core.designsystem.FieldReportOverlay
 @Composable
 fun GameScreen(
     viewModel: GameViewModel = hiltViewModel(),
-    onNavigateToResult: (Boolean, Int, String, Int, Int, Int, Int) -> Unit,
+    onNavigateToResult: (Boolean, Int, String, Int, Int, Int, Int, Int, Boolean, Int) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val currentLevel by viewModel.currentLevel.collectAsState()
@@ -60,6 +62,7 @@ fun GameScreen(
     val currentReport by viewModel.currentReport.collectAsState()
     val isPaused by viewModel.isPaused.collectAsState()
     val isHelperModeEnabled by viewModel.isHelperModeEnabled.collectAsState(initial = false)
+    val logicalMistakes by viewModel.logicalMistakesCount.collectAsState()
     val countdownValue by viewModel.countdownValue.collectAsState()
     val attempts = viewModel.attempts
 
@@ -74,10 +77,12 @@ fun GameScreen(
     LaunchedEffect(gameState) {
         when (gameState) {
             is GameState.Win -> {
-                onNavigateToResult(true, score, correctAnswer, attempts, viewModel.getTimeInSeconds(), dailyHighScore, allTimeHighScore)
+                val totalHintsFound = hints.sumOf { it.correct + it.misplaced }
+                onNavigateToResult(true, score, correctAnswer, attempts, viewModel.getTimeInSeconds(), dailyHighScore, allTimeHighScore, totalHintsFound, isHelperModeEnabled, logicalMistakes)
             }
             is GameState.GameOver -> {
-                onNavigateToResult(false, score, correctAnswer, attempts, viewModel.getTimeInSeconds(), dailyHighScore, allTimeHighScore)
+                val totalHintsFound = hints.sumOf { it.correct + it.misplaced }
+                onNavigateToResult(false, score, correctAnswer, attempts, viewModel.getTimeInSeconds(), dailyHighScore, allTimeHighScore, totalHintsFound, isHelperModeEnabled, logicalMistakes)
             }
             else -> {}
         }
@@ -204,12 +209,21 @@ fun GameScreen(
                         )
                     }
 
+                    val evidenceListState = rememberLazyListState()
+                    LaunchedEffect(evidenceHints.size) {
+                        if (evidenceHints.isNotEmpty()) {
+                            evidenceListState.animateScrollToItem(evidenceHints.size - 1)
+                        }
+                    }
+
                     LazyColumn(
+                        state = evidenceListState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .blur(if (countdownValue != null) 20.dp else 0.dp),
+                            .blur(if (countdownValue != null) 20.dp else 0.dp)
+                            .verticalFadingEdge(),
                         verticalArrangement = Arrangement.spacedBy(10.dp * scaleFactor),
-                        contentPadding = PaddingValues(bottom = 16.dp * scaleFactor)
+                        contentPadding = PaddingValues(top = 20.dp, bottom = 40.dp)
                     ) {
                         itemsIndexed(evidenceHints) { index, hint ->
                             DetectiveHintCard(
@@ -339,8 +353,12 @@ fun GameScreen(
                         }
                     } else {
                         LazyColumn(
-                            modifier = Modifier.fillMaxWidth().weight(1f, fill = false),
-                            verticalArrangement = Arrangement.spacedBy(10.dp * scaleFactor)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                                .verticalFadingEdge(),
+                            verticalArrangement = Arrangement.spacedBy(10.dp * scaleFactor),
+                            contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp)
                         ) {
                             itemsIndexed(trialHints) { index, hint -> 
                                 DetectiveHintCard(

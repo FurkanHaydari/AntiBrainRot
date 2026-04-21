@@ -84,8 +84,8 @@ fun AppNavigation(
             val gameViewModel: GameViewModel = hiltViewModel()
             GameScreen(
                 viewModel = gameViewModel,
-                onNavigateToResult = { isWin, score, correctAnswer, attempts, timeInSeconds, dailyHighScore, allTimeHighScore -> 
-                    navController.navigate("result/$isWin/$score/$correctAnswer/$attempts/$timeInSeconds/$dailyHighScore/$allTimeHighScore") {
+                onNavigateToResult = { isWin, score, correctAnswer, attempts, timeInSeconds, dailyHighScore, allTimeHighScore, totalHintsFound, isHelperModeEnabled, logicalMistakes -> 
+                    navController.navigate("result/$isWin/$score/$correctAnswer/$attempts/$timeInSeconds/$dailyHighScore/$allTimeHighScore/$totalHintsFound/$isHelperModeEnabled/$logicalMistakes") {
                         popUpTo("home")
                     }
                 },
@@ -94,7 +94,7 @@ fun AppNavigation(
                 }
             )
         }
-        composable("result/{isWin}/{score}/{correctAnswer}/{attempts}/{timeInSeconds}/{dailyHighScore}/{allTimeHighScore}") { backStackEntry ->
+        composable("result/{isWin}/{score}/{correctAnswer}/{attempts}/{timeInSeconds}/{dailyHighScore}/{allTimeHighScore}/{totalHintsFound}/{isHelperModeEnabled}/{logicalMistakes}") { backStackEntry ->
             val isWin = backStackEntry.arguments?.getString("isWin")?.toBoolean() ?: false
             val score = backStackEntry.arguments?.getString("score")?.toIntOrNull() ?: 0
             val correctAnswer = backStackEntry.arguments?.getString("correctAnswer") ?: ""
@@ -102,6 +102,9 @@ fun AppNavigation(
             val timeInSeconds = backStackEntry.arguments?.getString("timeInSeconds")?.toIntOrNull() ?: 0
             val dailyHighScore = backStackEntry.arguments?.getString("dailyHighScore")?.toIntOrNull() ?: 0
             val allTimeHighScore = backStackEntry.arguments?.getString("allTimeHighScore")?.toIntOrNull() ?: 0
+            val totalHintsFound = backStackEntry.arguments?.getString("totalHintsFound")?.toIntOrNull() ?: 0
+            val isHelperModeEnabled = backStackEntry.arguments?.getString("isHelperModeEnabled")?.toBoolean() ?: false
+            val logicalMistakes = backStackEntry.arguments?.getString("logicalMistakes")?.toIntOrNull() ?: 0
 
             ResultScreen(
                 isWin = isWin,
@@ -111,6 +114,9 @@ fun AppNavigation(
                 timeInSeconds = timeInSeconds,
                 dailyHighScore = dailyHighScore,
                 allTimeHighScore = allTimeHighScore,
+                totalHintsFound = totalHintsFound,
+                isHelperModeEnabled = isHelperModeEnabled,
+                logicalMistakes = logicalMistakes,
                 onPlayAgain = {
                     navController.navigate("game") { popUpTo("home") }
                 },

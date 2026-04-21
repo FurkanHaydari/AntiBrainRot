@@ -115,7 +115,7 @@
     <string name="log_interrogation_number">SORGU %1$d</string>
     <string name="case_file_level">VAKA DOSYASI: SEVİYE %d</string>
     <string name="label_lives">CAN</string>
-    <string name="label_time">SÜRE</string>
+    <string name="label_time">KALAN ZAMAN</string>
 
     <string name="report_promotion_title">TERFİ ALDIN</string>
     <string name="report_promotion_msg">Seviye %1$d\'e ulaştın. %2$d ekstra deneme hakkı ve %3$d saniye bonus kazandın. Sonraki aşamaya hazır mısın?</string>
@@ -128,4 +128,31 @@
     <string name="exit_mission">GÖREVİ İPTAL ET</string>
     <string name="resume_mission">GÖREVE DEVAM ET</string>
     <string name="countdown_go">BAŞLA!</string>
+
+    <!-- Cognitive Evaluation Metrics (Result Screen) -->
+    <string name="eval_header">SIA-7 NÖRAL TEŞHİS RAPORU</string>
+    
+    <string name="eval_precision_label">DİREKTİF HASSASİYETİ</string>
+    <string name="eval_precision_elite">ELİT (MİNİMUM SİNYAL KAYBI)</string>
+    <string name="eval_precision_sharp">KESKİN (VERİMLİ VERİ TAKİBİ)</string>
+    <string name="eval_precision_standard">STABİL (STANDART BİLİŞSEL YÜK)</string>
+    <string name="eval_precision_novice">DENEME HATASI TESPİT EDİLDİ (YÜKSEK GÜRÜLTÜ)</string>
+
+    <string name="eval_velocity_label">SİNAPTİK HIZ</string>
+    <string name="eval_velocity_flash">FLASH (NÖRAL OVERDRIVE AKTİF)</string>
+    <string name="eval_velocity_rapid">HIZLI (OPTİMAL İŞLEME HIZI)</string>
+    <string name="eval_velocity_steady">DENGELİ (TEMKİNLİ ANALİZ)</string>
+    <string name="eval_velocity_deliberate">SINIRDA (NÖRAL GECİKME İZLENDİ)</string>
+
+    <string name="eval_stability_label">NÖRAL STABİLİTE</string>
+    <string name="eval_stability_constant">SABİT (TAM ODAK KİLİDİ)</string>
+    <string name="eval_stability_intermittent">DEĞİŞKEN (DALGALI SENKRONİZASYON)</string>
+    
+    <string name="eval_intuition_label">SAYISAL SEZGİ</string>
+    <string name="eval_intuition_strong">GÜÇLÜ (ÖRÜNTÜ HIZLI TESPİT EDİLDİ)</string>
+    <string name="eval_intuition_analytical">ANALİTİK (SİSTEMATİK ELEME)</string>
+    <string name="eval_intuition_marginal">SINIRDA (MUHT. KONUMSAL KARIŞIKLIK)</string>
+
+    <string name="eval_conclusion_label">NİHAİ TEŞHİS</string>
+
 </resources>

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.util.Log
+import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -32,7 +33,8 @@ class GameViewModel @Inject constructor(
     private var _attemptsInLevel = 0
     private var _levelStartSeconds = 0
     private var _archiveChecksInLevel = 0
-    private val _wrongAttempts = MutableStateFlow(0)
+    private val _logicalMistakesCount = MutableStateFlow(0)
+    val logicalMistakesCount: StateFlow<Int> = _logicalMistakesCount
     
     private val _currentReport = MutableStateFlow<FieldReport?>(null)
     val currentReport: StateFlow<FieldReport?> = _currentReport
@@ -107,7 +109,7 @@ class GameViewModel @Inject constructor(
     fun startNewGame(isFirstGame: Boolean = true) {
         if (isFirstGame) {
             _attempts = 0
-            _wrongAttempts.value = 0
+            _logicalMistakesCount.value = 0
             _remainingAttempts.value = MAX_ATTEMPTS
             _score.value = 0
             startTime = System.currentTimeMillis()
@@ -127,24 +129,24 @@ class GameViewModel @Inject constructor(
         Log.d("NumberDetectiveDebug", "Target Number for Level ${_currentLevel.value}: ${_correctAnswer.value}")
         _gameState.value = GameState.Playing
 
-        // Restore Hint Generation Logic
+        // Restore Hint Generation Logic with statuses for logical check
         val hintList = mutableListOf<Hint>()
         if (_currentLevel.value == 3) {
             hintList.addAll(listOf(
-                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(3, 1)),
-                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(3, 2)),
-                Hint(game.thirdHint, 1, 1, descriptionRes = getHintResId(3, 3)),
-                Hint(game.fourthHint, 1, 1, descriptionRes = getHintResId(3, 4)),
-                Hint(game.fifthHint, 2, 0, descriptionRes = getHintResId(3, 5))
+                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(3, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value)),
+                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(3, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value)),
+                Hint(game.thirdHint, 1, 1, descriptionRes = getHintResId(3, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value)),
+                Hint(game.fourthHint, 1, 1, descriptionRes = getHintResId(3, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value)),
+                Hint(game.fifthHint, 2, 0, descriptionRes = getHintResId(3, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value))
             ))
             _hints.value = hintList
         } else {
             val h = listOf(
-                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(_currentLevel.value, 1)),
-                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(_currentLevel.value, 2)),
-                Hint(game.thirdHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 3)),
-                Hint(game.fourthHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 4)),
-                Hint(game.fifthHint, 1, 1, descriptionRes = getHintResId(_currentLevel.value, 5))
+                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(_currentLevel.value, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value)),
+                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(_currentLevel.value, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value)),
+                Hint(game.thirdHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value)),
+                Hint(game.fourthHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value)),
+                Hint(game.fifthHint, 1, 1, descriptionRes = getHintResId(_currentLevel.value, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value))
             )
             _hints.value = if (_currentLevel.value == 2) h.shuffled() else h
         }
@@ -212,19 +214,31 @@ class GameViewModel @Inject constructor(
             timestamp = System.currentTimeMillis(),
             levels = GameResultStorage.currentSessionLevels.toList(),
             totalScore = _score.value,
-            isWin = isWin
+            isWin = isWin,
+            isHelperMode = isHelperModeEnabledLocal,
+            logicalMistakes = _logicalMistakesCount.value
         )
-        GameResultStorage.lastGameSession = session
+        // Inject final diagnostic report into the session itself
+        val finalSession = session.copy(
+            diagnosticReport = DiagnosticEngine.generateReport(session)
+        )
+        GameResultStorage.lastGameSession = finalSession
         
         // Save to persistent storage
         viewModelScope.launch {
-            dataStoreManager.saveGameSession(session)
+            dataStoreManager.saveGameSession(finalSession)
         }
     }
 
     fun makeGuess(guess: String): GuessResult {
         if (guess.isBlank() || !guess.all { it.isDigit() }) return GuessResult.Invalid
         
+        // Logical Analysis: Check if the guess contradicts previous evidence
+        if (!isGuessLogical(guess, _hints.value)) {
+            _logicalMistakesCount.value++
+            Log.d("NumberDetectiveDebug", "Logical mistake detected! Total: ${_logicalMistakesCount.value}")
+        }
+
         // Protocol Check: Unique Digits
         if (guess.toSet().size != guess.length) {
             _currentReport.value = FieldReport.Validation(
@@ -305,6 +319,32 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    private fun isGuessLogical(guess: String, previousHints: List<Hint>): Boolean {
+        previousHints.forEach { hint ->
+            if (hint.digitStatuses.isNullOrEmpty()) return@forEach
+            
+            hint.guess.forEachIndexed { i, char ->
+                val status = hint.digitStatuses?.getOrNull(i) ?: return@forEachIndexed
+                when (status) {
+                    com.brainfocus.numberdetective.data.model.DigitStatus.INCORRECT -> {
+                        // If it's confirmed incorrect, it shouldn't be in the guess at all
+                        if (guess.contains(char)) return false
+                    }
+                    com.brainfocus.numberdetective.data.model.DigitStatus.CORRECT_POS -> {
+                        // If it's at correct position, it must be at the same position in current guess
+                        // Also, if the guess is shorter than index (shouldn't happen with validation), skip
+                        if (i < guess.length && guess[i] != char) return false
+                    }
+                    com.brainfocus.numberdetective.data.model.DigitStatus.WRONG_POS -> {
+                        // If it's misplaced, it shouldn't be in THAT SAME position again
+                        if (i < guess.length && guess[i] == char) return false
+                    }
+                }
+            }
+        }
+        return true
+    }
+
     private fun calculateDigitStatuses(guess: String, answer: String): List<com.brainfocus.numberdetective.data.model.DigitStatus> {
         val statuses = mutableListOf<com.brainfocus.numberdetective.data.model.DigitStatus>()
         guess.forEachIndexed { index, char ->
@@ -320,20 +360,29 @@ class GameViewModel @Inject constructor(
     }
 
     fun dismissReport() {
-        if (_currentReport.value is FieldReport.Promotion) {
-            _currentReport.value = null
+        val wasPromotion = _currentReport.value is FieldReport.Promotion
+        _currentReport.value = null
+        
+        if (wasPromotion) {
             startCountdown()
             return
         }
-        _currentReport.value = null
-        _isPaused.value = false
+
+        // Resume countdown if it was in progress during pause or validation
+        val currentCV = _countdownValue.value
+        if (currentCV != null) {
+            startCountdown(currentCV)
+        } else {
+            _isPaused.value = false
+        }
     }
 
-    private fun startCountdown() {
+    private fun startCountdown(startFrom: Int? = null) {
+        val initialValue = startFrom ?: 3
         countdownJob?.cancel()
         _isPaused.value = true
         countdownJob = viewModelScope.launch {
-            for (i in 3 downTo 1) {
+            for (i in initialValue downTo 1) {
                 _countdownValue.value = i
                 soundManager.playBeepSound()
                 delay(1000)
@@ -357,7 +406,14 @@ class GameViewModel @Inject constructor(
     fun resumeGame() {
         if (_currentReport.value is FieldReport.Pause) {
             _currentReport.value = null
-            _isPaused.value = false
+            
+            // Resume countdown if it was in progress (including 0/"GO!" state)
+            val currentCV = _countdownValue.value
+            if (currentCV != null) {
+                startCountdown(currentCV)
+            } else {
+                _isPaused.value = false
+            }
         }
     }
 

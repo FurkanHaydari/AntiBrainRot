@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.draw.rotate
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.brainfocus.numberdetective.R
+import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 import com.brainfocus.numberdetective.core.designsystem.*
 
 @Composable
@@ -79,43 +80,6 @@ fun HistoryDetailScreen(
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
-            
-            // Centralized Header
-            DetectiveHeader(
-                title = stringResource(R.string.final_report),
-                scaleFactor = scaleFactor,
-                rightContent = {
-                    IconButton(
-                        onClick = onNavigateBack,
-                        modifier = Modifier
-                            .size(40.dp * scaleFactor)
-                            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(10.dp * scaleFactor))
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = PrimaryCyan,
-                            modifier = Modifier.size(20.dp * scaleFactor)
-                        )
-                    }
-                }
-            )
-            
-            // SIA Official Header Component
-            SIAOfficialHeader(scaleFactor = scaleFactor)
-            
-            Text(
-                text = "CASE ID: #${session?.id?.take(8)?.uppercase() ?: "UNKNOWN"}",
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                    fontSize = (9 * scaleFactor).sp,
-                    letterSpacing = (1 * scaleFactor).sp
-                ),
-                color = TextSecondary.copy(alpha = 0.4f),
-                modifier = Modifier.padding(bottom = 20.dp * scaleFactor)
-            )
-
             if (session == null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(text = "Session not found", color = ErrorRed)
@@ -124,9 +88,66 @@ fun HistoryDetailScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp * scaleFactor),
-                    contentPadding = PaddingValues(bottom = 32.dp * scaleFactor),
+                    contentPadding = PaddingValues(top = 16.dp * scaleFactor, bottom = 32.dp * scaleFactor),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Header (Scrollable)
+                    item {
+                        DetectiveHeader(
+                            title = stringResource(R.string.final_report),
+                            scaleFactor = scaleFactor,
+                            rightContent = {
+                                IconButton(
+                                    onClick = onNavigateBack,
+                                    modifier = Modifier
+                                        .size(40.dp * scaleFactor)
+                                        .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(10.dp * scaleFactor))
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Back",
+                                        tint = PrimaryCyan,
+                                        modifier = Modifier.size(20.dp * scaleFactor)
+                                    )
+                                }
+                            }
+                        )
+                    }
+
+                    // SIA Official Header Component (Scrollable)
+                    item {
+                        SIAOfficialHeader(scaleFactor = scaleFactor)
+                    }
+
+                    // Case ID (Scrollable)
+                    item {
+                        Text(
+                            text = "CASE ID: #${session.id.take(8).uppercase()}",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                fontSize = (9 * scaleFactor).sp,
+                                letterSpacing = (1 * scaleFactor).sp
+                            ),
+                            color = TextSecondary.copy(alpha = 0.4f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp * scaleFactor)
+                        )
+                    }
+
+                    // Neuro-Diagnostic Report (Scrollable)
+                    item {
+                        val report = session.diagnosticReport ?: DiagnosticEngine.generateReport(session)
+                        com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
+                            report = report,
+                            isWin = session.isWin,
+                            scaleFactor = scaleFactor,
+                            staggered = false, // Immediate view for history
+                            modifier = Modifier.padding(bottom = 8.dp * scaleFactor)
+                        )
+                    }
+
+                    // Level Details and Hints
                     session.levels?.forEach { levelResult ->
                         item {
                             DetectiveHeader(
