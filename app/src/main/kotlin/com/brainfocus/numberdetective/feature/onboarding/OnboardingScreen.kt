@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
-import com.brainfocus.numberdetective.feature.home.RowDefaults
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,7 +40,7 @@ fun OnboardingScreen(
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val maxWidth = maxWidth
         val maxHeight = maxHeight
-        val scaleFactor = (maxWidth / 360.dp).coerceIn(1f, 2.2f)
+        val scaleFactor = minOf(maxWidth / 360.dp, maxHeight / 640.dp).coerceIn(1f, 1.7f)
         
         val pagerState = rememberPagerState(pageCount = { 7 })
         val scope = rememberCoroutineScope()

@@ -2,15 +2,12 @@ package com.brainfocus.numberdetective.feature.home
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +31,8 @@ import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Search
 
 @Composable
 fun HomeScreen(
@@ -55,17 +54,21 @@ fun HomeScreen(
         val maxWidth = maxWidth
         val maxHeight = maxHeight
         
-        // Robust scale factor: Baseline is 360dp (standard phone), scales up to 2.2x for tablets
-        val scaleFactor = (maxWidth / 360.dp).coerceIn(1f, 2.2f)
         
         // Derived responsive dimensions
-        // Derived responsive dimensions (Calculated as floats first for safe scaling)
-        val titleBaseSize = 34f
+        val isLandscape = maxWidth > maxHeight
+        val isTablet = maxWidth > 600.dp
+        
+        val scaleFactor = if (isLandscape) {
+            minOf(maxWidth / 720.dp, maxHeight / 400.dp).coerceIn(0.8f, 1.3f)
+        } else {
+            minOf(maxWidth / 360.dp, maxHeight / 640.dp).coerceIn(1f, 1.7f)
+        }
+        
+        val titleBaseSize = if (isLandscape) 28f else 34f
         val titleFontSize = (titleBaseSize * scaleFactor).sp
-        val buttonHeight = (58.dp * scaleFactor).coerceAtMost(100.dp)
-        val playButtonHeight = (62.dp * scaleFactor).coerceAtMost(92.dp) // Slimmer button
         val horizontalPadding = (24.dp * scaleFactor).coerceAtMost(80.dp)
-        val verticalPadding = (20.dp * scaleFactor).coerceAtMost(60.dp) // Reduced top/bottom padding to shift up
+        val verticalPadding = (16.dp * scaleFactor).coerceAtMost(48.dp)
 
         // --- Background Layers ---
         Image(
@@ -80,175 +83,246 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = horizontalPadding, vertical = verticalPadding)
                 .statusBarsPadding()
-                .navigationBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+                .navigationBarsPadding()
+                .padding(horizontal = horizontalPadding, vertical = verticalPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // --- TOP: Identity & Access ---
             val isSoundEnabled by viewModel.isSoundEnabled.collectAsState()
             val isHelperModeEnabled by viewModel.isHelperModeEnabled.collectAsState()
             var showSettings by remember { mutableStateOf(false) }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            HomeHeader(
+                highScore = highScore,
+                scaleFactor = scaleFactor,
+                onHistoryClick = onHistoryClick,
+                onSettingsClick = { showSettings = true }
+            )
+
+            if (showSettings) {
+                SettingsDialog(
+                    onDismiss = { showSettings = false },
+                    currentLanguage = currentLanguage,
+                    onLanguageChange = onLanguageChange,
+                    isSoundEnabled = isSoundEnabled,
+                    onSoundToggle = { viewModel.toggleSound(it) },
+                    isHelperModeEnabled = isHelperModeEnabled,
+                    onHelperModeToggle = { viewModel.toggleHelperMode(it) },
+                    onManualClick = onManualClick,
+                    scaleFactor = scaleFactor
+                )
+            }
+
+            // --- ADAPTIVE CONTENT ---
+            if (isLandscape) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    IconButton(
-                        onClick = onHistoryClick,
-                        modifier = Modifier
-                            .size((44.dp * scaleFactor).coerceAtMost(80.dp))
-                            .background(Color.White.copy(alpha = 0.05f), CircleShape)
-                            .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), CircleShape)
+                    // Left: Title & Status
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_attention),
-                            contentDescription = "Archive",
-                            tint = PrimaryCyan,
-                            modifier = Modifier.size((22.dp * scaleFactor).coerceAtMost(40.dp))
+                        Text(
+                            text = stringResource(R.string.app_title_1).uppercase(),
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontSize = (titleBaseSize * scaleFactor * 0.7f).sp,
+                                fontWeight = FontWeight.ExtraLight,
+                                letterSpacing = (5 * scaleFactor).sp,
+                                fontFamily = Montserrat
+                            ),
+                            color = Color.White.copy(alpha = 0.85f),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = stringResource(R.string.app_title_2).uppercase(),
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontSize = titleFontSize,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = (3 * scaleFactor).sp,
+                                fontFamily = Montserrat
+                            ),
+                            color = PrimaryCyan,
+                            textAlign = TextAlign.Center
+                        )
+                        
+                        Spacer(modifier = Modifier.height(30.dp * scaleFactor))
+                        
+                        DetectiveButton(
+                            text = stringResource(R.string.start_button),
+                            isPrimary = true,
+                            scaleFactor = scaleFactor,
+                            onClick = onPlayClick,
+                            modifier = Modifier.widthIn(max = 240.dp)
                         )
                     }
 
-                    IconButton(
-                        onClick = { showSettings = true },
-                        modifier = Modifier
-                            .size((44.dp * scaleFactor).coerceAtMost(80.dp))
-                            .background(Color.White.copy(alpha = 0.05f), CircleShape)
-                            .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), CircleShape)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = PrimaryCyan,
-                            modifier = Modifier.size((22.dp * scaleFactor).coerceAtMost(40.dp))
-                        )
+                    // Right: Briefing
+                    Box(modifier = Modifier.weight(1.2f), contentAlignment = Alignment.Center) {
+                        MissionBriefingPanel(scaleFactor, maxWidth)
                     }
                 }
+            } else {
+                // Portrait Layout
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    
+                    // Header Column
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = stringResource(R.string.app_title_1).uppercase(),
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontSize = (titleBaseSize * scaleFactor * 0.75f).sp,
+                                fontWeight = FontWeight.ExtraLight,
+                                letterSpacing = (5 * scaleFactor).sp,
+                                fontFamily = Montserrat
+                            ),
+                            color = Color.White.copy(alpha = 0.85f),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = stringResource(R.string.app_title_2).uppercase(),
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontSize = titleFontSize,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = (3 * scaleFactor).sp,
+                                fontFamily = Montserrat
+                            ),
+                            color = PrimaryCyan,
+                            textAlign = TextAlign.Center
+                        )
+                    }
 
-                if (showSettings) {
-                    SettingsDialog(
-                        onDismiss = { showSettings = false },
-                        currentLanguage = currentLanguage,
-                        onLanguageChange = onLanguageChange,
-                        isSoundEnabled = isSoundEnabled,
-                        onSoundToggle = { viewModel.toggleSound(it) },
-                        isHelperModeEnabled = isHelperModeEnabled,
-                        onHelperModeToggle = { viewModel.toggleHelperMode(it) },
-                        onManualClick = onManualClick
+                    Spacer(modifier = Modifier.weight(1.2f)) // Centering weight
+
+                    MissionBriefingPanel(scaleFactor, maxWidth)
+
+                    Spacer(modifier = Modifier.weight(1.5f)) // Centering weight
+
+                    DetectiveButton(
+                        text = stringResource(R.string.start_button),
+                        isPrimary = true,
+                        scaleFactor = scaleFactor,
+                        onClick = onPlayClick,
+                        modifier = Modifier
+                            .widthIn(max = 300.dp)
+                            .fillMaxWidth(0.85f)
+                            .padding(bottom = (32.dp * scaleFactor).coerceAtLeast(16.dp))
                     )
                 }
+            }
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.height(12.dp * scaleFactor))
-
-                // High Score Badge
-                AnimatedVisibility(
-                    visible = highScore > 0,
-                    enter = fadeIn(tween(800)) + slideInVertically(tween(800)) { -it }
-                ) {
-                    Surface(
-                        color = Color.White.copy(alpha = 0.08f),
-                        shape = RoundedCornerShape(14.dp * scaleFactor),
-                        border = RowDefaults.CardBorder
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp * scaleFactor, vertical = 8.dp * scaleFactor),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "🏆",
-                                fontSize = (16 * scaleFactor).coerceAtMost(28f).sp,
-                                modifier = Modifier.padding(end = 8.dp * scaleFactor)
-                            )
-                            Text(
-                                text = stringResource(R.string.score_text, highScore),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontSize = (14 * scaleFactor).coerceAtMost(24f).sp,
-                                    fontWeight = FontWeight.Black,
-                                    letterSpacing = 1.sp
-                                ),
-                                color = PrimaryCyan
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp * scaleFactor))
-                
-                // Game Title
-                Text(
-                    text = stringResource(R.string.app_title_1).uppercase(),
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = (titleBaseSize * scaleFactor * 0.75f).sp,
-                        fontWeight = FontWeight.ExtraLight,
-                        letterSpacing = (5 * scaleFactor).sp
-                    ),
-                    color = Color.White.copy(alpha = 0.85f),
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = stringResource(R.string.app_title_2).uppercase(),
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = titleFontSize,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (3 * scaleFactor).sp
-                    ),
-                    color = PrimaryCyan,
-                    textAlign = TextAlign.Center
+@Composable
+fun HomeHeader(
+    highScore: Int,
+    scaleFactor: Float,
+    onHistoryClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onHistoryClick,
+                modifier = Modifier
+                    .size((44.dp * scaleFactor).coerceAtMost(80.dp))
+                    .background(Color.White.copy(alpha = 0.05f), CircleShape)
+                    .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Archive",
+                    tint = PrimaryCyan,
+                    modifier = Modifier.size((22.dp * scaleFactor).coerceAtMost(40.dp))
                 )
             }
 
-            // Balanced space above and below Briefing
-            Spacer(modifier = Modifier.weight(1f).heightIn(min = 24.dp * scaleFactor))
-
-            // --- CENTER: Briefing ---
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(animationSpec = tween(1000, delayMillis = 400))
+            IconButton(
+                onClick = onSettingsClick,
+                modifier = Modifier
+                    .size((44.dp * scaleFactor).coerceAtMost(80.dp))
+                    .background(Color.White.copy(alpha = 0.05f), CircleShape)
+                    .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), CircleShape)
             ) {
-                MissionBriefingPanel(scaleFactor, maxWidth)
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = PrimaryCyan,
+                    modifier = Modifier.size((22.dp * scaleFactor).coerceAtMost(40.dp))
+                )
             }
+        }
 
-            // Balanced space above and below Briefing
-            Spacer(modifier = Modifier.weight(1f).heightIn(min = 24.dp * scaleFactor))
+        Spacer(modifier = Modifier.height(20.dp * scaleFactor))
 
-            // --- BOTTOM: Actions ---
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(animationSpec = tween(1200, delayMillis = 800)) + 
-                        slideInVertically(animationSpec = tween(1200, delayMillis = 800)) { it / 3 }
+        // Case Status Badge
+        AnimatedVisibility(
+            visible = highScore > 0,
+            enter = fadeIn(tween(1000)) + expandVertically(tween(1000))
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        Color.White.copy(alpha = 0.05f),
+                        RoundedCornerShape(12.dp * scaleFactor)
+                    )
+                    .border(
+                        1.dp,
+                        PrimaryCyan.copy(alpha = 0.2f),
+                        RoundedCornerShape(12.dp * scaleFactor)
+                    )
+                    .padding(horizontal = 14.dp * scaleFactor, vertical = 6.dp * scaleFactor)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .widthIn(max = (400.dp * scaleFactor).coerceAtMost(maxHeight))
-                        .padding(bottom = 16.dp * scaleFactor) // Ensure it doesn't touch the navigation bar
-                ) {
-                    PlayButton(onClick = onPlayClick, height = playButtonHeight, scaleFactor = scaleFactor)
-                    
-                    Spacer(modifier = Modifier.height(14.dp * scaleFactor))
-
-                    ManualButton(onClick = onManualClick, height = buttonHeight * 0.85f, scaleFactor = scaleFactor)
-                    
-                    Spacer(modifier = Modifier.height(14.dp * scaleFactor))
-
-                    var showAboutDialog by remember { mutableStateOf(false) }
-                    AboutButton(onClick = { showAboutDialog = true }, height = buttonHeight * 0.85f, scaleFactor = scaleFactor)
-
-                    if (showAboutDialog) {
-                        AboutGameDialog(
-                            scaleFactor = scaleFactor,
-                            maxWidth = maxWidth,
-                            onDismiss = { showAboutDialog = false }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "ID: #${10000 + (highScore % 1000)}",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = (9 * scaleFactor).sp,
+                            fontFamily = Montserrat,
+                            color = Color.White.copy(alpha = 0.4f),
+                            letterSpacing = (1.5 * scaleFactor).sp
                         )
-                    }
+                    )
+                    
+                    Spacer(modifier = Modifier.width(12.dp * scaleFactor))
+                    
+                    Box(modifier = Modifier.size(1.dp, 10.dp * scaleFactor).background(Color.White.copy(alpha = 0.1f)))
+                    
+                    Spacer(modifier = Modifier.width(12.dp * scaleFactor))
+
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = PrimaryCyan.copy(alpha = 0.8f),
+                        modifier = Modifier
+                            .size(16.dp * scaleFactor)
+                            .padding(end = 4.dp * scaleFactor)
+                    )
+                    
+                    Text(
+                        text = stringResource(R.string.score_text, highScore).uppercase(),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = (11 * scaleFactor).sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Montserrat,
+                            color = PrimaryCyan,
+                            letterSpacing = (1 * scaleFactor).sp
+                        )
+                    )
                 }
             }
-
-            // Final push to keep everything shifted slightly up
-            Spacer(modifier = Modifier.weight(0.4f))
         }
     }
 }
@@ -256,23 +330,41 @@ fun HomeScreen(
 @Composable
 fun MissionBriefingPanel(scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp) {
     Surface(
-        color = SurfaceCard,
-        shape = RoundedCornerShape(28.dp * scaleFactor),
         modifier = Modifier
-            .widthIn(max = (420.dp * scaleFactor).coerceAtMost(maxWidth)) // Prevent excessive width
-            .padding(horizontal = 16.dp * scaleFactor), // Increased padding for a slimmer look
-        border = RowDefaults.CardBorder
+            .widthIn(max = 500.dp)
+            .fillMaxWidth(0.9f),
+        color = Color.White.copy(alpha = 0.03f),
+        shape = RoundedCornerShape(20.dp * scaleFactor),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))
     ) {
         Column(
             modifier = Modifier.padding(24.dp * scaleFactor),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(R.string.home_mission_title).uppercase(),
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = (14 * scaleFactor).coerceAtMost(24f).sp),
-                color = PrimaryCyan,
-                letterSpacing = (2 * scaleFactor).sp
-            )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(R.string.home_mission_title).uppercase(),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = (13 * scaleFactor).coerceAtMost(20f).sp,
+                        fontFamily = Montserrat,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = PrimaryCyan,
+                    letterSpacing = (2.5 * scaleFactor).sp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                
+                // Subtle "CONFIDENTIAL" tab
+                Text(
+                    text = "SIA-7",
+                    fontSize = (8 * scaleFactor).sp,
+                    color = Color.White.copy(alpha = 0.15f),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .border(0.5.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                )
+            }
             
             Spacer(modifier = Modifier.height(24.dp * scaleFactor))
             
@@ -280,24 +372,27 @@ fun MissionBriefingPanel(scaleFactor: Float, maxWidth: androidx.compose.ui.unit.
                 icon = "🔍",
                 title = stringResource(R.string.home_step_1_title),
                 description = stringResource(R.string.home_step_1_desc),
+                cognitiveLabel = stringResource(R.string.home_cognitive_1),
                 scaleFactor = scaleFactor
             )
             
-            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(28.dp * scaleFactor))
             
             BriefingRow(
                 icon = "🧠",
                 title = stringResource(R.string.home_step_2_title),
                 description = stringResource(R.string.home_step_2_desc),
+                cognitiveLabel = stringResource(R.string.home_cognitive_2),
                 scaleFactor = scaleFactor
             )
             
-            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(28.dp * scaleFactor))
             
             BriefingRow(
                 icon = "🎯",
                 title = stringResource(R.string.home_step_3_title),
                 description = stringResource(R.string.home_step_3_desc),
+                cognitiveLabel = stringResource(R.string.home_cognitive_3),
                 scaleFactor = scaleFactor
             )
         }
@@ -305,291 +400,58 @@ fun MissionBriefingPanel(scaleFactor: Float, maxWidth: androidx.compose.ui.unit.
 }
 
 @Composable
-fun BriefingRow(icon: String, title: String, description: String, scaleFactor: Float) {
+fun BriefingRow(icon: String, title: String, description: String, cognitiveLabel: String, scaleFactor: Float) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         modifier = Modifier.fillMaxWidth()
     ) {
         Box(
             modifier = Modifier
-                .size((44.dp * scaleFactor).coerceAtMost(70.dp))
+                .size((44.dp * scaleFactor).coerceAtMost(64.dp))
                 .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp * scaleFactor))
-                .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(12.dp * scaleFactor)),
+                .border(0.5.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(12.dp * scaleFactor)),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = icon, fontSize = (20 * scaleFactor).coerceAtMost(32f).sp)
+            Text(text = icon, fontSize = (22 * scaleFactor).coerceAtMost(32f).sp)
         }
         
-        Spacer(modifier = Modifier.width(16.dp * scaleFactor))
+        Spacer(modifier = Modifier.width(18.dp * scaleFactor))
         
         Column {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = (16 * scaleFactor).coerceAtMost(26f).sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = (15 * scaleFactor).coerceAtMost(24f).sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Montserrat
                 ),
                 color = Color.White
             )
+            
+            // Cognitive Tag - Now below title with more distinct style
+            Text(
+                text = cognitiveLabel.uppercase(),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = (8.5f * scaleFactor).sp,
+                    fontFamily = Montserrat,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = (0.5f * scaleFactor).sp
+                ),
+                color = PrimaryCyan.copy(alpha = 0.7f),
+                modifier = Modifier.padding(vertical = 2.dp * scaleFactor)
+            )
+            
+            Spacer(modifier = Modifier.height(2.dp * scaleFactor))
+            
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = (12 * scaleFactor).coerceAtMost(18f).sp,
-                    lineHeight = (16 * scaleFactor).coerceAtMost(24f).sp
+                    fontSize = (12.5f * scaleFactor).coerceAtMost(18f).sp,
+                    lineHeight = (16f * scaleFactor).coerceAtMost(24f).sp,
+                    fontFamily = Montserrat
                 ),
-                color = TextSecondary
+                color = TextSecondary.copy(alpha = 0.9f)
             )
-        }
-    }
-}
-
-@Composable
-fun PlayButton(onClick: () -> Unit, height: androidx.compose.ui.unit.Dp, scaleFactor: Float) {
-    val infiniteTransition = rememberInfiniteTransition(label = "glow")
-    val glowAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.4f,
-        targetValue = 0.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "alpha"
-    )
-
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height)
-            .border(2.dp, PrimaryCyan.copy(alpha = glowAlpha), RoundedCornerShape(20.dp * scaleFactor)),
-        shape = RoundedCornerShape(20.dp * scaleFactor),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(PlayButtonGradient),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                stringResource(R.string.start_button),
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = (20 * scaleFactor).coerceAtMost(32f).sp),
-                color = Color.White
-            )
-        }
-    }
-}
-
-@Composable
-fun LanguageButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        color = if (isSelected) PrimaryCyan.copy(alpha = 0.2f) else Color.Transparent,
-        shape = RoundedCornerShape(8.dp),
-        border = if (isSelected) RowDefaults.CardBorder else null
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            color = if (isSelected) PrimaryCyan else Color.White.copy(alpha = 0.5f),
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            fontSize = 12.sp
-        )
-    }
-}
-
-object RowDefaults {
-    val CardBorder @Composable get() = androidx.compose.foundation.BorderStroke(
-        width = 1.dp,
-        brush = CardBorderGradient
-    )
-}
-
-@Composable
-fun ManualButton(onClick: () -> Unit, height: androidx.compose.ui.unit.Dp, scaleFactor: Float) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height)
-            .border(1.dp, PrimaryCyan.copy(alpha = 0.4f), RoundedCornerShape(16.dp * scaleFactor)),
-        shape = RoundedCornerShape(16.dp * scaleFactor),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White.copy(alpha = 0.05f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(text = "📖", fontSize = (18 * scaleFactor).coerceAtMost(28f).sp)
-                Spacer(modifier = Modifier.width(12.dp * scaleFactor))
-                Text(
-                    stringResource(R.string.home_manual_button).uppercase(),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = (2 * scaleFactor).sp
-                    ),
-                    color = PrimaryCyan.copy(alpha = 0.85f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun AboutButton(onClick: () -> Unit, height: androidx.compose.ui.unit.Dp, scaleFactor: Float) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height)
-            .border(1.dp, PrimaryCyan.copy(alpha = 0.25f), RoundedCornerShape(14.dp * scaleFactor)),
-        shape = RoundedCornerShape(14.dp * scaleFactor),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White.copy(alpha = 0.03f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(text = "🧬", fontSize = (16 * scaleFactor).coerceAtMost(24f).sp)
-                Spacer(modifier = Modifier.width(10.dp * scaleFactor))
-                Text(
-                    stringResource(R.string.home_about_button).uppercase(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = (14 * scaleFactor).coerceAtMost(20f).sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = (1.5 * scaleFactor).sp
-                    ),
-                    color = Color.White.copy(alpha = 0.85f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun AboutGameDialog(
-    scaleFactor: Float,
-    maxWidth: androidx.compose.ui.unit.Dp,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    val coffeeUrl = stringResource(R.string.about_buy_coffee_url)
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(24.dp * scaleFactor),
-            color = Color(0xFF0F1923),
-            border = androidx.compose.foundation.BorderStroke(
-                1.dp,
-                PrimaryCyan.copy(alpha = 0.3f)
-            ),
-            modifier = Modifier
-                .widthIn(max = (400.dp * scaleFactor).coerceAtMost(maxWidth))
-                .fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(28.dp * scaleFactor)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Title
-                Text(
-                    text = "✦",
-                    fontSize = (24 * scaleFactor).coerceAtMost(36f).sp,
-                    color = PrimaryCyan
-                )
-
-                Spacer(modifier = Modifier.height(8.dp * scaleFactor))
-
-                Text(
-                    text = stringResource(R.string.about_dialog_title).uppercase(),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = (2 * scaleFactor).sp
-                    ),
-                    color = PrimaryCyan,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
-
-                // Divider line
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(PrimaryCyan.copy(alpha = 0.15f))
-                )
-
-                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
-
-                // Body text
-                Text(
-                    text = stringResource(R.string.about_dialog_body),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = (14 * scaleFactor).coerceAtMost(22f).sp,
-                        lineHeight = (22 * scaleFactor).coerceAtMost(32f).sp
-                    ),
-                    color = Color.White.copy(alpha = 0.82f),
-                    textAlign = TextAlign.Start
-                )
-
-                Spacer(modifier = Modifier.height(28.dp * scaleFactor))
-
-                // Buy Me a Coffee button
-                Button(
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(coffeeUrl))
-                        context.startActivity(intent)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height((52.dp * scaleFactor).coerceAtMost(80.dp)),
-                    shape = RoundedCornerShape(14.dp * scaleFactor),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFDD00)
-                    )
-                ) {
-                    Text(
-                        text = stringResource(R.string.about_buy_coffee),
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontSize = (14 * scaleFactor).coerceAtMost(20f).sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = (0.5 * scaleFactor).sp
-                        ),
-                        color = Color(0xFF1A1200)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp * scaleFactor))
-
-                // Close
-                TextButton(onClick = onDismiss) {
-                    Text(
-                        text = "✕",
-                        color = Color.White.copy(alpha = 0.35f),
-                        fontSize = (13 * scaleFactor).coerceAtMost(20f).sp
-                    )
-                }
-            }
         }
     }
 }

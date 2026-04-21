@@ -33,34 +33,8 @@
     <string name="start_button">OYUNA BAŞLA</string>
     
     <string name="back_to_menu">ANA MENÜ</string>
-
-    <string-array name="game_quotes">
-        <item>"İmkansızı elediğinde, geriye kalan ne kadar olası dışı görünürse görünsün, gerçek olmalıdır." – Sherlock Holmes</item>
-        <item>"Veri olmadan teori üretmek büyük bir hatadır." – Sherlock Holmes</item>
-        <item>"Dünya, kimsenin fark etmediği apaçık şeylerle doludur." – Sherlock Holmes</item>
-        <item>"Apaçık bir doğrudan daha aldatıcı bir şey yoktur." – Sherlock Holmes</item>
-        <item>"Küçük şeyler, sonsuz derecede en önemli şeylerdir." – Sherlock Holmes</item>
-        <item>"Görüyorsun ama gözlemlemiyorsun. Aradaki fark çok net." – Sherlock Holmes</item>
-        <item>"Asla tahmin yürütmem. Bu, mantık yürütme yetisine zarar verir." – Sherlock Holmes</item>
-        <item>"Veri! Veri! Veri! Kil olmadan tuğla yapamam." – Sherlock Holmes</item>
-        <item>"Oyun başladı!" – Sherlock Holmes</item>
-        <item>"Eğitim asla bitmez. Bir dizi derstir, en büyüğü ise sona saklanmıştır." – Sherlock Holmes</item>
-        <item>"İnsanın güvenmesi gereken tek şey beynidir, o küçük gri hücrelerdir." – Hercule Poirot</item>
-        <item>"İmkansız olan gerçekleşmiş olamaz. Öyleyse imkansız gibi görünen şey aslında mümkün olmalıdır." – Hercule Poirot</item>
-        <item>"İçgüdü harika bir şeydir. Ne açıklanabilir ne de görmezden gelinebilir." – Agatha Christie</item>
-        <item>"Her vaka bir bulmacadır. Parçaları birleştirin ve resim ortaya çıksın." – Agatha Christie</item>
-        <item>"Gerçek, ne kadar çirkin olursa olsun, güzel bir yalandan her zaman daha iyidir." – Agatha Christie</item>
-        <item>"Mantık bilgeliğin sonu değil, başlangıcıdır." – Leonard Nimoy</item>
-        <item>"Zekanın ölçüsü, değişebilme yeteneğidir." – Albert Einstein</item>
-        <item>"Sayılar, bilginin en yüksek derecesidir." – Platon</item>
-        <item>"Her şifre, en nihayetinde kırılmak için oluşturulur."</item>
-        <item>"Bir dedektif, ancak görmezden gelmeyi reddettiği ipuçları kadar iyidir."</item>
-        <item>"Şifre her zaman konuşur. Sadece onun dilini öğrenmen gerekir."</item>
-        <item>"Sabır her kasayı açar. Acele ise her alarmı tetikler."</item>
-        <item>"Her yanlış cevap bir ihtimali eler. Bu da ilerlemedir."</item>
-        <item>"Örüntüye güven. Sayılar asla yalan söylemez."</item>
-        <item>"Keskin bir zihin, başkalarının kaos gördüğü yerde düzeni görür."</item>
-    </string-array>
+    <string name="sia_evaluation_win">BİLİŞSEL SENKRONİZASYON: OPTİMAL. VERİ TASNİFİ STANDARTLARIN ÜZERİNDE.</string>
+    <string name="sia_evaluation_loss">SİNYAL GÜRÜLTÜSÜ TESPİT EDİLDİ. BİR SONRAKİ FAZ İÇİN NÖRAL KALİBRASYON ÖNERİLİR.</string>
 
     <!-- Result Screen -->
     <string name="correct_answer">Doğru Cevap</string>
@@ -74,10 +48,13 @@
     <string name="home_mission_title">Görev Brifingi</string>
     <string name="home_step_1_title">Analiz Et</string>
     <string name="home_step_1_desc">Gizli kodu bulmak için ipuçlarını incele.</string>
+    <string name="home_cognitive_1">Görsel Tarama &amp; Odaklanma</string>
     <string name="home_step_2_title">Mantık Yürüt</string>
     <string name="home_step_2_desc">İmkansız rakamları eleyerek mantığını kullan.</string>
+    <string name="home_cognitive_2">Stratejik Bellek &amp; Çıkarım</string>
     <string name="home_step_3_title">Çöz</string>
     <string name="home_step_3_desc">Doğru dizilimi bul ve zafer kazan!</string>
+    <string name="home_cognitive_3">Zihinsel Çeviklik &amp; Hız</string>
 
     <!-- Onboarding / Tutorial -->
     <string name="tutorial_title">DEDEKTİF EL KİTABI</string>
@@ -87,14 +64,14 @@
     <string name="tutorial_page2_desc">Rakamları seçmek için dikey silindirleri kullan. Test etmek istediğin kombinasyonu ortaya çıkarmak için onları kaydır veya üzerine dokun.</string>
     <string name="tutorial_page3_title">[ VAKA ARŞİVİ ]</string>
     <string name="tutorial_page3_desc">Takıldın mı? Herhangi bir anda sağ üstteki \'Denemeler\' alanına tıklayarak Vaka Arşivi\'ni açabilirsin. Önceki tüm tahminlerini burada görebilir ve ihtimalleri daraltabilirsin.</string>
-    <string name="tutorial_page4_title">[ ANALİZ ANAHTARI ]</string>
-    <string name="tutorial_page4_desc">Eğer yardımlı modu ayarlardan açarsan, arşivdeki tahminlerin için renkli analizler görebilirsin:\n\n• YEŞİL: Doğru rakam doğru yerde.\n• SARI: Doğru rakam yanlış yerde.</string>
+    <string name="tutorial_page4_title">[ İSTİHBARAT ANAHTARI ]</string>
+    <string name="tutorial_page4_desc">Eğer yardımlı modu ayarlardan açarsan, arşivdeki tahminlerin için renkli istihbarat verileri görebilirsin:\n\n• YEŞİL: Doğru rakam doğru yerde.\n• SARI: Doğru rakam yanlış yerde.</string>
     <string name="tutorial_page5_title">> İLERLEME</string>
     <string name="tutorial_page5_desc">Bir katmanı kırmak sana ek deneme hakkı ve ekstra süre kazandırır. Davayı kazanmak için 3 katmanı da temizle.</string>
     <string name="tutorial_page6_title">PERFORMANS ÖDÜLLERİ</string>
     <string name="tutorial_page6_desc">Hızlı ve keskin zekalı dedektifler ek puan kazanır:\n\n• KESKİN ZEKA (+500): 2 veya daha az denemede çözüm.\n• FLASH ÇÖZÜM (+300): 20 saniyeden kısa sürede çözüm.</string>
     <string name="tutorial_page7_title">DEDEKTİF MALİYETİ</string>
-    <string name="tutorial_page7_desc">Aldığınız her yardım puanınızdan düşer. Ancak toplam puanınız asla sıfırın altına inmez:\n\n• ARŞİV KONTROLÜ: -50 Puan\n• YARDIMCI MOD: Arşivde her hamle başına -150 Puan.</string>
+    <string name="tutorial_page7_desc">Aldığınız her yardım puanınızdan düşer. Ancak toplam puanınız asla sıfırın altına inmez:\n\n• ARŞİV KONTROLÜ: -50 Puan\n• YARDIMCI MOD: Arşivde her hamle başına -300 Puan.</string>
     <string name="tutorial_continue_button">DEVAM ET</string>
     <string name="tutorial_finish_button">GÖREVİ KABUL ET</string>
     <string name="home_manual_button">DEDEKTİF REHBERİ</string>
@@ -116,11 +93,11 @@
     <string name="settings_language">DİL</string>
     <string name="settings_helper">YARDIMCI MOD</string>
     <string name="settings_helper_desc">Sorgu günlüğündeki her rakam için renkli mantık geri bildirimini açar.</string>
-    <string name="log_analysis_attempt">ANALİZ GİRİŞİMİ</string>
+    <string name="log_analysis_attempt">İSTİHBARAT ANALİZİ</string>
     <string name="log_analysis_success">ERİŞİM SAĞLANDI</string>
     <string name="label_trials">DENEMELER</string>
     <string name="label_case_archive">VAKA ARŞİVİ</string>
-    <string name="msg_analysis_active">SIA ANALİZİ AKTİF</string>
+    <string name="msg_analysis_active">SIA İSTİHBARATI AKTİF</string>
     <string name="msg_no_evidence_waiting">GİRİŞ BEKLENİYOR...</string>
     <string name="label_daily_record">GÜNLÜK REKOR</string>
     <string name="label_all_time_record">EBEDİ REKOR</string>
@@ -134,7 +111,8 @@
     <string name="continue_mission">GÖREVE DEVAM ET</string>
     <string name="initial_intelligence">BAŞLANGIÇ İSTİHBARATI</string>
     <string name="initial_intelligence_number">İSTİHBARAT #%1$d</string>
-    <string name="log_analysis_number">ANALİZ %1$d</string>
+    <string name="log_analysis_number">İSTİHBARAT %1$d</string>
+    <string name="log_interrogation_number">SORGU %1$d</string>
     <string name="case_file_level">VAKA DOSYASI: SEVİYE %d</string>
     <string name="label_lives">CAN</string>
     <string name="label_time">SÜRE</string>

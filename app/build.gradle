@@ -20,8 +20,8 @@ android {
         applicationId = "com.brainfocus.numberdetective"
         minSdk = 24
         targetSdk = 35
-        versionCode = 9
-        versionName = "2.0.9"
+        versionCode = 10
+        versionName = "2.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,13 +53,6 @@ android {
 
     kapt {
         correctErrorTypes true
-        arguments {
-            arg("dagger.fastInit", "enabled")
-            arg("dagger.hilt.android.internal.disableAndroidSuperclassValidation", "true")
-            arg("dagger.hilt.android.internal.projectType", "APP")
-            arg("dagger.hilt.internal.useAggregatingRootProcessor", "false")
-            arg("kapt.kotlin.generated", "false")
-        }
     }
 }
 

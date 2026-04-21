@@ -11,6 +11,7 @@ import com.brainfocus.numberdetective.data.model.Hint
 import com.brainfocus.numberdetective.core.sound.SoundManager
 import com.brainfocus.numberdetective.data.storage.DataStoreManager
 import com.brainfocus.numberdetective.data.storage.GameResultStorage
+import com.brainfocus.numberdetective.data.model.FieldReport
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,37 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.annotation.StringRes
-
-sealed class FieldReport(
-    @StringRes val titleRes: Int,
-    @StringRes val messageRes: Int,
-    val isPositive: Boolean,
-    val messageArgs: List<Any> = emptyList()
-) {
-    class Promotion(level: Int, bonusAttempts: Int, bonusTime: Int) : FieldReport(
-        titleRes = R.string.report_promotion_title,
-        messageRes = R.string.report_promotion_msg,
-        messageArgs = listOf(level, bonusAttempts, bonusTime),
-        isPositive = true
-    )
-    class Compromised(remaining: Int) : FieldReport(
-        titleRes = R.string.report_compromised_title,
-        messageRes = R.string.report_compromised_msg,
-        messageArgs = listOf(remaining),
-        isPositive = false
-    )
-    class Validation(@StringRes title: Int, @StringRes message: Int) : FieldReport(
-        titleRes = title,
-        messageRes = message,
-        isPositive = false
-    )
-    class Pause : FieldReport(
-        titleRes = R.string.report_pause_title,
-        messageRes = R.string.report_pause_msg,
-        isPositive = true
-    )
-}
+import android.util.Log
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -153,6 +124,7 @@ class GameViewModel @Inject constructor(
         _guesses.value = emptyList()
         game.startNewGame(_currentLevel.value)
         _correctAnswer.value = game.getCorrectAnswer()
+        Log.d("NumberDetectiveDebug", "Target Number for Level ${_currentLevel.value}: ${_correctAnswer.value}")
         _gameState.value = GameState.Playing
 
         // Restore Hint Generation Logic
@@ -326,14 +298,6 @@ class GameViewModel @Inject constructor(
             }
             else -> {
                 soundManager.playPartialWrongSound()
-                
-                // If helper mode is active, we store the per-digit status in the hint
-                // But we need to check helper mode synchronously here.
-                // I'll grab it from the flow's current value if possible or just use a state variable.
-                
-                // Simple workaround: the ViewModel can have a local variable updated by the flow.
-                
-                
                 _currentReport.value = FieldReport.Compromised(_remainingAttempts.value)
                 _isPaused.value = true
                 GuessResult.Partial(result.correct, result.misplaced)
@@ -414,19 +378,19 @@ class GameViewModel @Inject constructor(
         val attemptsPenalty = _attemptsInLevel * 100 // 100 points per attempt
         
         // --- Archive & Assistance Penalties ---
-        val perCheckPenalty = if (isHelperModeEnabledLocal) 150 else 50
+        val perCheckPenalty = if (isHelperModeEnabledLocal) 300 else 50
         val archivePenalty = _archiveChecksInLevel * perCheckPenalty
         
-        var levelScore = maxOf(0, baseScore - timePenalty - attemptsPenalty - archivePenalty)
+        var levelScore = if (_attemptsInLevel == 0) 0 else maxOf(0, baseScore - timePenalty - attemptsPenalty - archivePenalty)
         
         // --- Skill Bonuses (Added after zero-floor protection) ---
-        // 1. Deduction Bonus: Solved in 2 or fewer attempts
-        if (_attemptsInLevel <= 2) {
+        // 1. Deduction Bonus: Solved in 2 or fewer attempts (but at least 1 attempt)
+        if (_attemptsInLevel in 1..2) {
             levelScore += 500
         }
         
-        // 2. Flash Clearance: Solved in under 20 seconds
-        if (timeTakenInLevel < 20) {
+        // 2. Flash Clearance: Solved in under 20 seconds (only if actually solved/attempts > 0)
+        if (_attemptsInLevel > 0 && timeTakenInLevel < 20) {
             levelScore += 300
         }
         

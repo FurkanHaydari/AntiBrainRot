@@ -4,11 +4,9 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,12 +29,6 @@ import com.brainfocus.numberdetective.data.storage.GameSession
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.font.FontFamily
 
 @Composable
@@ -82,36 +74,27 @@ fun HistoryScreen(
                 .padding(24.dp)
         ) {
             // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onNavigateBack,
-                    modifier = Modifier
-                        .size(48.dp * scaleFactor)
-                        .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp * scaleFactor))
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = PrimaryCyan,
-                        modifier = Modifier.size(24.dp * scaleFactor)
-                    )
+            DetectiveHeader(
+                title = stringResource(R.string.label_tab_archive),
+                scaleFactor = scaleFactor,
+                rightContent = {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier
+                            .size(40.dp * scaleFactor)
+                            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(10.dp * scaleFactor))
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = PrimaryCyan,
+                            modifier = Modifier.size(20.dp * scaleFactor)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.width(16.dp * scaleFactor))
-                Text(
-                    text = stringResource(R.string.label_tab_archive).uppercase(),
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontFamily = Montserrat,
-                        letterSpacing = (2 * scaleFactor).sp,
-                        fontSize = (24 * scaleFactor).coerceAtMost(32f).sp
-                    ),
-                    color = PrimaryCyan
-                )
-            }
+            )
 
-            Spacer(modifier = Modifier.height(24.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
 
             if (history.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -131,8 +114,10 @@ fun HistoryScreen(
                     contentPadding = PaddingValues(bottom = 24.dp * scaleFactor),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(history.size) { index ->
-                        val session = history[index]
+                    itemsIndexed(
+                        items = history,
+                        key = { index, session -> session.id ?: "session_$index" }
+                    ) { index, session ->
                         val caseNumber = history.size - index
                         HistoryItem(
                             session = session, 
@@ -163,11 +148,12 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
             .fillMaxWidth()
     ) {
         Box {
-            // Paperclip Effect
+            // Paperclip Effect from DetectiveComponents
             PaperClip(
                 scaleFactor = scaleFactor,
                 modifier = Modifier
-                    .padding(start = 12.dp * scaleFactor, top = (-4).dp * scaleFactor)
+                    .offset(y = (-4).dp * scaleFactor)
+                    .padding(start = 12.dp * scaleFactor)
                     .align(Alignment.TopStart)
             )
 
@@ -199,14 +185,12 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                         )
                     }
                     
-                    Box(contentAlignment = Alignment.Center) {
-                        MissionStamp(
-                            text = if (session.isWin) stringResource(R.string.mission_accomplished) 
-                                   else stringResource(R.string.mission_failed),
-                            color = if (session.isWin) SuccessGreen else ErrorRed,
-                            scaleFactor = scaleFactor
-                        )
-                    }
+                    MissionStamp(
+                        text = if (session.isWin) stringResource(R.string.mission_accomplished) 
+                               else stringResource(R.string.mission_failed),
+                        color = if (session.isWin) SuccessGreen else ErrorRed,
+                        scaleFactor = scaleFactor * 0.8f
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp * scaleFactor))
@@ -215,16 +199,15 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                 Text(
                     text = dateString.uppercase(),
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
+                        fontSize = (14 * scaleFactor).coerceAtMost(22f).sp,
                         fontFamily = FontFamily.Monospace,
-                        letterSpacing = (12f / 10f * scaleFactor).sp
+                        letterSpacing = (1.2f * scaleFactor).sp
                     ),
                     color = TextSecondary.copy(alpha = 0.5f)
                 )
 
-                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+                Spacer(modifier = Modifier.height(16.dp * scaleFactor))
 
-                // Score Detail (Primary focus in the new layout)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -234,8 +217,8 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                         Text(
                             text = stringResource(R.string.final_score).uppercase(),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = (14 * scaleFactor).coerceAtMost(20f).sp,
-                                letterSpacing = (1 * scaleFactor).sp
+                                fontSize = (12 * scaleFactor).coerceAtMost(18f).sp,
+                                letterSpacing = (1.5 * scaleFactor).sp
                             ),
                             color = TextSecondary.copy(alpha = 0.4f)
                         )
@@ -243,77 +226,23 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                             text = session.totalScore.toString(),
                             style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = (40 * scaleFactor).coerceAtMost(56f).sp
+                                fontSize = (36 * scaleFactor).coerceAtMost(52f).sp
                             ),
                             color = PrimaryCyan
                         )
                     }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp * scaleFactor))
-            
-            // Level summary
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                session.levels.forEach { level ->
-                    LevelBadge(levelNumber = level.levelNumber, scaleFactor = scaleFactor)
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp * scaleFactor),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 4.dp * scaleFactor)
+                    ) {
+                        session.levels?.forEach { level ->
+                            LevelBadge(levelNumber = level.levelNumber, scaleFactor = scaleFactor * 0.9f)
+                        }
+                    }
                 }
             }
         }
     }
-}
-
-@Composable
-fun LevelBadge(levelNumber: Int, scaleFactor: Float) {
-    Box(
-        modifier = Modifier
-            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(6.dp * scaleFactor))
-            .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), RoundedCornerShape(6.dp * scaleFactor))
-            .padding(horizontal = 8.dp * scaleFactor, vertical = 4.dp * scaleFactor)
-    ) {
-        Text(
-            text = "LVL $levelNumber",
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = (16 * scaleFactor).coerceAtMost(22f).sp
-            ),
-            color = TextSecondary
-        )
-    }
-}
-@Composable
-fun MissionStamp(text: String, color: Color, scaleFactor: Float, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .rotate(-15f)
-            .border(
-                width = (2.dp * scaleFactor),
-                color = color.copy(alpha = 0.4f),
-                shape = RoundedCornerShape(4.dp * scaleFactor)
-            )
-            .padding(horizontal = 8.dp * scaleFactor, vertical = 4.dp * scaleFactor)
-    ) {
-        Text(
-            text = text.uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Black,
-                fontSize = (16 * scaleFactor).coerceAtMost(22f).sp,
-                letterSpacing = (1.5f * scaleFactor).sp,
-                fontFamily = FontFamily.Monospace
-            ),
-            color = color.copy(alpha = 0.6f)
-        )
-    }
-}
-
-@Composable
-fun PaperClip(scaleFactor: Float, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .size(width = 12.dp * scaleFactor, height = 32.dp * scaleFactor)
-            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(percent = 50))
-            .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(percent = 50))
-    )
 }

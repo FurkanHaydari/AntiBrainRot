@@ -1,19 +1,25 @@
 package com.brainfocus.numberdetective.feature.home
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,8 +40,18 @@ fun SettingsDialog(
     onSoundToggle: (Boolean) -> Unit,
     isHelperModeEnabled: Boolean,
     onHelperModeToggle: (Boolean) -> Unit,
-    onManualClick: () -> Unit
+    onManualClick: () -> Unit,
+    scaleFactor: Float = 1.0f
 ) {
+    var showAboutDialog by remember { mutableStateOf(false) }
+
+    if (showAboutDialog) {
+        AboutGameDialog(
+            scaleFactor = scaleFactor,
+            onDismiss = { showAboutDialog = false }
+        )
+    }
+
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -49,14 +65,17 @@ fun SettingsDialog(
         ) {
             Surface(
                 modifier = Modifier
-                    .fillMaxWidth(0.85f)
+                    .widthIn(max = 550.dp)
+                    .fillMaxWidth(0.92f)
                     .clickable(enabled = false) {},
                 color = SurfaceCard,
-                shape = RoundedCornerShape(28.dp),
+                shape = RoundedCornerShape(28.dp * scaleFactor),
                 border = RowDefaults.CardBorder
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(24.dp * scaleFactor),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Header
@@ -68,31 +87,40 @@ fun SettingsDialog(
                         Text(
                             text = stringResource(R.string.settings_title),
                             style = MaterialTheme.typography.titleLarge.copy(
+                                fontSize = (20 * scaleFactor).coerceAtMost(32f).sp,
                                 fontFamily = Montserrat,
-                                letterSpacing = 1.sp
+                                letterSpacing = (1 * scaleFactor).sp
                             ),
                             color = PrimaryCyan
                         )
                         IconButton(
                             onClick = onDismiss,
-                            modifier = Modifier.size(32.dp).background(Color.White.copy(alpha = 0.05f), CircleShape)
+                            modifier = Modifier
+                                .size(32.dp * scaleFactor)
+                                .background(Color.White.copy(alpha = 0.05f), CircleShape)
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
+                            Icon(
+                                Icons.Default.Close, 
+                                contentDescription = null, 
+                                tint = Color.Gray, 
+                                modifier = Modifier.size(18.dp * scaleFactor)
+                            )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(24.dp * scaleFactor))
 
                     // Language Selection
-                    SettingRow(label = stringResource(R.string.settings_language)) {
+                    SettingRow(label = stringResource(R.string.settings_language), scaleFactor = scaleFactor) {
                         Row(
                             modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
-                                .padding(4.dp)
+                                .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp * scaleFactor))
+                                .padding(4.dp * scaleFactor)
                         ) {
                             LanguageOption(
                                 text = "TR",
                                 isSelected = currentLanguage == "tr",
+                                scaleFactor = scaleFactor,
                                 onClick = { 
                                     onDismiss()
                                     onLanguageChange("tr") 
@@ -101,6 +129,7 @@ fun SettingsDialog(
                             LanguageOption(
                                 text = "EN",
                                 isSelected = currentLanguage == "en",
+                                scaleFactor = scaleFactor,
                                 onClick = { 
                                     onDismiss()
                                     onLanguageChange("en") 
@@ -109,13 +138,14 @@ fun SettingsDialog(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp * scaleFactor))
 
                     // Sound Toggle
-                    SettingRow(label = stringResource(R.string.settings_sound)) {
+                    SettingRow(label = stringResource(R.string.settings_sound), scaleFactor = scaleFactor) {
                         Switch(
                             checked = isSoundEnabled,
                             onCheckedChange = onSoundToggle,
+                            modifier = Modifier.scale(0.9f * scaleFactor),
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = PrimaryCyan,
                                 checkedTrackColor = PrimaryCyan.copy(alpha = 0.3f),
@@ -125,7 +155,7 @@ fun SettingsDialog(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp * scaleFactor))
 
                     // Helper Mode Toggle
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -136,12 +166,16 @@ fun SettingsDialog(
                         ) {
                             Text(
                                 text = stringResource(R.string.settings_helper),
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = (15 * scaleFactor).sp,
+                                    fontWeight = FontWeight.Bold
+                                ),
                                 color = Color.White
                             )
                             Switch(
                                 checked = isHelperModeEnabled,
                                 onCheckedChange = onHelperModeToggle,
+                                modifier = Modifier.scale(0.9f * scaleFactor),
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = SuccessGreen,
                                     checkedTrackColor = SuccessGreen.copy(alpha = 0.3f),
@@ -152,52 +186,57 @@ fun SettingsDialog(
                         }
                         Text(
                             text = stringResource(R.string.settings_helper_desc),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = (12 * scaleFactor).sp,
+                                lineHeight = (16 * scaleFactor).sp
+                            ),
                             color = TextSecondary,
-                            lineHeight = 16.sp,
-                            modifier = Modifier.padding(top = 4.dp, end = 48.dp)
+                            modifier = Modifier.padding(top = 4.dp * scaleFactor, end = 32.dp * scaleFactor)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(24.dp * scaleFactor))
 
                     // How to Play / Manual Button
-                    Button(
+                    DetectiveButton(
+                        text = "📖 " + stringResource(R.string.tutorial_title).uppercase(),
+                        isPrimary = false,
+                        scaleFactor = scaleFactor * 0.9f,
                         onClick = {
                             onDismiss()
                             onManualClick()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .border(1.dp, PrimaryCyan.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.05f))
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(text = "📖", fontSize = 18.sp)
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = stringResource(R.string.tutorial_title).uppercase(),
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.sp
-                                ),
-                                color = PrimaryCyan
-                            )
                         }
-                    }
+                    )
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(24.dp * scaleFactor))
                     
                     Text(
                         text = "VERSION ${BuildConfig.VERSION_NAME} - NOIR EDITION",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.2f),
-                        letterSpacing = 2.sp
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = (9 * scaleFactor).sp,
+                            letterSpacing = (2 * scaleFactor).sp
+                        ),
+                        color = Color.White.copy(alpha = 0.2f)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // About Game Text Link
+                    Text(
+                        text = stringResource(R.string.home_about_button),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = (13 * scaleFactor).sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Montserrat,
+                            letterSpacing = (1 * scaleFactor).sp
+                        ),
+                        color = PrimaryCyan.copy(alpha = 0.7f),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp * scaleFactor))
+                            .clickable { showAboutDialog = true }
+                            .padding(8.dp * scaleFactor)
                     )
                 }
             }
@@ -206,7 +245,116 @@ fun SettingsDialog(
 }
 
 @Composable
-fun SettingRow(label: String, content: @Composable () -> Unit) {
+fun AboutGameDialog(
+    scaleFactor: Float,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val coffeeUrl = stringResource(R.string.about_buy_coffee_url)
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(24.dp * scaleFactor),
+            color = Color(0xFF0F1923),
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                PrimaryCyan.copy(alpha = 0.3f)
+            ),
+            modifier = Modifier
+                .widthIn(max = (400.dp * scaleFactor))
+                .fillMaxWidth(0.9f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(28.dp * scaleFactor)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "✦",
+                    fontSize = (24 * scaleFactor).coerceAtMost(36f).sp,
+                    color = PrimaryCyan
+                )
+
+                Spacer(modifier = Modifier.height(8.dp * scaleFactor))
+
+                Text(
+                    text = stringResource(R.string.about_dialog_title).uppercase(),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (2 * scaleFactor).sp,
+                        fontFamily = Montserrat
+                    ),
+                    color = PrimaryCyan,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(PrimaryCyan.copy(alpha = 0.15f))
+                )
+
+                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+
+                Text(
+                    text = stringResource(R.string.about_dialog_body),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = (14 * scaleFactor).coerceAtMost(22f).sp,
+                        lineHeight = (22 * scaleFactor).coerceAtMost(32f).sp,
+                        fontFamily = Montserrat
+                    ),
+                    color = Color.White.copy(alpha = 0.82f),
+                    textAlign = TextAlign.Start
+                )
+
+                Spacer(modifier = Modifier.height(28.dp * scaleFactor))
+
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(coffeeUrl))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height((52.dp * scaleFactor).coerceAtMost(80.dp)),
+                    shape = RoundedCornerShape(14.dp * scaleFactor),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFDD00)
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.about_buy_coffee),
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontSize = (14 * scaleFactor).coerceAtMost(20f).sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = (0.5 * scaleFactor).sp,
+                            fontFamily = Montserrat
+                        ),
+                        color = Color(0xFF1A1200)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp * scaleFactor))
+
+                TextButton(onClick = onDismiss) {
+                    Text(
+                        text = "✕",
+                        color = Color.White.copy(alpha = 0.35f),
+                        fontSize = (13 * scaleFactor).coerceAtMost(20f).sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SettingRow(label: String, scaleFactor: Float, content: @Composable () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -214,7 +362,10 @@ fun SettingRow(label: String, content: @Composable () -> Unit) {
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = (15 * scaleFactor).sp,
+                fontWeight = FontWeight.Bold
+            ),
             color = Color.White
         )
         content()
@@ -222,18 +373,20 @@ fun SettingRow(label: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun LanguageOption(text: String, isSelected: Boolean, onClick: () -> Unit) {
+fun LanguageOption(text: String, isSelected: Boolean, scaleFactor: Float, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp * scaleFactor))
             .background(if (isSelected) PrimaryCyan.copy(alpha = 0.2f) else Color.Transparent)
             .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp * scaleFactor, vertical = 8.dp * scaleFactor),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = (14 * scaleFactor).sp
+            ),
             color = if (isSelected) PrimaryCyan else Color.Gray,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )

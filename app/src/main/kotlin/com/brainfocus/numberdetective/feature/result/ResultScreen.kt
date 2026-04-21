@@ -5,7 +5,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,7 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
-import com.brainfocus.numberdetective.feature.home.RowDefaults
 import com.brainfocus.numberdetective.core.utils.ShareImageGenerator
 import com.brainfocus.numberdetective.data.storage.GameResultStorage
 
@@ -97,7 +95,7 @@ fun ResultScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
 
             // Cinematic Header
             AnimatedVisibility(
@@ -106,23 +104,23 @@ fun ResultScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = stringResource(if (isWin) R.string.mission_accomplished else R.string.mission_failed),
+                        text = stringResource(if (isWin) R.string.mission_accomplished else R.string.mission_failed).uppercase(),
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontFamily = Montserrat,
-                            fontSize = (36 * scaleFactor).coerceAtMost(54f).sp,
+                            fontSize = (28 * scaleFactor).coerceAtMost(42f).sp,
                             letterSpacing = (2 * scaleFactor).sp,
                             fontWeight = FontWeight.Black
                         ),
                         color = if (isWin) PrimaryCyan else ErrorRed,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(8.dp * scaleFactor))
+                    Spacer(modifier = Modifier.height(4.dp * scaleFactor))
                     Text(
                         text = (if (isWin) stringResource(R.string.win_motivation) else stringResource(R.string.lose_motivation)).uppercase(),
                         style = MaterialTheme.typography.bodySmall.copy(
                             letterSpacing = (1.5f * scaleFactor).sp,
                             fontWeight = FontWeight.Medium,
-                            fontSize = (15 * scaleFactor).coerceAtMost(22f).sp
+                            fontSize = (11 * scaleFactor).coerceAtMost(16f).sp
                         ),
                         color = TextSecondary,
                         textAlign = TextAlign.Center
@@ -130,12 +128,13 @@ fun ResultScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp * scaleFactor))
 
             // Custom Tab Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .widthIn(max = 450.dp * scaleFactor)
                     .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp * scaleFactor))
                     .padding(4.dp * scaleFactor)
             ) {
@@ -155,7 +154,7 @@ fun ResultScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp * scaleFactor))
 
             // Tab Content
             Crossfade(
@@ -179,18 +178,18 @@ fun ResultScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+            Spacer(modifier = Modifier.height(20.dp * scaleFactor))
 
             // Action Buttons
             Column(
                 modifier = Modifier
                     .widthIn(max = (400.dp * scaleFactor).coerceAtMost(maxWidthDp))
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp * scaleFactor)
+                verticalArrangement = Arrangement.spacedBy(8.dp * scaleFactor)
             ) {
                 // Share
-                ResultActionButton(
-                    text = stringResource(R.string.share_button).uppercase(),
+                DetectiveButton(
+                    text = stringResource(R.string.share_button),
                     isPrimary = false,
                     scaleFactor = scaleFactor,
                     onClick = {
@@ -221,8 +220,8 @@ fun ResultScreen(
                 )
 
                 // Play Again
-                ResultActionButton(
-                    text = stringResource(R.string.play_again_button).uppercase(),
+                DetectiveButton(
+                    text = stringResource(R.string.play_again_button),
                     isPrimary = true,
                     scaleFactor = scaleFactor,
                     onClick = onPlayAgain
@@ -235,7 +234,7 @@ fun ResultScreen(
                     Text(
                         text = stringResource(R.string.back_to_menu).uppercase(),
                         style = MaterialTheme.typography.bodySmall.copy(
-                            letterSpacing = (1 * scaleFactor).sp,
+                            letterSpacing = (1.5 * scaleFactor).sp,
                             fontSize = (12 * scaleFactor).coerceAtMost(16f).sp
                         ),
                         color = TextSecondary
@@ -260,7 +259,7 @@ fun TabItem(text: String, isSelected: Boolean, scaleFactor: Float, modifier: Mod
             text = text,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                letterSpacing = (1 * scaleFactor).sp,
+                letterSpacing = (1.5 * scaleFactor).sp,
                 fontSize = (12 * scaleFactor).coerceAtMost(18f).sp
             ),
             color = if (isSelected) PrimaryCyan else TextSecondary
@@ -280,26 +279,27 @@ fun BriefingView(
     scaleFactor: Float,
     maxWidth: androidx.compose.ui.unit.Dp
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
             color = SurfaceCard,
-            shape = RoundedCornerShape(28.dp * scaleFactor),
-            border = RowDefaults.CardBorder,
+            shape = RoundedCornerShape(24.dp * scaleFactor),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
             modifier = Modifier
                 .widthIn(max = (450.dp * scaleFactor).coerceAtMost(maxWidth))
                 .fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(24.dp * scaleFactor),
+                modifier = Modifier.padding(16.dp * scaleFactor),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.final_score),
+                    text = stringResource(R.string.final_score).uppercase(),
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = (12 * scaleFactor).coerceAtMost(18f).sp
+                        fontSize = (10 * scaleFactor).coerceAtMost(14f).sp
                     ),
                     color = TextSecondary,
                     letterSpacing = (2 * scaleFactor).sp
@@ -307,71 +307,58 @@ fun BriefingView(
                 Text(
                     text = score.toString(),
                     style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = (48 * scaleFactor).coerceAtMost(72f).sp,
+                        fontSize = (42 * scaleFactor).coerceAtMost(60f).sp,
                         fontWeight = FontWeight.Bold
                     ),
                     color = PrimaryCyan
                 )
                 
                 // Records Summary
-                Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+                Spacer(modifier = Modifier.height(8.dp * scaleFactor))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.03f), RoundedCornerShape(12.dp * scaleFactor))
-                        .padding(12.dp * scaleFactor),
+                        .background(Color.White.copy(alpha = 0.03f), RoundedCornerShape(10.dp * scaleFactor))
+                        .padding(8.dp * scaleFactor),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    RecordItem(label = stringResource(R.string.label_daily_record), value = dailyHighScore, scaleFactor = scaleFactor)
-                    RecordItem(label = stringResource(R.string.label_all_time_record), value = allTimeHighScore, scaleFactor = scaleFactor)
+                    DetectiveStatItem(label = stringResource(R.string.label_daily_record), value = dailyHighScore.toString(), color = Color.White.copy(alpha = 0.9f), scaleFactor = scaleFactor * 0.9f)
+                    DetectiveStatItem(label = stringResource(R.string.label_all_time_record), value = allTimeHighScore.toString(), color = Color.White.copy(alpha = 0.9f), scaleFactor = scaleFactor * 0.9f)
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp * scaleFactor))
-                
+                // SIA Evaluation Section (Integrated)
+                Spacer(modifier = Modifier.height(16.dp * scaleFactor))
                 HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
-                
-                Spacer(modifier = Modifier.height(24.dp * scaleFactor))
+                Spacer(modifier = Modifier.height(12.dp * scaleFactor))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White.copy(alpha = 0.03f), RoundedCornerShape(10.dp * scaleFactor))
+                        .padding(10.dp * scaleFactor),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (!isWin) {
-                        DebriefStat(stringResource(R.string.correct_answer), correctAnswer, scaleFactor)
-                    }
-                    DebriefStat(stringResource(R.string.attempts), attempts.toString(), scaleFactor)
-                    DebriefStat(stringResource(R.string.time), formattedTime, scaleFactor)
+                    Text(
+                        text = "SIA-7 COGNITIVE EVALUATION",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = (9 * scaleFactor).sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = (2 * scaleFactor).sp
+                        ),
+                        color = PrimaryCyan.copy(alpha = 0.5f)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp * scaleFactor))
+                    Text(
+                        text = stringResource(if (isWin) R.string.sia_evaluation_win else R.string.sia_evaluation_loss),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            fontSize = (11 * scaleFactor).coerceAtMost(15f).sp,
+                            lineHeight = (16 * scaleFactor).coerceAtMost(22f).sp
+                        ),
+                        color = TextSecondary.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center
+                    )
                 }
-            }
-        }
-        
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Philosophical Insight
-        val quotes = stringArrayResource(id = R.array.game_quotes)
-        val selectedQuote = remember { quotes.random() }
-        
-        Column(
-            modifier = Modifier
-                .widthIn(max = (450.dp * scaleFactor).coerceAtMost(maxWidth))
-                .padding(bottom = 24.dp * scaleFactor)
-        ) {
-            Surface(
-                color = Color.White.copy(alpha = 0.03f),
-                shape = RoundedCornerShape(12.dp * scaleFactor),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = selectedQuote,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                        fontSize = (12 * scaleFactor).coerceAtMost(16f).sp,
-                        lineHeight = (18 * scaleFactor).coerceAtMost(24f).sp
-                    ),
-                    color = TextSecondary.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp * scaleFactor)
-                )
             }
         }
     }
@@ -395,271 +382,56 @@ fun CaseArchiveView(scaleFactor: Float) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp * scaleFactor),
-        contentPadding = PaddingValues(bottom = 24.dp * scaleFactor),
+        contentPadding = PaddingValues(bottom = 32.dp * scaleFactor),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         session.levels.forEach { levelResult ->
             item {
-                LevelHeader(levelResult, scaleFactor)
+                DetectiveHeader(
+                    title = stringResource(R.string.case_file_level, levelResult.levelNumber),
+                    subtitle = stringResource(R.string.score_points, levelResult.scoreGained),
+                    scaleFactor = scaleFactor,
+                    rightContent = {
+                        Text(
+                            text = levelResult.secretNumber,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = (16 * scaleFactor).coerceAtMost(24f).sp
+                            ),
+                            color = SuccessGreen
+                        )
+                    }
+                )
             }
             
             items(levelResult.hints.size) { globalIndex ->
                 val hint = levelResult.hints[globalIndex]
-                
-                // Check if it's a user guess using the resource ID
                 val isUserGuess = hint.descriptionRes == R.string.log_analysis_attempt
                 
-                // Determine how many preceding items were user guesses
-                val analysisNumber = if (isUserGuess) {
-                    levelResult.hints.take(globalIndex + 1).count { it.descriptionRes == R.string.log_analysis_attempt }
+                val label = if (hint.descriptionRes == R.string.log_analysis_success) {
+                    stringResource(R.string.log_analysis_success)
+                } else if (isUserGuess) {
+                    val interrogationNumber = levelResult.hints.take(globalIndex + 1).count { it.descriptionRes == R.string.log_analysis_attempt }
+                    stringResource(R.string.log_interrogation_number, interrogationNumber)
                 } else {
-                    0
-                }
-
-                // Determine how many preceding items were initial intelligence
-                val intelligenceNumber = if (!isUserGuess && hint.descriptionRes != R.string.log_analysis_success) {
-                    levelResult.hints.take(globalIndex + 1).count { 
+                    val intelligenceNumber = levelResult.hints.take(globalIndex + 1).count { 
                         it.descriptionRes != R.string.log_analysis_attempt && 
                         it.descriptionRes != R.string.log_analysis_success 
                     }
-                } else {
-                    0
-                }
-
-                ArchiveHintCard(
-                    hint = hint, 
-                    analysisNumber = analysisNumber, 
-                    intelligenceNumber = intelligenceNumber,
-                    scaleFactor = scaleFactor
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun LevelHeader(levelResult: com.brainfocus.numberdetective.data.storage.LevelResult, scaleFactor: Float) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp * scaleFactor, bottom = 4.dp * scaleFactor)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.case_file_level, levelResult.levelNumber).uppercase(),
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (2 * scaleFactor).sp,
-                        fontSize = (14 * scaleFactor).coerceAtMost(20f).sp
-                    ),
-                    color = PrimaryCyan
-                )
-                Text(
-                    text = stringResource(R.string.score_points, levelResult.scoreGained),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = (11 * scaleFactor).coerceAtMost(16f).sp
-                    ),
-                    color = SuccessGreen.copy(alpha = 0.8f),
-                    letterSpacing = (1 * scaleFactor).sp
-                )
-            }
-            Text(
-                text = levelResult.secretNumber,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Poppins,
-                    fontSize = (16 * scaleFactor).coerceAtMost(24f).sp
-                ),
-                color = SuccessGreen
-            )
-        }
-        HorizontalDivider(
-            modifier = Modifier.padding(top = 4.dp),
-            color = Color.White.copy(alpha = 0.1f),
-            thickness = 1.dp
-        )
-    }
-}
-
-@Composable
-fun ArchiveHintCard(hint: com.brainfocus.numberdetective.data.model.Hint, analysisNumber: Int, intelligenceNumber: Int, scaleFactor: Float) {
-    val isUserGuess = hint.descriptionRes == R.string.log_analysis_attempt || hint.descriptionRes == R.string.log_analysis_success
-
-    Surface(
-        color = SurfaceCard,
-        shape = RoundedCornerShape(16.dp * scaleFactor),
-        border = RowDefaults.CardBorder,
-        modifier = Modifier.widthIn(max = (550.dp * scaleFactor)).fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp * scaleFactor),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Header: INTEL #N or ANALYSIS #N or ACCESS GRANTED
-            Text(
-                text = if (hint.descriptionRes == R.string.log_analysis_success) {
-                    stringResource(R.string.log_analysis_success).uppercase()
-                } else if (isUserGuess) {
-                    stringResource(R.string.log_analysis_number, analysisNumber)
-                } else {
                     stringResource(R.string.initial_intelligence_number, intelligenceNumber)
-                },
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = (11 * scaleFactor).coerceAtMost(16f).sp
-                ),
-                color = if (hint.descriptionRes == R.string.log_analysis_success) SuccessGreen 
-                        else if (isUserGuess) PrimaryCyan 
-                        else TextSecondary.copy(alpha = 0.6f),
-                letterSpacing = (1.5 * scaleFactor).sp,
-                modifier = Modifier.padding(bottom = 12.dp * scaleFactor)
-            )
-
-            // Digits Array (Horizontal and Centered)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp * scaleFactor)) {
-                    hint.guess.forEachIndexed { charIndex, char ->
-                        val status = hint.digitStatuses?.getOrNull(charIndex)
-                        val bgColor = when (status) {
-                            com.brainfocus.numberdetective.data.model.DigitStatus.CORRECT_POS -> SuccessGreen.copy(alpha = 0.15f)
-                            com.brainfocus.numberdetective.data.model.DigitStatus.WRONG_POS -> WarningYellow.copy(alpha = 0.15f)
-                            com.brainfocus.numberdetective.data.model.DigitStatus.INCORRECT -> ErrorRed.copy(alpha = 0.15f)
-                            else -> Color.White.copy(alpha = 0.05f)
-                        }
-                        val borderColor = when (status) {
-                            com.brainfocus.numberdetective.data.model.DigitStatus.CORRECT_POS -> SuccessGreen
-                            com.brainfocus.numberdetective.data.model.DigitStatus.WRONG_POS -> WarningYellow
-                            com.brainfocus.numberdetective.data.model.DigitStatus.INCORRECT -> ErrorRed
-                            else -> Color.White.copy(alpha = 0.1f)
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp * scaleFactor)
-                                .background(bgColor, RoundedCornerShape(10.dp * scaleFactor))
-                                .border(1.dp, borderColor, RoundedCornerShape(10.dp * scaleFactor)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = char.toString(),
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = (16 * scaleFactor).coerceAtMost(24f).sp
-                                ),
-                                color = if (status != null) Color.White else PrimaryCyan
-                            )
-                        }
-                    }
                 }
+
+                DetectiveHintCard(
+                    hint = hint,
+                    isHelperModeEnabled = true,
+                    scaleFactor = scaleFactor,
+                    label = label,
+                    labelColor = if (hint.descriptionRes == R.string.log_analysis_success) SuccessGreen 
+                                 else if (isUserGuess) PrimaryCyan 
+                                 else TextSecondary.copy(alpha = 0.6f),
+                    maxWidth = 550.dp * scaleFactor
+                )
             }
-
-            Spacer(modifier = Modifier.height(14.dp * scaleFactor))
-
-            val hintDesc = if (hint.descriptionRes != null) {
-                stringResource(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
-            } else {
-                hint.description
-            }
-            
-            Text(
-                text = hintDesc,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = (15 * scaleFactor).coerceAtMost(22f).sp,
-                    lineHeight = (22 * scaleFactor).coerceAtMost(30f).sp,
-                    fontWeight = FontWeight.Medium
-                ),
-                color = TextPrimary.copy(alpha = 0.9f),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp * scaleFactor),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
         }
-    }
-}
-
-@Composable
-fun DebriefStat(label: String, value: String, scaleFactor: Float) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = label.uppercase(),
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontSize = (12 * scaleFactor).coerceAtMost(16f).sp
-            ),
-            color = TextSecondary
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = (20 * scaleFactor).coerceAtMost(28f).sp
-            ),
-            color = Color.White
-        )
-    }
-}
-
-@Composable
-fun ResultActionButton(text: String, isPrimary: Boolean, scaleFactor: Float, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp * scaleFactor)
-            .border(
-                1.dp,
-                if (isPrimary) PrimaryCyan.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f),
-                RoundedCornerShape(16.dp * scaleFactor)
-            ),
-        shape = RoundedCornerShape(16.dp * scaleFactor),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(if (isPrimary) PlayButtonGradient else Brush.linearGradient(listOf(Color.White.copy(alpha = 0.05f), Color.White.copy(alpha = 0.02f)))),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontFamily = Montserrat,
-                    letterSpacing = (1 * scaleFactor).sp,
-                    fontSize = (16 * scaleFactor).coerceAtMost(22f).sp
-                ),
-                color = Color.White
-            )
-        }
-    }
-}
-
-@Composable
-fun RecordItem(label: String, value: Int, scaleFactor: Float) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = (13 * scaleFactor).coerceAtMost(18f).sp
-            ),
-            color = TextSecondary.copy(alpha = 0.6f),
-            letterSpacing = (1 * scaleFactor).sp
-        )
-        Text(
-            text = value.toString(),
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = (20 * scaleFactor).coerceAtMost(28f).sp
-            ),
-            color = Color.White.copy(alpha = 0.9f)
-        )
     }
 }

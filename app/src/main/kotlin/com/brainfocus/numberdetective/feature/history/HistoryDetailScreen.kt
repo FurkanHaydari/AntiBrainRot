@@ -23,8 +23,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
-import com.brainfocus.numberdetective.feature.result.ArchiveHintCard
-import com.brainfocus.numberdetective.feature.result.LevelHeader
 
 @Composable
 fun HistoryDetailScreen(
@@ -68,7 +66,7 @@ fun HistoryDetailScreen(
                     fontSize = (90 * scaleFactor).sp,
                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                 ),
-                color = Color.White.copy(alpha = 0.04f), // Slightly more visible on dark bg
+                color = Color.White.copy(alpha = 0.04f),
                 modifier = Modifier.rotate(-35f)
             )
         }
@@ -81,69 +79,42 @@ fun HistoryDetailScreen(
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp)
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp * scaleFactor))
             
-            // Top Bar
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onNavigateBack,
-                    modifier = Modifier
-                        .size(48.dp * scaleFactor)
-                        .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp * scaleFactor))
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = PrimaryCyan,
-                        modifier = Modifier.size(24.dp * scaleFactor)
-                    )
+            // Centralized Header
+            DetectiveHeader(
+                title = stringResource(R.string.final_report),
+                scaleFactor = scaleFactor,
+                rightContent = {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier
+                            .size(40.dp * scaleFactor)
+                            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(10.dp * scaleFactor))
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = PrimaryCyan,
+                            modifier = Modifier.size(20.dp * scaleFactor)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.width(16.dp * scaleFactor))
-                Text(
-                    text = stringResource(R.string.final_report).uppercase(),
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontFamily = Montserrat,
-                        letterSpacing = (2 * scaleFactor).sp,
-                        fontSize = (24 * scaleFactor).coerceAtMost(32f).sp
-                    ),
-                    color = PrimaryCyan
-                )
-            }
+            )
             
-            Spacer(modifier = Modifier.height(12.dp * scaleFactor))
+            // SIA Official Header Component
+            SIAOfficialHeader(scaleFactor = scaleFactor)
             
-            // SIA Official Header
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "SIA - STRATEGIC INTELLIGENCE AGENCY",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                        fontSize = (10 * scaleFactor).sp,
-                        letterSpacing = (2 * scaleFactor).sp,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = PrimaryCyan.copy(alpha = 0.6f)
-                )
-                Text(
-                    text = "DIVISION: LOGIC & CRYPTOGRAPHY | CASE ID: #${session?.id?.take(8)?.uppercase() ?: "UNKNOWN"}",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                        fontSize = (9 * scaleFactor).sp,
-                        letterSpacing = (1 * scaleFactor).sp
-                    ),
-                    color = TextSecondary.copy(alpha = 0.4f)
-                )
-                androidx.compose.material3.HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp * scaleFactor),
-                    thickness = 1.dp,
-                    color = PrimaryCyan.copy(alpha = 0.15f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(32.dp * scaleFactor))
+            Text(
+                text = "CASE ID: #${session?.id?.take(8)?.uppercase() ?: "UNKNOWN"}",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                    fontSize = (9 * scaleFactor).sp,
+                    letterSpacing = (1 * scaleFactor).sp
+                ),
+                color = TextSecondary.copy(alpha = 0.4f),
+                modifier = Modifier.padding(bottom = 20.dp * scaleFactor)
+            )
 
             if (session == null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -156,45 +127,58 @@ fun HistoryDetailScreen(
                     contentPadding = PaddingValues(bottom = 32.dp * scaleFactor),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    session.levels.forEach { levelResult ->
+                    session.levels?.forEach { levelResult ->
                         item {
-                            LevelHeader(levelResult, scaleFactor)
+                            DetectiveHeader(
+                                title = stringResource(R.string.case_file_level, levelResult.levelNumber),
+                                subtitle = stringResource(R.string.score_points, levelResult.scoreGained),
+                                scaleFactor = scaleFactor,
+                                rightContent = {
+                                    Text(
+                                        text = levelResult.secretNumber,
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = (18 * scaleFactor).coerceAtMost(26f).sp
+                                        ),
+                                        color = SuccessGreen
+                                    )
+                                }
+                            )
                         }
                         
                         items(levelResult.hints.size) { globalIndex ->
                             val hint = levelResult.hints[globalIndex]
-                            
-                            // Check if it's a user guess
                             val isUserGuess = hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_attempt
                             
-                            // Analysis numbering
-                            val analysisNumber = if (isUserGuess) {
-                                levelResult.hints.take(globalIndex + 1).count { it.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_attempt }
+                            val label = if (hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success) {
+                                stringResource(com.brainfocus.numberdetective.R.string.log_analysis_success)
+                            } else if (isUserGuess) {
+                                val interrogationNumber = levelResult.hints.take(globalIndex + 1).count { 
+                                    it.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_attempt 
+                                }
+                                stringResource(com.brainfocus.numberdetective.R.string.log_interrogation_number, interrogationNumber)
                             } else {
-                                0
-                            }
-
-                            // Intelligence numbering
-                            val intelligenceNumber = if (!isUserGuess && hint.descriptionRes != com.brainfocus.numberdetective.R.string.log_analysis_success) {
-                                levelResult.hints.take(globalIndex + 1).count { 
+                                val intelligenceNumber = levelResult.hints.take(globalIndex + 1).count { 
                                     it.descriptionRes != com.brainfocus.numberdetective.R.string.log_analysis_attempt && 
                                     it.descriptionRes != com.brainfocus.numberdetective.R.string.log_analysis_success 
                                 }
-                            } else {
-                                0
+                                stringResource(com.brainfocus.numberdetective.R.string.initial_intelligence_number, intelligenceNumber)
                             }
 
-                            ArchiveHintCard(
-                                hint = hint, 
-                                analysisNumber = analysisNumber, 
-                                intelligenceNumber = intelligenceNumber,
-                                scaleFactor = scaleFactor
+                            DetectiveHintCard(
+                                hint = hint,
+                                isHelperModeEnabled = true, // History detail always shows hints
+                                scaleFactor = scaleFactor,
+                                label = label,
+                                labelColor = if (hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success) SuccessGreen 
+                                             else if (isUserGuess) PrimaryCyan 
+                                             else TextSecondary.copy(alpha = 0.6f),
+                                maxWidth = 550.dp * scaleFactor
                             )
                         }
                     }
                 }
             }
-            
         }
     }
 }
