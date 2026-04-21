@@ -31,6 +31,13 @@ import com.brainfocus.numberdetective.data.storage.GameSession
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.text.font.FontFamily
 
 @Composable
 fun HistoryScreen(
@@ -45,7 +52,10 @@ fun HistoryScreen(
         isVisible = true
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val scaleFactor = (maxHeight.value / 720f).coerceIn(1.0f, 2.2f)
+        val maxWidthDp = maxWidth
+
         // --- Layer 1: Background ---
         Image(
             painter = painterResource(id = R.drawable.detective_bg),
@@ -79,41 +89,47 @@ fun HistoryScreen(
                 IconButton(
                     onClick = onNavigateBack,
                     modifier = Modifier
-                        .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                        .size(48.dp * scaleFactor)
+                        .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp * scaleFactor))
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = PrimaryCyan
+                        tint = PrimaryCyan,
+                        modifier = Modifier.size(24.dp * scaleFactor)
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp * scaleFactor))
                 Text(
                     text = stringResource(R.string.label_tab_archive).uppercase(),
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontFamily = Montserrat,
-                        letterSpacing = 2.sp
+                        letterSpacing = (2 * scaleFactor).sp,
+                        fontSize = (24 * scaleFactor).coerceAtMost(32f).sp
                     ),
                     color = PrimaryCyan
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp * scaleFactor))
 
             if (history.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = stringResource(R.string.msg_no_evidence_waiting),
                         color = TextSecondary.copy(alpha = 0.5f),
-                        letterSpacing = 1.sp,
-                        style = MaterialTheme.typography.bodyLarge
+                        letterSpacing = (1 * scaleFactor).sp,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = (16 * scaleFactor).coerceAtMost(24f).sp
+                        )
                     )
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 24.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp * scaleFactor),
+                    contentPadding = PaddingValues(bottom = 24.dp * scaleFactor),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(history.size) { index ->
                         val session = history[index]
@@ -121,6 +137,8 @@ fun HistoryScreen(
                         HistoryItem(
                             session = session, 
                             caseNumber = caseNumber,
+                            scaleFactor = scaleFactor,
+                            maxWidth = maxWidthDp,
                             onClick = { onNavigateToDetail(session.id) }
                         )
                     }
@@ -131,70 +149,109 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryItem(session: GameSession, caseNumber: Int, onClick: () -> Unit) {
+fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp, onClick: () -> Unit) {
     val dateFormat = remember { SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()) }
     val dateString = remember(session.timestamp) { dateFormat.format(Date(session.timestamp)) }
     
     Surface(
         onClick = onClick,
         color = SurfaceCard,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(16.dp * scaleFactor),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .widthIn(max = (550.dp * scaleFactor).coerceAtMost(maxWidth))
+            .fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        Box {
+            // Paperclip Effect
+            PaperClip(
+                scaleFactor = scaleFactor,
+                modifier = Modifier
+                    .padding(start = 12.dp * scaleFactor, top = (-4).dp * scaleFactor)
+                    .align(Alignment.TopStart)
+            )
+
+            Column(
+                modifier = Modifier
+                    .padding(20.dp * scaleFactor)
+                    .fillMaxWidth()
             ) {
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(
-                            color = PrimaryCyan.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(4.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryCyan.copy(alpha = 0.3f))
-                        ) {
-                            Text(
-                                text = "#$caseNumber",
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black),
-                                color = PrimaryCyan,
-                                fontSize = 10.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
+                // Header: Case # and Status
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Surface(
+                        color = PrimaryCyan.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(4.dp * scaleFactor),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryCyan.copy(alpha = 0.3f))
+                    ) {
                         Text(
-                            text = if (session.isWin) stringResource(R.string.mission_accomplished).uppercase() 
-                                   else stringResource(R.string.mission_failed).uppercase(),
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = if (session.isWin) SuccessGreen else ErrorRed,
-                            letterSpacing = 1.sp
+                            text = "CASE #$caseNumber",
+                            modifier = Modifier.padding(horizontal = 8.dp * scaleFactor, vertical = 2.dp * scaleFactor),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Black,
+                                fontSize = (14 * scaleFactor).coerceAtMost(20f).sp,
+                                fontFamily = FontFamily.Monospace
+                            ),
+                            color = PrimaryCyan
                         )
                     }
-                    Text(
-                        text = dateString,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary.copy(alpha = 0.6f)
-                    )
+                    
+                    Box(contentAlignment = Alignment.Center) {
+                        MissionStamp(
+                            text = if (session.isWin) stringResource(R.string.mission_accomplished) 
+                                   else stringResource(R.string.mission_failed),
+                            color = if (session.isWin) SuccessGreen else ErrorRed,
+                            scaleFactor = scaleFactor
+                        )
+                    }
                 }
-                
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = session.totalScore.toString(),
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        color = PrimaryCyan
-                    )
-                    Text(
-                        text = stringResource(R.string.final_score).uppercase(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary.copy(alpha = 0.4f),
-                        fontSize = 8.sp
-                    )
+
+                Spacer(modifier = Modifier.height(10.dp * scaleFactor))
+
+                // Date and Session Details
+                Text(
+                    text = dateString.uppercase(),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
+                        fontFamily = FontFamily.Monospace,
+                        letterSpacing = (12f / 10f * scaleFactor).sp
+                    ),
+                    color = TextSecondary.copy(alpha = 0.5f)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+
+                // Score Detail (Primary focus in the new layout)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.final_score).uppercase(),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontSize = (14 * scaleFactor).coerceAtMost(20f).sp,
+                                letterSpacing = (1 * scaleFactor).sp
+                            ),
+                            color = TextSecondary.copy(alpha = 0.4f)
+                        )
+                        Text(
+                            text = session.totalScore.toString(),
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = (40 * scaleFactor).coerceAtMost(56f).sp
+                            ),
+                            color = PrimaryCyan
+                        )
+                    }
                 }
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp * scaleFactor))
             
             // Level summary
             Row(
@@ -202,7 +259,7 @@ fun HistoryItem(session: GameSession, caseNumber: Int, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 session.levels.forEach { level ->
-                    LevelBadge(levelNumber = level.levelNumber)
+                    LevelBadge(levelNumber = level.levelNumber, scaleFactor = scaleFactor)
                 }
             }
         }
@@ -210,18 +267,53 @@ fun HistoryItem(session: GameSession, caseNumber: Int, onClick: () -> Unit) {
 }
 
 @Composable
-fun LevelBadge(levelNumber: Int) {
+fun LevelBadge(levelNumber: Int, scaleFactor: Float) {
     Box(
         modifier = Modifier
-            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(6.dp))
-            .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(6.dp * scaleFactor))
+            .border(1.dp, PrimaryCyan.copy(alpha = 0.2f), RoundedCornerShape(6.dp * scaleFactor))
+            .padding(horizontal = 8.dp * scaleFactor, vertical = 4.dp * scaleFactor)
     ) {
         Text(
             text = "LVL $levelNumber",
-            style = MaterialTheme.typography.labelSmall,
-            color = TextSecondary,
-            fontSize = 9.sp
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = (16 * scaleFactor).coerceAtMost(22f).sp
+            ),
+            color = TextSecondary
         )
     }
+}
+@Composable
+fun MissionStamp(text: String, color: Color, scaleFactor: Float, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .rotate(-15f)
+            .border(
+                width = (2.dp * scaleFactor),
+                color = color.copy(alpha = 0.4f),
+                shape = RoundedCornerShape(4.dp * scaleFactor)
+            )
+            .padding(horizontal = 8.dp * scaleFactor, vertical = 4.dp * scaleFactor)
+    ) {
+        Text(
+            text = text.uppercase(),
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Black,
+                fontSize = (16 * scaleFactor).coerceAtMost(22f).sp,
+                letterSpacing = (1.5f * scaleFactor).sp,
+                fontFamily = FontFamily.Monospace
+            ),
+            color = color.copy(alpha = 0.6f)
+        )
+    }
+}
+
+@Composable
+fun PaperClip(scaleFactor: Float, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(width = 12.dp * scaleFactor, height = 32.dp * scaleFactor)
+            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(percent = 50))
+            .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(percent = 50))
+    )
 }

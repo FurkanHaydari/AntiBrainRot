@@ -132,6 +132,7 @@
     <string name="final_score">FINAL SCORE</string>
     <string name="continue_mission">CONTINUE MISSION</string>
     <string name="initial_intelligence">INITIAL INTELLIGENCE</string>
+    <string name="initial_intelligence_number">INITIAL INTELLIGENCE #%1$d</string>
     <string name="log_analysis_number">ANALYSIS %1$d</string>
     <string name="case_file_level">CASE FILE: LEVEL %d</string>
     <string name="label_lives">LIVES</string>

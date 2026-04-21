@@ -133,6 +133,7 @@
     <string name="final_score">TOPLAM SKOR</string>
     <string name="continue_mission">GÖREVE DEVAM ET</string>
     <string name="initial_intelligence">BAŞLANGIÇ İSTİHBARATI</string>
+    <string name="initial_intelligence_number">İSTİHBARAT #%1$d</string>
     <string name="log_analysis_number">ANALİZ %1$d</string>
     <string name="case_file_level">VAKA DOSYASI: SEVİYE %d</string>
     <string name="label_lives">CAN</string>
