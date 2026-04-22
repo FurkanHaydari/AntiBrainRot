@@ -1,6 +1,7 @@
 package com.brainfocus.numberdetective.feature.result
 
 import android.content.Intent
+import com.brainfocus.numberdetective.core.utils.ShareImageGenerator
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -29,12 +30,14 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.content.res.ResourcesCompat
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
-import com.brainfocus.numberdetective.core.utils.ShareImageGenerator
 import com.brainfocus.numberdetective.data.storage.GameResultStorage
 import com.brainfocus.numberdetective.data.storage.GameSession
+import com.brainfocus.numberdetective.data.storage.SyncLevel
 import com.brainfocus.numberdetective.data.storage.DiagnosticReport
+import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 
 @Composable
 fun ResultScreen(
@@ -63,6 +66,10 @@ fun ResultScreen(
 
     LaunchedEffect(Unit) {
         isVisible = true
+    }
+
+    val diagnosticReport = remember(session) {
+        session?.diagnosticReport ?: DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
@@ -184,7 +191,8 @@ fun ResultScreen(
                         logicalMistakes = logicalMistakes,
                         scaleFactor = scaleFactor,
                         maxWidth = maxWidthDp,
-                        session = session
+                        session = session,
+                        report = diagnosticReport
                     )
                     1 -> CaseArchiveView(scaleFactor = scaleFactor)
                 }
@@ -206,12 +214,23 @@ fun ResultScreen(
                     scaleFactor = scaleFactor,
                     onClick = {
                         val playStoreLink = "https://play.google.com/store/apps/details?id=${context.packageName}"
+                        
+                        // Localized Sync Level for the text message
+                        val syncLevelStr = when(diagnosticReport.syncLevel) {
+                            SyncLevel.OPTIMAL -> context.getString(R.string.sia_sync_optimal)
+                            SyncLevel.STABLE -> context.getString(R.string.sia_sync_stable)
+                            SyncLevel.STANDARD -> context.getString(R.string.sia_sync_standard)
+                            SyncLevel.SUBOPTIMAL -> context.getString(R.string.sia_sync_suboptimal)
+                            SyncLevel.CRITICAL -> context.getString(R.string.sia_sync_critical)
+                            else -> context.getString(R.string.sia_sync_standard)
+                        }
+
                         val baseMessage = context.getString(R.string.share_score_message, score, attempts, formattedTime)
-                        val shareMessage = "$baseMessage\n\n$playStoreLink"
+                        val shareMessage = "$baseMessage\n\n$syncLevelStr\n\n$playStoreLink"
                         val shareTitle = context.getString(R.string.share_score_title)
                         
                         coroutineScope.launch(Dispatchers.IO) {
-                            val imageUri = ShareImageGenerator.generateShareImage(context, isWin, score)
+                            val imageUri = ShareImageGenerator.generateShareImage(context, isWin, score, diagnosticReport)
                             
                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                 if (imageUri != null) {
@@ -294,7 +313,8 @@ fun BriefingView(
     logicalMistakes: Int,
     scaleFactor: Float,
     maxWidth: androidx.compose.ui.unit.Dp,
-    session: GameSession? = null
+    session: GameSession? = null,
+    report: DiagnosticReport? = null
 ) {
     val context = LocalContext.current
     val verticalScale = (scaleFactor * 1.1f).coerceIn(1.0f, 2.5f)
@@ -338,7 +358,7 @@ fun BriefingView(
         ) {
             Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                 // Cognitive diagnostic content
-                val diagnosticReport = remember(session) {
+                val diagnosticReport = report ?: remember(session) {
                     session?.diagnosticReport ?: DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
                 }
 

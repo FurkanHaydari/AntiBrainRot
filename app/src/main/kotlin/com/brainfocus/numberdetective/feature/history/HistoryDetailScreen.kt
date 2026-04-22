@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.brainfocus.numberdetective.data.model.Hint
 import com.brainfocus.numberdetective.data.model.HintResolver
+import com.brainfocus.numberdetective.data.storage.SyncLevel
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 import com.brainfocus.numberdetective.core.designsystem.*
@@ -236,11 +237,21 @@ private fun BriefingTabContent(
                              val score = session.totalScore
                              val attempts = session.levels.sumOf { level -> level.hints.count { !it.isSystemHint } }
                              val baseMessage = context.getString(R.string.share_score_message, score, attempts, formattedTime)
-                             val shareMessage = "$baseMessage\n\n$playStoreLink"
-                             val shareTitle = context.getString(R.string.share_score_title)
                              
                              coroutineScope.launch(Dispatchers.IO) {
-                                 val imageUri = com.brainfocus.numberdetective.core.utils.ShareImageGenerator.generateShareImage(context, session.isWin, score)
+                                 // Localized Sync Level for the text message
+                                 val syncLevelStr = when(report.syncLevel) {
+                                     SyncLevel.OPTIMAL -> context.getString(R.string.sia_sync_optimal)
+                                     SyncLevel.STABLE -> context.getString(R.string.sia_sync_stable)
+                                     SyncLevel.STANDARD -> context.getString(R.string.sia_sync_standard)
+                                     SyncLevel.SUBOPTIMAL -> context.getString(R.string.sia_sync_suboptimal)
+                                     SyncLevel.CRITICAL -> context.getString(R.string.sia_sync_critical)
+                                 }
+
+                                 val shareMessage = "$baseMessage\n\n$syncLevelStr\n\n$playStoreLink"
+                                 val shareTitle = context.getString(R.string.share_score_title)
+                                 
+                                 val imageUri = com.brainfocus.numberdetective.core.utils.ShareImageGenerator.generateShareImage(context, session.isWin, score, report)
                                  
                                  val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                                      if (imageUri != null) {
