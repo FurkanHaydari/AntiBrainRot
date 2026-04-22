@@ -33,15 +33,15 @@ fun CognitiveDiagnosticReport(
 ) {
     val reportLines = remember(report) {
         listOf(
-            Triple(R.string.eval_precision_label, getPrecisionText(report.precision), report.precision?.numeric ?: 3),
-            Triple(R.string.eval_velocity_label, getVelocityText(report.velocity), report.velocity?.numeric ?: 3),
-            Triple(R.string.eval_stability_label, getStabilityText(report.stability), report.stability?.numeric ?: 3),
-            Triple(R.string.eval_intuition_label, getIntuitionText(report.intuition), report.intuition?.numeric ?: 3),
-            Triple(R.string.eval_convergence_label, getConvergenceText(report.convergence), report.convergence?.numeric ?: 3),
+            Triple(R.string.eval_precision_label, getPrecisionText(report.precision), report.precision.numeric),
+            Triple(R.string.eval_velocity_label, getVelocityText(report.velocity), report.velocity.numeric),
+            Triple(R.string.eval_stability_label, getStabilityText(report.stability), report.stability.numeric),
+            Triple(R.string.eval_intuition_label, getIntuitionText(report.intuition), report.intuition.numeric),
+            Triple(R.string.eval_convergence_label, getConvergenceText(report.convergence), report.convergence.numeric),
             Triple(
                 R.string.eval_conclusion_label, 
                 getSyncLevelText(report.syncLevel),
-                (report.syncLevel ?: SyncLevel.STANDARD).numeric
+                report.syncLevel.numeric
             )
         )
     }

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.brainfocus.numberdetective.feature.home.HomeScreen
 import com.brainfocus.numberdetective.feature.game.GameScreen
 import com.brainfocus.numberdetective.feature.result.ResultScreen

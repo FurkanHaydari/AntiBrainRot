@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.brainfocus.numberdetective.data.model.Hint
 import com.brainfocus.numberdetective.data.model.HintResolver
 import com.brainfocus.numberdetective.data.storage.SyncLevel
@@ -287,7 +287,7 @@ private fun ArchiveTabContent(
         contentPadding = PaddingValues(bottom = 32.dp * scaleFactor),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        session.levels?.forEach { levelResult ->
+        session.levels.forEach { levelResult ->
             item {
                 DetectiveHeader(
                     title = stringResource(R.string.case_file_level, levelResult.levelNumber),

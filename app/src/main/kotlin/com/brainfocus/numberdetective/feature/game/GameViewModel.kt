@@ -345,7 +345,7 @@ class GameViewModel @Inject constructor(
             if (hint.digitStatuses.isNullOrEmpty()) return@forEach
             
             hint.guess.forEachIndexed { i, char ->
-                val status = hint.digitStatuses?.getOrNull(i) ?: return@forEachIndexed
+                val status = hint.digitStatuses.getOrNull(i) ?: return@forEachIndexed
                 when (status) {
                     com.brainfocus.numberdetective.data.model.DigitStatus.INCORRECT -> {
                         // If it's confirmed incorrect, it shouldn't be in the guess at all

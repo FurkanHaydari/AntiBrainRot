@@ -222,7 +222,6 @@ fun ResultScreen(
                             SyncLevel.STANDARD -> context.getString(R.string.sia_sync_standard)
                             SyncLevel.SUBOPTIMAL -> context.getString(R.string.sia_sync_suboptimal)
                             SyncLevel.CRITICAL -> context.getString(R.string.sia_sync_critical)
-                            else -> context.getString(R.string.sia_sync_standard)
                         }
 
                         val baseMessage = context.getString(R.string.share_score_message, score, attempts, formattedTime)

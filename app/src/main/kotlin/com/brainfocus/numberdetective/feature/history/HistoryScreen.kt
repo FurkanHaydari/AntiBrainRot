@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import com.brainfocus.numberdetective.data.storage.GameSession
@@ -116,7 +116,7 @@ fun HistoryScreen(
                 ) {
                     itemsIndexed(
                         items = history,
-                        key = { index, session -> session.id ?: "session_$index" }
+                        key = { index, session -> session.id }
                     ) { index, session ->
                         val caseNumber = history.size - index
                         HistoryItem(
@@ -238,7 +238,7 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(bottom = 4.dp * scaleFactor)
                     ) {
-                        session.levels?.forEach { level ->
+                        session.levels.forEach { level ->
                             LevelBadge(levelNumber = level.levelNumber, scaleFactor = scaleFactor * 0.9f)
                         }
                     }
