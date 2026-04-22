@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.data.model.DigitStatus
 import com.brainfocus.numberdetective.data.model.Hint
+import com.brainfocus.numberdetective.data.model.HintResolver
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.animation.core.*
@@ -358,8 +359,7 @@ fun DetectiveHintCard(
             }
 
             val context = androidx.compose.ui.platform.LocalContext.current
-            val isLevel3 = hint.guess.length == 4
-            val hintText = hint.getDisplayText(context, isLevel3)
+            val hintText = HintResolver.getHintDescription(hint, context)
             
             Text(
                 text = hintText, 
@@ -444,8 +444,7 @@ fun DetectiveHintCard(
                 Spacer(modifier = Modifier.height(10.dp * scaleFactor))
 
                 val context = androidx.compose.ui.platform.LocalContext.current
-                val isLevel3 = hint.guess.length == 4
-                val hintText = hint.getDisplayText(context, isLevel3)
+                val hintText = HintResolver.getHintDescription(hint, context)
             
                 
                 Text(

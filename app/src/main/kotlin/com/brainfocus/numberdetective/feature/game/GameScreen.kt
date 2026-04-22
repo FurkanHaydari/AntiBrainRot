@@ -39,6 +39,8 @@ import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import com.brainfocus.numberdetective.data.model.GameState
 import com.brainfocus.numberdetective.data.model.GuessResult
+import com.brainfocus.numberdetective.data.model.Hint
+import com.brainfocus.numberdetective.data.model.HintResolver
 import com.brainfocus.numberdetective.data.model.FieldReport
 import com.brainfocus.numberdetective.core.designsystem.FieldReportOverlay
 
@@ -248,11 +250,12 @@ fun GameScreen(
                         contentPadding = PaddingValues(top = 20.dp, bottom = 40.dp)
                     ) {
                         itemsIndexed(evidenceHints) { index, hint ->
+                            val context = LocalContext.current
                             DetectiveHintCard(
                                 hint = hint, 
                                 isHelperModeEnabled = isHelperModeEnabled, 
                                 scaleFactor = scaleFactor,
-                                label = stringResource(R.string.log_analysis_number, index + 1),
+                                label = HintResolver.getActionLabel(hint, index, evidenceHints, context),
                                 labelColor = PrimaryCyan.copy(alpha = 0.7f)
                             )
                         }
@@ -383,11 +386,12 @@ fun GameScreen(
                             contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp)
                         ) {
                             itemsIndexed(trialHints) { index, hint -> 
+                                val context = LocalContext.current
                                 DetectiveHintCard(
                                     hint = hint, 
                                     isHelperModeEnabled = isHelperModeEnabled, 
                                     scaleFactor = scaleFactor,
-                                    label = stringResource(R.string.log_interrogation_number, index + 1),
+                                    label = HintResolver.getActionLabel(hint, index, trialHints, context),
                                     labelColor = PrimaryCyan.copy(alpha = 0.7f),
                                     isInterrogation = true
                                 )
@@ -532,11 +536,12 @@ fun GameScreen(
                                 verticalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 evidenceHints.forEachIndexed { index, hint ->
+                                    val context = LocalContext.current
                                     DetectiveHintCard(
                                         hint = hint,
                                         isHelperModeEnabled = isHelperModeEnabled,
                                         scaleFactor = scaleFactor,
-                                        label = stringResource(R.string.log_analysis_number, index + 1),
+                                        label = HintResolver.getActionLabel(hint, index, evidenceHints, context),
                                         isFullscreenMode = true
                                     )
                                     

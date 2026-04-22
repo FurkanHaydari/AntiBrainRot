@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.brainfocus.numberdetective.data.model.Hint
+import com.brainfocus.numberdetective.data.model.HintResolver
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 import com.brainfocus.numberdetective.core.designsystem.*
@@ -296,22 +298,16 @@ private fun ArchiveTabContent(
             
             items(levelResult.hints.size) { globalIndex ->
                 val hint = levelResult.hints[globalIndex]
-                val isUserGuess = hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_attempt
+                val context = androidx.compose.ui.platform.LocalContext.current
                 
-                val label = if (hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success) {
-                    stringResource(com.brainfocus.numberdetective.R.string.log_analysis_success)
-                } else if (isUserGuess) {
-                    val interrogationNumber = levelResult.hints.take(globalIndex + 1).count { 
-                        it.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_attempt 
-                    }
-                    stringResource(com.brainfocus.numberdetective.R.string.log_interrogation_number, interrogationNumber)
-                } else {
-                    val intelligenceNumber = levelResult.hints.take(globalIndex + 1).count { 
-                        it.descriptionRes != com.brainfocus.numberdetective.R.string.log_analysis_attempt && 
-                        it.descriptionRes != com.brainfocus.numberdetective.R.string.log_analysis_success 
-                    }
-                    stringResource(com.brainfocus.numberdetective.R.string.initial_intelligence_number, intelligenceNumber)
-                }
+                val label = HintResolver.getActionLabel(
+                    hint = hint,
+                    index = globalIndex,
+                    allHints = levelResult.hints,
+                    context = context
+                )
+
+                val isInterrogation = !hint.isSystemHint || hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success
 
                 DetectiveHintCard(
                     hint = hint,
@@ -319,9 +315,9 @@ private fun ArchiveTabContent(
                     scaleFactor = scaleFactor,
                     label = label,
                     labelColor = if (hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success) SuccessGreen 
-                                 else if (isUserGuess) PrimaryCyan 
+                                 else if (isInterrogation) PrimaryCyan 
                                  else TextSecondary.copy(alpha = 0.6f),
-                    isInterrogation = isUserGuess || hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success,
+                    isInterrogation = isInterrogation,
                     maxWidth = 550.dp * scaleFactor
                 )
             }

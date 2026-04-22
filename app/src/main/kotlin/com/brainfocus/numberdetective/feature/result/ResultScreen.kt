@@ -306,7 +306,6 @@ fun BriefingView(
     ) {
         DetectiveHeader(
             title = stringResource(R.string.final_report),
-            subtitle = stringResource(R.string.correct_answer_label) + ": $correctAnswer",
             scaleFactor = verticalScale,
             rightContent = {
                 Text(
