@@ -27,6 +27,17 @@ object DiagnosticEngine {
     private val LEVEL_WEIGHTS = listOf(1.0f, 1.3f, 1.9f)
     
     /**
+     * Verimlilik (Sezgi/Yakınsama) indeksini hesaplayan merkezi motor fonksiyonu.
+     * V2.3 Turbo: Katsayı 1.2f olarak sabitlendi.
+     */
+    fun calculateEfficiencyIndex(hints: List<com.brainfocus.numberdetective.data.model.Hint>, attempts: Int, levelNumber: Int): Float {
+        val coins = calculateCoinsForLevel(hints, levelNumber)
+        val digits = if (levelNumber == 3) 4 else 3
+        return (coins.first.toFloat() / (max(1.0f, attempts.toFloat()) * digits.toFloat() * 1.2f))
+            .coerceIn(0.1f, 1.2f)
+    }
+    
+    /**
      * DiagnosticReport üzerinden nihai "Nöral Puan" (0-500) hesaplar.
      * V2.0: Puan toplama artık seviye rütbelerinin ağırlığına (numeric) dayanır.
      */
@@ -109,7 +120,8 @@ object DiagnosticEngine {
             
             // Formül: Toplam İsabet / (Deneme Sayısı * Hane Sayısı * Siber-Sabit)
             // Bu indeks, "rastgele tahmin" ile "akıllı daraltma" arasındaki farkı yakalar.
-            val efficiencyIdx = (hitScore / (max(1.0f, actualAttempts) * digits * 1.5f)).coerceIn(0.1f, 1.2f)
+            // V2.3 Turbo: Katsayı 1.5f -> 1.2f olarak esnetildi (Daha premium puan hissi).
+            val efficiencyIdx = (hitScore / (max(1.0f, actualAttempts) * digits * 1.2f)).coerceIn(0.1f, 1.2f)
 
             weightedPrecisionSum += precisionIdx * weight
             weightedVelocitySum += velocityIdx * weight
@@ -160,15 +172,16 @@ object DiagnosticEngine {
 
         // 3. LOGICAL CONVERGENCE (Yakınsama) & INTUITION
         // EfficiencyIdx; ipuçlarından veri süzme ("Data Filtering") hızını temsil eder.
+        // V2.3 Turbo: Eşikler 0.7f -> 0.65f olarak esnetildi (5. diş ELITE/FOCUSED rütbesi için).
         val convergence = when {
-            efficiencyIdx >= 0.7f -> ConvergenceLevel.FOCUSED
+            efficiencyIdx >= 0.65f -> ConvergenceLevel.FOCUSED
             efficiencyIdx >= 0.5f -> ConvergenceLevel.ALIGNED
             efficiencyIdx >= 0.3f -> ConvergenceLevel.DRIFTING
             else -> ConvergenceLevel.ERRATIC
         }
 
         val intuition = when {
-            efficiencyIdx >= 0.7f -> IntuitionLevel.ELITE
+            efficiencyIdx >= 0.65f -> IntuitionLevel.ELITE
             efficiencyIdx >= 0.5f -> IntuitionLevel.STRONG
             efficiencyIdx >= 0.3f -> IntuitionLevel.ANALYTICAL
             else -> IntuitionLevel.MARGINAL
@@ -254,14 +267,20 @@ object DiagnosticEngine {
             totalDuplicateGuesses = totalDuplicateGuesses
         )
         
-        // Seviye bazlı dinamik baseline kullanımı
+        // V2.3 Turbo: Legacy çağrıda veri sızıntısını önlemek için final indeksleri doğrudan map ediyoruz.
+        // Bu sayede mock seans içindeki boş ipuçları (empty hints) verimliliği sıfıramaz.
         val targetAttempts = TARGET_ATTEMPTS.getOrElse(levelNumber - 1) { 5.0f }
         val targetSeconds = TARGET_SECONDS.getOrElse(levelNumber - 1) { 60.0f }
-        
-        val pIdx = (targetAttempts / max(1.0f, totalAttempts.toFloat())).coerceIn(0.1f, 1.2f)
-        val vIdx = (targetSeconds / max(1.0f, totalTimeSeconds.toFloat())).coerceIn(0.1f, 1.2f)
-        
-        return generateReportFromIndices(pIdx, vIdx, efficiencyIdx, mockSession)
+
+        val precisionIdx = (targetAttempts / max(1.0f, totalAttempts.toFloat())).coerceIn(0.1f, 1.2f)
+        val velocityIdx = (targetSeconds / max(1.0f, totalTimeSeconds.toFloat())).coerceIn(0.1f, 1.2f)
+
+        return generateReportFromIndices(
+            precisionIdx = precisionIdx,
+            velocityIdx = velocityIdx,
+            efficiencyIdx = efficiencyIdx, // Parametre olarak gelen gerçek verimliliği kullan
+            session = mockSession
+        )
     }
 
     fun calculateSessionMetrics(session: GameSession): Pair<Int, Int> {

@@ -101,7 +101,7 @@ fun HomeScreen(
                 onSettingsClick = { showSettings = true }
             )
 
-            Spacer(modifier = Modifier.height(16.dp * scaleFactor)) // Space below the score bar
+            Spacer(modifier = Modifier.height(10.dp * scaleFactor)) // Space below the score bar (Reduced from 16dp)
 
             if (showSettings) {
                 SettingsDialog(
@@ -204,7 +204,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.weight(0.7f)) // Reduced from 1.0f to bring title closer to top scores
                     
                     // Header Column
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

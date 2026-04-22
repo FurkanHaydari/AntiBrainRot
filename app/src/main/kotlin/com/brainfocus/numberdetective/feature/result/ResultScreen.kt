@@ -33,6 +33,8 @@ import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import com.brainfocus.numberdetective.core.utils.ShareImageGenerator
 import com.brainfocus.numberdetective.data.storage.GameResultStorage
+import com.brainfocus.numberdetective.data.storage.GameSession
+import com.brainfocus.numberdetective.data.storage.DiagnosticReport
 
 @Composable
 fun ResultScreen(
@@ -50,6 +52,7 @@ fun ResultScreen(
     onGoHome: () -> Unit
 ) {
     val context = LocalContext.current
+    val session = GameResultStorage.lastGameSession
     var isVisible by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableIntStateOf(0) } // 0: Briefing, 1: Archive
     val coroutineScope = rememberCoroutineScope()

@@ -354,10 +354,19 @@ fun DetectiveHintCard(
                 }
             }
 
-            val hintText = if (hint.descriptionRes != null) {
-                stringResource(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val hintText = if (!hint.description.isNullOrBlank()) {
+                // Öncelik 1: Veritabanına önceden çözülüp kaydedilmiş gerçek metin (Immortalized)
+                hint.description
+            } else if (hint.descriptionRes != null && hint.descriptionRes != 0) {
+                // Öncelik 2: Aktif oyun anındaki dinamik Resource ID
+                try {
+                    context.resources.getString(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
+                } catch (e: Exception) {
+                    "" // Hata durumunda boş dön
+                }
             } else {
-                hint.description ?: ""
+                ""
             }
             
             Text(
@@ -442,11 +451,21 @@ fun DetectiveHintCard(
 
                 Spacer(modifier = Modifier.height(10.dp * scaleFactor))
 
-                val hintText = if (hint.descriptionRes != null) {
-                    stringResource(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
+                val context = androidx.compose.ui.platform.LocalContext.current
+                val hintText = if (!hint.description.isNullOrBlank()) {
+                    // Arşiv için kalıcı metin önceliği
+                    hint.description
+                } else if (hint.descriptionRes != null && hint.descriptionRes != 0) {
+                    // Aktif oyun için ID önceliği
+                    try {
+                        context.resources.getString(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
+                    } catch (e: Exception) {
+                        ""
+                    }
                 } else {
-                    hint.description ?: ""
+                    ""
                 }
+            
                 
                 Text(
                     text = hintText, 

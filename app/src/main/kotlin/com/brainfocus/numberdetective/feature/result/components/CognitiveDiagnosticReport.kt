@@ -79,7 +79,7 @@ fun CognitiveDiagnosticReport(
         
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp * scaleFactor)
+            verticalArrangement = Arrangement.spacedBy(24.dp * scaleFactor)
         ) {
             reportLines.forEachIndexed { index, (labelRes, valueRes, powerLevel) ->
                 val isConclusion = index == reportLines.size - 1
@@ -92,7 +92,7 @@ fun CognitiveDiagnosticReport(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = if (isConclusion) 8.dp * scaleFactor else 0.dp),
+                            .padding(vertical = if (isConclusion) 12.dp * scaleFactor else 0.dp),
                         horizontalAlignment = if (isConclusion) Alignment.CenterHorizontally else Alignment.Start
                     ) {
                         if (!isConclusion) {
@@ -107,7 +107,7 @@ fun CognitiveDiagnosticReport(
                                 color = PrimaryCyan.copy(alpha = 0.7f)
                             )
                             
-                            Spacer(modifier = Modifier.height(2.dp * scaleFactor))
+                            Spacer(modifier = Modifier.height(6.dp * scaleFactor))
                             
                             val fullText = stringResource(valueRes)
                             val mainValue = fullText.substringBefore(" (")
