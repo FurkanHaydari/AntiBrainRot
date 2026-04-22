@@ -11,6 +11,8 @@
     <string name="hint_l3_3">2 rakam doğru, 1 tanesi doğru yerde</string>
     <string name="hint_l3_4">2 rakam doğru, 1 tanesi doğru yerde</string>
     <string name="hint_l3_5">2 rakam doğru, ikisi de doğru yerde</string>
+    <string name="hint_l3_none">Hiçbir rakam doğru değil</string>
+    <string name="hint_l3_all_correct">Tüm rakamlar doğru</string>
 
     <!-- Seviye 1-2 İpuçları (3 haneli) -->
     <string name="hint_1">1 rakam doğru ve doğru yerde</string>
@@ -18,6 +20,8 @@
     <string name="hint_3">2 rakam doğru, ikisi de yanlış yerde</string>
     <string name="hint_4">2 rakam doğru, ikisi de yanlış yerde</string>
     <string name="hint_5">2 rakam doğru, 1 tanesi doğru yerde</string>
+    <string name="hint_none">Hiçbir rakam doğru değil</string>
+    <string name="hint_all_correct">Tüm rakamlar doğru</string>
 
 
     <!-- Game Result Activity -->
@@ -53,7 +57,7 @@
     <string name="home_step_2_title">Mantık Yürüt</string>
     <string name="home_step_2_desc">İmkansız rakamları eleyerek mantığını kullan.</string>
     <string name="home_cognitive_2">Stratejik Bellek &amp; Çıkarım</string>
-    <string name="home_step_3_title">Çöz</string>
+    <string name="home_step_3_title">Solve</string>
     <string name="home_step_3_desc">Doğru dizilimi bul ve zafer kazan!</string>
     <string name="home_cognitive_3">Zihinsel Çeviklik &amp; Hız</string>
 

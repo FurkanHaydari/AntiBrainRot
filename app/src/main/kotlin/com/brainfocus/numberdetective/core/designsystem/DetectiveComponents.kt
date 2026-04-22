@@ -213,12 +213,12 @@ fun DetectiveHeader(
             .fillMaxWidth()
             .padding(bottom = 12.dp * scaleFactor)
     ) {
-        Row(
+            Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f, fill = false)) {
                 Text(
                     text = title.uppercase(),
                     style = MaterialTheme.typography.titleSmall.copy(
@@ -239,6 +239,9 @@ fun DetectiveHeader(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.width(24.dp * scaleFactor))
+
             rightContent?.let {
                 Box(content = it)
             }
@@ -355,19 +358,8 @@ fun DetectiveHintCard(
             }
 
             val context = androidx.compose.ui.platform.LocalContext.current
-            val hintText = if (!hint.description.isNullOrBlank()) {
-                // Öncelik 1: Veritabanına önceden çözülüp kaydedilmiş gerçek metin (Immortalized)
-                hint.description
-            } else if (hint.descriptionRes != null && hint.descriptionRes != 0) {
-                // Öncelik 2: Aktif oyun anındaki dinamik Resource ID
-                try {
-                    context.resources.getString(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
-                } catch (e: Exception) {
-                    "" // Hata durumunda boş dön
-                }
-            } else {
-                ""
-            }
+            val isLevel3 = hint.guess.length == 4
+            val hintText = hint.getDisplayText(context, isLevel3)
             
             Text(
                 text = hintText, 
@@ -452,19 +444,8 @@ fun DetectiveHintCard(
                 Spacer(modifier = Modifier.height(10.dp * scaleFactor))
 
                 val context = androidx.compose.ui.platform.LocalContext.current
-                val hintText = if (!hint.description.isNullOrBlank()) {
-                    // Arşiv için kalıcı metin önceliği
-                    hint.description
-                } else if (hint.descriptionRes != null && hint.descriptionRes != 0) {
-                    // Aktif oyun için ID önceliği
-                    try {
-                        context.resources.getString(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
-                    } catch (e: Exception) {
-                        ""
-                    }
-                } else {
-                    ""
-                }
+                val isLevel3 = hint.guess.length == 4
+                val hintText = hint.getDisplayText(context, isLevel3)
             
                 
                 Text(

@@ -27,57 +27,80 @@ class SoundManager @Inject constructor(
     private var loadedSounds = 0
     private var totalSounds = 9
     
+    private val loadQueue = java.util.LinkedList<Pair<Int, (Int) -> Unit>>()
+    
     fun setSoundEnabled(enabled: Boolean) {
         isSoundEnabled = enabled
     }
     
     fun initialize() {
-        if (isInitialized) return
-        
-        try {
-            val attributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_GAME)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
+        synchronized(this) {
+            if (isInitialized || soundPool != null) return
             
-            soundPool = SoundPool.Builder()
-                .setMaxStreams(10)
-                .setAudioAttributes(attributes)
-                .build()
-            
-            soundPool?.setOnLoadCompleteListener { _, _, status ->
-                synchronized(this) {
-                    if (status == 0) {
-                        loadedSounds++
-                        if (loadedSounds == totalSounds) {
-                            isInitialized = true
+            try {
+                val attributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                
+                soundPool = SoundPool.Builder()
+                    .setMaxStreams(5) // Reduced from 10 to mitigate memory pressure (-12 errors)
+                    .setAudioAttributes(attributes)
+                    .build()
+                
+                soundPool?.setOnLoadCompleteListener { _, _, status ->
+                    synchronized(this@SoundManager) {
+                        if (status == 0) {
+                            loadedSounds++
+                            if (loadedSounds == totalSounds) {
+                                isInitialized = true
+                            } else {
+                                // Load the next sound in the sequential queue
+                                loadNextSoundFromQueue()
+                            }
+                        } else {
+                            android.util.Log.e("SoundManager", "Failed to load sound, status: $status")
+                            // Even on failure, try to load the next one to avoid getting stuck
+                            loadNextSoundFromQueue()
                         }
                     }
                 }
+                
+                // Reset state for new pool
+                loadedSounds = 0
+                isInitialized = false
+                
+                // Prepare the sequential load queue
+                loadQueue.clear()
+                loadQueue.add(R.raw.tick_sound to { id -> tickSoundId = id })
+                loadQueue.add(R.raw.win_sound to { id -> winSoundId = id })
+                loadQueue.add(R.raw.wrong_guess to { id -> wrongSoundId = id })
+                loadQueue.add(R.raw.correct_guess to { id -> correctSoundId = id })
+                loadQueue.add(R.raw.button_click to { id -> buttonClickId = id })
+                loadQueue.add(R.raw.lose_sound to { id -> loseSoundId = id })
+                loadQueue.add(R.raw.level_up to { id -> levelUpSoundId = id })
+                loadQueue.add(R.raw.partial_or_wrong_guess to { id -> partialWrongSoundId = id })
+                loadQueue.add(R.raw.beep to { id -> beepSoundId = id })
+                
+                // Start the first load
+                loadNextSoundFromQueue()
+                
+            } catch (e: Exception) {
+                android.util.Log.e("SoundManager", "Error initializing SoundManager", e)
+                release()
             }
-            
-            // Reset counters and IDs
-            loadedSounds = 0
-            isInitialized = false
-            tickSoundId = 0
-            winSoundId = 0
-            wrongSoundId = 0
-            levelUpSoundId = 0
-            partialWrongSoundId = 0
-            
-            tickSoundId = loadSound(R.raw.tick_sound)
-            winSoundId = loadSound(R.raw.win_sound)
-            wrongSoundId = loadSound(R.raw.wrong_guess)
-            correctSoundId = loadSound(R.raw.correct_guess)
-            buttonClickId = loadSound(R.raw.button_click)
-            loseSoundId = loadSound(R.raw.lose_sound)
-            levelUpSoundId = loadSound(R.raw.level_up)
-            partialWrongSoundId = loadSound(R.raw.partial_or_wrong_guess)
-            beepSoundId = loadSound(R.raw.beep)
-            
+        }
+    }
+
+    private fun loadNextSoundFromQueue() {
+        val next = loadQueue.poll() ?: return
+        val (resId, setter) = next
+        try {
+            val soundId = soundPool?.load(context, resId, 1) ?: 0
+            setter(soundId)
         } catch (e: Exception) {
-            android.util.Log.e("SoundManager", "Error initializing SoundManager", e)
-            release()
+            android.util.Log.e("SoundManager", "Error starting load for $resId", e)
+            loadNextSoundFromQueue() // Try next one on error
         }
     }
     
@@ -188,21 +211,6 @@ class SoundManager @Inject constructor(
         }
     }
 
-    private fun loadSound(resId: Int): Int {
-        return try {
-            val soundId = soundPool?.load(context, resId, 1) ?: 0
-            if (soundId == 0) {
-                android.util.Log.e("SoundManager", "Failed to load sound ID: $resId")
-            }
-            soundId
-        } catch (e: android.content.res.Resources.NotFoundException) {
-            android.util.Log.e("SoundManager", "Resource not found: $resId")
-            0
-        } catch (e: Exception) {
-            android.util.Log.e("SoundManager", "Error loading sound $resId: ${e.message}")
-            0
-        }
-    }
 
     fun release() {
         try {

@@ -72,8 +72,5 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // SoundManager is a Singleton, release call might be better handled globally 
-        // or during specific lifecycle if needed, but we ensure it's clean here.
-        soundManager.release()
     }
 }

@@ -283,6 +283,7 @@ private fun ArchiveTabContent(
                     rightContent = {
                         Text(
                             text = stringResource(R.string.score_points, levelResult.scoreGained),
+                            modifier = Modifier.padding(end = 1.dp * scaleFactor),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = SuccessGreen,

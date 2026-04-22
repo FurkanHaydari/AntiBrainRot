@@ -11,6 +11,8 @@
     <string name="hint_l3_3">2 digits are correct, 1 is in the right spot</string>
     <string name="hint_l3_4">2 digits are correct, 1 is in the right spot</string>
     <string name="hint_l3_5">2 digits are correct, both in right spots</string>
+    <string name="hint_l3_none">No digits are correct</string>
+    <string name="hint_l3_all_correct">All digits are correct</string>
 
     <!-- Level 1-2 Hints (3 digits) -->
     <string name="hint_1">1 digit is correct and in the right spot</string>
@@ -18,6 +20,8 @@
     <string name="hint_3">2 digits are correct, both in wrong spots</string>
     <string name="hint_4">2 digits are correct, both in wrong spots</string>
     <string name="hint_5">2 digits are correct, 1 is in the right spot</string>
+    <string name="hint_none">No digits are correct</string>
+    <string name="hint_all_correct">All digits are correct</string>
 
 
     <!-- Game Result Activity -->
@@ -138,7 +142,7 @@
     <string name="eval_precision_sharp">SHARP (EFFICIENT PATTERN TRACKING)</string>
     <string name="eval_precision_standard">STABLE (STANDARD COGNITIVE LOAD)</string>
     <string name="eval_precision_novice">TRIAL ERROR DETECTED (HIGH NOISE)</string>
-
+ 
     <string name="eval_velocity_label">SYNAPTIC VELOCITY</string>
     <string name="eval_velocity_flash">FLASH (NEURAL OVERDRIVE ACTIVE)</string>
     <string name="eval_velocity_rapid">RAPID (OPTIMAL PROCESSING SPEED)</string>

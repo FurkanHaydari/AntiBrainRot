@@ -201,39 +201,16 @@ class GameViewModel @Inject constructor(
         val levelDuration = getTimeInSeconds() - _levelStartSeconds
         val levelScore = calculateLevelScore()
         
-        // Profesyonel Mimari: Kayıt anında ipuçlarını gerçek metne çözüyoruz (Immortalization)
-        val persistentHints = resolveHints(_hints.value)
-        
         val levelResult = com.brainfocus.numberdetective.data.storage.LevelResult(
             levelNumber = _currentLevel.value,
             secretNumber = _correctAnswer.value,
-            hints = persistentHints,
+            hints = _hints.value,
             durationSeconds = levelDuration,
             scoreGained = levelScore,
             archiveChecks = _archiveChecksInLevel,
             duplicateGuesses = _duplicateGuessesInLevel
         )
         GameResultStorage.currentSessionLevels.add(levelResult)
-    }
-
-    /**
-     * İpuçlarını veritabanına kaydetmeden önce gerçek metne dönüştürür.
-     * Bu sayede ID kaymalarından etkilenmeyen, kalıcı bir arşiv oluşur.
-     */
-    private fun resolveHints(hints: List<Hint>): List<Hint> {
-        val resources = getApplication<Application>().resources
-        return hints.map { hint ->
-            if (hint.descriptionRes != null && hint.descriptionRes != 0) {
-                try {
-                    val resolvedText = resources.getString(hint.descriptionRes, *hint.descriptionArgs.toTypedArray())
-                    hint.copy(description = resolvedText)
-                } catch (e: Exception) {
-                    hint // Hata durumunda olduğu gibi bırak
-                }
-            } else {
-                hint
-            }
-        }
     }
 
     private fun finalizeGameSession(isWin: Boolean) {
