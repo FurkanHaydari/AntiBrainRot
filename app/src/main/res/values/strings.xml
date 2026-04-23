@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Number Detective</string>
+    <string name="app_name">No Brain Rot: Number Detective</string>
 
     <!-- Game Activity -->
     <string name="submit_button">SUBMIT</string>
