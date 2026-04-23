@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.background
 import com.brainfocus.numberdetective.core.designsystem.SurfaceCard
+import com.brainfocus.numberdetective.feature.onboarding.DiagnosticManualScreen
 
 @Composable
 fun AppNavigation(
@@ -49,6 +50,11 @@ fun AppNavigation(
                 }
             )
         }
+        composable("diagnostic_manual") {
+            DiagnosticManualScreen(
+                onDismiss = { navController.popBackStack() }
+            )
+        }
         composable("home") {
             HomeScreen(
                 onPlayClick = {
@@ -60,6 +66,9 @@ fun AppNavigation(
                 },
                 onHistoryClick = {
                     navController.navigate("history")
+                },
+                onDiagnosticClick = {
+                    navController.navigate("diagnostic_manual")
                 },
                 onLanguageChange = onLanguageChange,
                 currentLanguage = currentLanguage

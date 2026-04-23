@@ -26,7 +26,6 @@
         android:resizeableActivity="true"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="37">
-
         <meta-data android:name="android.max_aspect" android:value="2.4" />
 
         <!-- Activities -->

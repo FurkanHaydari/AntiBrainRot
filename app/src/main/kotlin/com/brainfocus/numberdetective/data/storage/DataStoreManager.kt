@@ -206,8 +206,8 @@ class DataStoreManager @Inject constructor(
         context.dataStore.edit { preferences ->
             val lastCleanup = preferences[PreferencesKeys.LAST_CLEANUP_VERSION] ?: "0.0.0"
             
-            // Define targeted versions for cleanup (2.1.1 to 2.1.5)
-            val cleanupTargetVersions = listOf("2.1.1", "2.1.2", "2.1.3", "2.1.4", "2.1.5")
+            // Define targeted versions for cleanup (2.1.1 to 2.1.3)
+            val cleanupTargetVersions = listOf("2.1.1", "2.1.2", "2.1.3")
             
             if (lastCleanup != currentVersion && cleanupTargetVersions.contains(currentVersion)) {
                 // Clear the session history for the specified infrastructure-rebuild versions

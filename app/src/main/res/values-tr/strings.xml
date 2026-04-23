@@ -11,6 +11,14 @@
     <string name="hint_l3_3">2 rakam doğru, 1 tanesi doğru yerde</string>
     <string name="hint_l3_4">2 rakam doğru, 1 tanesi doğru yerde</string>
     <string name="hint_l3_5">2 rakam doğru, ikisi de doğru yerde</string>
+    <string name="hint_l3_6">2 rakam doğru, ikisi de yanlış yerde</string>
+    <string name="hint_l3_7">3 rakam doğru, üçü de doğru yerde</string>
+    <string name="hint_l3_8">3 rakam doğru, üçü de yanlış yerde</string>
+    <string name="hint_l3_9">3 rakam doğru, 1 tanesi doğru yerde</string>
+    <string name="hint_l3_10">3 rakam doğru, 2 tanesi doğru yerde</string>
+    <string name="hint_l3_11">4 rakam doğru, hepsi yanlış yerde</string>
+    <string name="hint_l3_12">4 rakam doğru, 1 tanesi doğru yerde</string>
+    <string name="hint_l3_13">4 rakam doğru, ikisi de doğru yerde</string>
     <string name="hint_l3_none">Hiçbir rakam doğru değil</string>
     <string name="hint_l3_all_correct">Tüm rakamlar doğru</string>
 
@@ -20,8 +28,13 @@
     <string name="hint_3">2 rakam doğru, ikisi de yanlış yerde</string>
     <string name="hint_4">2 rakam doğru, ikisi de yanlış yerde</string>
     <string name="hint_5">2 rakam doğru, 1 tanesi doğru yerde</string>
+    <string name="hint_6">2 rakam doğru, ikisi de doğru yerde</string>
+    <string name="hint_7">3 rakam doğru, üçü de yanlış yerde</string>
+    <string name="hint_8">3 rakam doğru, 1 tanesi doğru yerde</string>
     <string name="hint_none">Hiçbir rakam doğru değil</string>
     <string name="hint_all_correct">Tüm rakamlar doğru</string>
+    <string name="hint_prefix_fail">KULLANICI KOMUTU HATALI: %s</string>
+    <string name="hint_prefix_close">KULLANICI YAKLAŞIYOR: %s</string>
 
 
     <!-- Game Result Activity -->
@@ -62,19 +75,19 @@
     <!-- Onboarding / Tutorial -->
     <string name="tutorial_title">DEDEKTİF EL KİTABI</string>
     <string name="tutorial_page1_title">GÖREV</string>
-    <string name="tutorial_page1_desc">Süre dolduğunda deliller imha edilecek. Davayı çözmek için, deliller yok olmadan 3 katmanlı şifreyi kırmalısın. Şifredeki hiçbir rakam tekrar etmez, hepsi benzersizdir. Bu da ihtimalleri daraltarak hesap yapmanı ve şifreyi kırmanı kolaylaştıracaktır.</string>
-    <string name="tutorial_page2_title">{ SİLİNDİRLER }</string>
-    <string name="tutorial_page2_desc">Rakamları seçmek için dikey silindirleri kullan. Test etmek istediğin kombinasyonu ortaya çıkarmak için onları kaydır veya üzerine dokun.</string>
-    <string name="tutorial_page3_title">[ VAKA GEÇMİŞİ ]</string>
-    <string name="tutorial_page3_desc">Takıldın mı? Herhangi bir anda sağ üstteki \'Denemeler\' alanına tıklayarak Vaka Arşivi\'ni açabilirsin. Önceki tüm tahminlerini burada görebilir ve ihtimalleri daraltabilirsin.</string>
-    <string name="tutorial_page4_title">[ İSTİHBARAT ANAHTARI ]</string>
-    <string name="tutorial_page4_desc">Eğer yardımlı modu ayarlardan açarsan, arşivdeki tahminlerin için renkli istihbarat verileri görebilirsin:\n\n• YEŞİL: Doğru rakam doğru yerde.\n• SARI: Doğru rakam yanlış yerde.</string>
-    <string name="tutorial_page5_title">> İLERLEME</string>
-    <string name="tutorial_page5_desc">Bir katmanı kırmak sana ek deneme hakkı ve ekstra süre kazandırır. Davayı kazanmak için 3 katmanı da temizle.</string>
-    <string name="tutorial_page6_title">PERFORMANS ÖDÜLLERİ</string>
-    <string name="tutorial_page6_desc">Performans 5 Nöral Sütun üzerinden değerlendirilir:\n\n• HASSASİYET  • HIZ\n• STABİLİTE  • SEZGİ\n• YAKINSAMA\n\nHer sütun rütbenize göre 100 PUAN kazandırır. Kusursuz bir skor için keskin mantık ve hız gerekir.</string>
-    <string name="tutorial_page7_title">DEDEKTİF MALİYETİ</string>
-    <string name="tutorial_page7_desc">Operasyonel hatalar rütbenizi ve puanınızı düşürür:\n\n• HAFIZA HATASI: Önceki bir tahmini tekrar etmek stabiliteyi ağır sarsar.\n• ARŞİV BAĞIMLILIĞI: Loglara çok sık bakmak sezgi puanını düşürür.\n• MANTIKSAL HATALAR: Yanlış örüntü takibi hassasiyeti azaltır.</string>
+    <string name="tutorial_page1_desc">Operasyonel Sahaya Hoş Geldiniz. Süre dolduğunda deliller otomatik olarak imha edilecek. Davayı çözmek için 3 katmanlı şifreleme protokolünü kırmalısınız. Şifredeki hiçbir rakam tekrar etmez; bu da ihtimalleri daraltarak zihinsel çıkarım yapmanızı sağlar. Unutmayın, bu sadece bir oyun değil, bilişsel bir reset protokolüdür.</string>
+    <string name="tutorial_page2_title">DİSİPLİN: SİLİNDİRLER</string>
+    <string name="tutorial_page2_desc">Rakamları manipüle etmek için dikey sinaptik silindirleri kullanın. Test etmek istediğiniz kombinasyonu merkezi deşifre alanına yerleştirmek için silindirleri dikey olarak kaydırın veya doğrudan rakamlar üzerine dokunun.</string>
+    <string name="tutorial_page3_title">PROTOKOL: SORGU KAYITLARI</string>
+    <string name="tutorial_page3_desc">Mantıksal bir tıkanıklık mı yaşıyorsunuz? Herhangi bir anda sağ üstteki \'Sorgu\' alanına tıklayarak saha arşivini açabilirsiniz. Önceki tüm tahminleriniz ve sistem geri bildirimleriniz burada tutulur; bu verileri kullanarak imkansız kombinasyonları eleyin.</string>
+    <string name="tutorial_page4_title">ANALİZ: İSTİHBARAT ANAHTARI</string>
+    <string name="tutorial_page4_desc">Yardımlı Mod aktifse, arşivdeki veriler nöral renk kodlaması ile işaretlenir:\n\n• YEŞİL: Rakam doğru ve konumu doğrulandı.\n• SARI: Rakam doğru ancak konumu hatalı.\n\nBu veriler, sezgisel verimliliğinizi artırmak için tasarlanmıştır.</string>
+    <string name="tutorial_page5_title">STRATEJİ: KATMAN İLERLEME</string>
+    <string name="tutorial_page5_desc">Her katmanı başarıyla kırmak, sistemin size ek deneme hakkı ve operasyonel süre tanımasını sağlar. Davayı sonuçlandırmak için 3 katmanı da temizlemeli ve nihai şifreye ulaşmalısınız.</string>
+    <string name="tutorial_page6_title">DEĞERLENDİRME: NÖRAL SÜTUNLAR</string>
+    <string name="tutorial_page6_desc">SIA performansınız 5 ana nöral sütun üzerinden canlı olarak analiz edilir: Hassasiyet, Hız, Stabilite, Sezgi ve Yakınsama. Her sütun performansınıza göre 100 PUAN üretir. Kusursuz bir rütbe için mutlak mantık ve çeviklik gerekir.</string>
+    <string name="tutorial_page7_title">RİSKLER: OPERASYONEL KAYIP</string>
+    <string name="tutorial_page7_desc">Hatalı hamleler nöral senkronizasyonu bozar ve rütbenizi düşürür: \n\n• HAFIZA HATASI: Önceki tahminleri tekrarlamak.\n• ARŞİV BAĞIMLILIĞI: Günlüklere aşırı güvenmek.\n• MANTIKSAL HATALAR: Verilerle çelişen girişler yapmak.</string>
     <string name="tutorial_continue_button">DEVAM ET</string>
     <string name="tutorial_finish_button">GÖREVİ KABUL ET</string>
     <string name="home_about_button">BU OYUN HAKKINDA</string>
@@ -112,7 +125,8 @@
     <string name="initial_intelligence_number">İSTİHBARAT #%1$d</string>
     <string name="log_interrogation_number">SORGU %1$d</string>
     <string name="case_file_level">VAKA DOSYASI: SEVİYE %d</string>
-    <string name="label_lives">CAN</string>
+    <string name="level_progress">KATMAN %1$d / 3</string>
+    <string name="label_lives">HAK</string>
     <string name="label_time">KALAN ZAMAN</string>
 
     <string name="report_promotion_title">TERFİ ALDIN</string>
@@ -136,7 +150,7 @@
     <!-- Cognitive Evaluation Metrics (Result Screen) -->
     <string name="eval_header">SIA-7 NÖRAL TEŞHİS RAPORU</string>
     
-    <string name="eval_precision_label">DİREKTİF HASSASİYETİ</string>
+    <string name="eval_precision_label">DEDÜKTİF HASSASİYET</string>
     <string name="eval_precision_elite">ELİT (MİNİMUM SİNYAL KAYBI)</string>
     <string name="eval_precision_sharp">KESKİN (VERİMLİ VERİ TAKİBİ)</string>
     <string name="eval_precision_standard">STABİL (STANDART BİLİŞSEL YÜK)</string>
@@ -173,5 +187,27 @@
     <string name="sia_sync_standard">BİLİŞSEL SENKRONİZASYON: STANDART. OPERASYONEL KARARLILIK KORUNUYOR.</string>
     <string name="sia_sync_suboptimal">BİLİŞSEL SENKRONİZASYON: SINIRA YAKIN. SİNYAL GÜRÜLTÜSÜ TESPİT EDİLDİ.</string>
     <string name="sia_sync_critical">BİLİŞSEL SENKRONİZASYON: KRİTİK. NÖRAL KALİBRASYON ÖNERİLİR.</string>
+ 
+    <!-- Diagnostic Manual -->
+    <string name="manual_title">NÖRAL PROTOKOL</string>
+    <string name="manual_intro_title">DA-7 TEŞHİS SİSTEMİ</string>
+    <string name="manual_intro_desc">Nöral Teşhis Motoru, bilişsel performansınızı 5 özel sütunda değerlendirir. Bu protokolleri anlamak, SIA dosyalarında Elit rütbeye ulaşmak için esastır.</string>
+    
+    <string name="manual_precision_title">DEDÜKTİF HASSASİYET</string>
+    <string name="manual_precision_desc">Operasyonel keskinliğinizi ve çıkarım saflığınızı değerlendirir. Mevcut verilerle çelişen veya hiçbir yeni istihbarat sağlamayan her tahmin "sinyal israfı" olarak kaydedilir ve hassasiyet rütbenizi düşürür. Maksimum puan için her hamleniz mutlak bir mantıksal ilerleme içermelidir.</string>
+    
+    <string name="manual_velocity_title">SİNAPTİK HIZ</string>
+    <string name="manual_velocity_desc">Sinaptik işlem hızınızı ve baskı altındaki karar verme kabiliyetinizi ölçer. Zamanlayıcı, DA-7 motorunun birincil değerlendirme değişkenidir. Katmanları rekor sürelerde deşifre etmek, nöral aşırı yükleme (overdrive) bonuslarını tetikleyerek puan üretimini maksimize eder.</string>
+    
+    <string name="manual_stability_title">NÖRAL STABİLİTE</string>
+    <string name="manual_stability_desc">Zihinsel odaklanma ve kısa süreli hafıza tutarlılığını takip eder. Önceki bir tahmini tekrar etmek (Mükerrer Hatası) veya mantık dizisinden saparak rastgele girişler yapmak, nöral dalgada ağır dengesizliğe neden olur. Stabil bir zihin, SIA protokolünün temelidir.</string>
+    
+    <string name="manual_intuition_title">SAYISAL SEZGİ</string>
+    <string name="manual_intuition_desc">Sistem desteği olmadan çalışan saf örüntü tanıma yeteneğinizi ölçer. Sorgu Günlüklerine (İnterrogations) sık bağımlılık, sezgi puanınızda kayıplara neden olur. Kodu arşive minimum bakışla deşifre etmek, sezgisel rütbenizi en üst seviyeye taşır.</string>
+    
+    <string name="manual_convergence_title">MANTIKSAL YAKINSAMA</string>
+    <string name="manual_convergence_desc">Hedef kodu ne kadar stratejik bir daraltma ile yakaladığınızı analiz eder. Her tahmin sizi matematiksel çekirdeğe daha da yaklaştırmalıdır. Sapan örüntüler veya hedeften uzaklaşan denemeler, mantıksal bütünlüğün kaybolduğunu ve operasyonel verimliliğin azaldığını gösterir.</string>
+    
+    <string name="settings_scoring_manual">SKOR PROTOKOLÜ</string>
 
 </resources>

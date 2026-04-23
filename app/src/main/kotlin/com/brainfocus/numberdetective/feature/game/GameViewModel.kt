@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.util.Log
 import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
+import com.brainfocus.numberdetective.data.model.DigitStatus
 import kotlin.math.max
 
 @HiltViewModel
@@ -133,24 +134,41 @@ class GameViewModel @Inject constructor(
         Log.d("NumberDetectiveDebug", "Target Number for Level ${_currentLevel.value}: ${_correctAnswer.value}")
         _gameState.value = GameState.Playing
 
-        // Restore Hint Generation Logic with statuses for logical check
+        // Restore Hint Generation Logic with dynamic calculation to prevent hardcoded mismatches
         val hintList = mutableListOf<Hint>()
+        val secret = _correctAnswer.value
+        
+        fun createHint(hintStr: String, hintIndex: Int): Hint {
+            val statuses = calculateDigitStatuses(hintStr, secret)
+            val correctCount = statuses.count { it == DigitStatus.CORRECT_POS }
+            val misplacedCount = statuses.count { it == DigitStatus.WRONG_POS }
+            
+            return Hint(
+                guess = hintStr,
+                correct = correctCount,
+                misplaced = misplacedCount,
+                descriptionRes = getHintResId(_currentLevel.value, hintIndex),
+                digitStatuses = statuses,
+                isSystemHint = true
+            )
+        }
+
         if (_currentLevel.value == 3) {
             hintList.addAll(listOf(
-                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(3, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(3, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.thirdHint, 1, 1, descriptionRes = getHintResId(3, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.fourthHint, 1, 1, descriptionRes = getHintResId(3, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.fifthHint, 2, 0, descriptionRes = getHintResId(3, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value), isSystemHint = true)
+                createHint(game.firstHint, 1),
+                createHint(game.secondHint, 2),
+                createHint(game.thirdHint, 3),
+                createHint(game.fourthHint, 4),
+                createHint(game.fifthHint, 5)
             ))
             _hints.value = hintList
         } else {
             val h = listOf(
-                Hint(game.firstHint, 1, 0, descriptionRes = getHintResId(_currentLevel.value, 1), digitStatuses = calculateDigitStatuses(game.firstHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.secondHint, 0, 1, descriptionRes = getHintResId(_currentLevel.value, 2), digitStatuses = calculateDigitStatuses(game.secondHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.thirdHint, 1, 1, descriptionRes = getHintResId(_currentLevel.value, 3), digitStatuses = calculateDigitStatuses(game.thirdHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.fourthHint, 0, 2, descriptionRes = getHintResId(_currentLevel.value, 4), digitStatuses = calculateDigitStatuses(game.fourthHint, _correctAnswer.value), isSystemHint = true),
-                Hint(game.fifthHint, 1, 1, descriptionRes = getHintResId(_currentLevel.value, 5), digitStatuses = calculateDigitStatuses(game.fifthHint, _correctAnswer.value), isSystemHint = true)
+                createHint(game.firstHint, 1),
+                createHint(game.secondHint, 2),
+                createHint(game.thirdHint, 3),
+                createHint(game.fourthHint, 4),
+                createHint(game.fifthHint, 5)
             )
             _hints.value = if (_currentLevel.value == 2) h.shuffled() else h
         }

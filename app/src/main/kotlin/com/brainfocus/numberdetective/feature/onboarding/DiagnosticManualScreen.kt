@@ -29,22 +29,21 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnboardingScreen(
-    viewModel: OnboardingViewModel = hiltViewModel(),
-    onFinish: () -> Unit
+fun DiagnosticManualScreen(
+    onDismiss: () -> Unit
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val maxWidth = maxWidth
         val maxHeight = maxHeight
         val scaleFactor = minOf(maxWidth / 360.dp, maxHeight / 640.dp).coerceIn(1f, 1.7f)
         
-        val pagerState = rememberPagerState(pageCount = { 7 })
+        // 6 pages: Intro + 5 Pillars
+        val pagerState = rememberPagerState(pageCount = { 6 })
         val scope = rememberCoroutineScope()
 
         // --- Layer 1: Atmospheric Background ---
@@ -72,7 +71,7 @@ fun OnboardingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.tutorial_title).uppercase(),
+                text = stringResource(R.string.manual_title).uppercase(),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = (12 * scaleFactor).coerceAtMost(20f).sp,
                     letterSpacing = (4 * scaleFactor).sp
@@ -87,7 +86,7 @@ fun OnboardingScreen(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-                TutorialCard(page, scaleFactor, maxWidth)
+                DiagnosticCard(page, scaleFactor, maxWidth)
             }
 
             Spacer(modifier = Modifier.height(24.dp * scaleFactor))
@@ -116,15 +115,14 @@ fun OnboardingScreen(
                 }
             }
 
-            // Navigation Buttons
+            // Navigation Button
             val isLastPage = pagerState.currentPage == pagerState.pageCount - 1
             val buttonHeight = (60.dp * scaleFactor).coerceAtMost(90.dp)
             
             Button(
                 onClick = {
                     if (isLastPage) {
-                        viewModel.completeOnboarding()
-                        onFinish()
+                        onDismiss()
                     } else {
                         scope.launch {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
@@ -159,9 +157,9 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(16.dp * scaleFactor))
         }
 
-        // --- Layer 4: Close Button ---
+        // Close Button
         IconButton(
-            onClick = onFinish,
+            onClick = onDismiss,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 16.dp * scaleFactor, end = 16.dp * scaleFactor)
@@ -181,35 +179,32 @@ fun OnboardingScreen(
 }
 
 @Composable
-fun TutorialCard(page: Int, scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp) {
+fun DiagnosticCard(page: Int, scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp) {
     val title = when (page) {
-        0 -> R.string.tutorial_page1_title
-        1 -> R.string.tutorial_page2_title
-        2 -> R.string.tutorial_page3_title
-        3 -> R.string.tutorial_page4_title
-        4 -> R.string.tutorial_page5_title
-        5 -> R.string.tutorial_page6_title
-        else -> R.string.tutorial_page7_title
+        0 -> R.string.manual_intro_title
+        1 -> R.string.manual_precision_title
+        2 -> R.string.manual_velocity_title
+        3 -> R.string.manual_stability_title
+        4 -> R.string.manual_intuition_title
+        else -> R.string.manual_convergence_title
     }
     
     val description = when (page) {
-        0 -> R.string.tutorial_page1_desc
-        1 -> R.string.tutorial_page2_desc
-        2 -> R.string.tutorial_page3_desc
-        3 -> R.string.tutorial_page4_desc
-        4 -> R.string.tutorial_page5_desc
-        5 -> R.string.tutorial_page6_desc
-        else -> R.string.tutorial_page7_desc
+        0 -> R.string.manual_intro_desc
+        1 -> R.string.manual_precision_desc
+        2 -> R.string.manual_velocity_desc
+        3 -> R.string.manual_stability_desc
+        4 -> R.string.manual_intuition_desc
+        else -> R.string.manual_convergence_desc
     }
 
     val icon = when (page) {
-        0 -> "🎯"
-        1 -> "🔒"
-        2 -> "📂"
-        3 -> "🎨"
-        4 -> "🚀"
-        5 -> "🎖️"
-        else -> "⚖️"
+        0 -> "🖥️"
+        1 -> "🎯"
+        2 -> "⚡"
+        3 -> "🧘"
+        4 -> "👁️"
+        else -> "🔭"
     }
 
     val configuration = LocalConfiguration.current

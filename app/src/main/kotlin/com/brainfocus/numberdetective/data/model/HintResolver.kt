@@ -56,7 +56,18 @@ object HintResolver {
             getLevel1HintRes(hint.correct, hint.misplaced)
         }
         
-        if (resId != 0) return context.getString(resId)
+        if (resId != 0) {
+            val baseDescription = context.getString(resId)
+            val totalHits = hint.correct + hint.misplaced
+            val threshold = if (isLevel3) 3 else 2
+
+            return when {
+                hint.isSystemHint -> baseDescription
+                hint.correct == (if (isLevel3) 4 else 3) -> baseDescription
+                totalHits >= threshold -> context.getString(R.string.hint_prefix_close, baseDescription)
+                else -> context.getString(R.string.hint_prefix_fail, baseDescription)
+            }
+        }
 
         // 2. Eğer bir kaynak ID'si (descriptionRes) zaten atanmışsa fallback olarak kullan
         if (hint.descriptionRes != null && hint.descriptionRes != 0) {
@@ -83,6 +94,9 @@ object HintResolver {
             correct == 0 && misplaced == 1 -> R.string.hint_2
             correct == 0 && misplaced == 2 -> R.string.hint_3
             correct == 1 && misplaced == 1 -> R.string.hint_5
+            correct == 2 && misplaced == 0 -> R.string.hint_6
+            correct == 0 && misplaced == 3 -> R.string.hint_7
+            correct == 1 && misplaced == 2 -> R.string.hint_8
             else -> 0
         }
     }
@@ -95,6 +109,14 @@ object HintResolver {
             correct == 0 && misplaced == 1 -> R.string.hint_l3_2
             correct == 1 && misplaced == 1 -> R.string.hint_l3_3
             correct == 2 && misplaced == 0 -> R.string.hint_l3_5
+            correct == 0 && misplaced == 2 -> R.string.hint_l3_6
+            correct == 3 && misplaced == 0 -> R.string.hint_l3_7
+            correct == 0 && misplaced == 3 -> R.string.hint_l3_8
+            correct == 1 && misplaced == 2 -> R.string.hint_l3_9
+            correct == 2 && misplaced == 1 -> R.string.hint_l3_10
+            correct == 0 && misplaced == 4 -> R.string.hint_l3_11
+            correct == 1 && misplaced == 3 -> R.string.hint_l3_12
+            correct == 2 && misplaced == 2 -> R.string.hint_l3_13
             else -> 0
         }
     }

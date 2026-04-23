@@ -11,6 +11,14 @@
     <string name="hint_l3_3">2 digits are correct, 1 is in the right spot</string>
     <string name="hint_l3_4">2 digits are correct, 1 is in the right spot</string>
     <string name="hint_l3_5">2 digits are correct, both in right spots</string>
+    <string name="hint_l3_6">2 digits are correct, both in wrong spots</string>
+    <string name="hint_l3_7">3 digits are correct, all in right spots</string>
+    <string name="hint_l3_8">3 digits are correct, all in wrong spots</string>
+    <string name="hint_l3_9">3 digits are correct, 1 is in the right spot</string>
+    <string name="hint_l3_10">3 digits are correct, 2 are in right spots</string>
+    <string name="hint_l3_11">4 digits are correct, all in wrong spots</string>
+    <string name="hint_l3_12">4 digits are correct, 1 is in the right spot</string>
+    <string name="hint_l3_13">4 digits are correct, 2 are in right spots</string>
     <string name="hint_l3_none">No digits are correct</string>
     <string name="hint_l3_all_correct">All digits are correct</string>
 
@@ -20,8 +28,13 @@
     <string name="hint_3">2 digits are correct, both in wrong spots</string>
     <string name="hint_4">2 digits are correct, both in wrong spots</string>
     <string name="hint_5">2 digits are correct, 1 is in the right spot</string>
+    <string name="hint_6">2 digits are correct and both in right spots</string>
+    <string name="hint_7">3 digits are correct but all in wrong spots</string>
+    <string name="hint_8">3 digits are correct, 1 is in the right spot</string>
     <string name="hint_none">No digits are correct</string>
     <string name="hint_all_correct">All digits are correct</string>
+    <string name="hint_prefix_fail">USER PROMPT FAILED: %s</string>
+    <string name="hint_prefix_close">USER CLOSING IN: %s</string>
 
 
     <!-- Game Result Activity -->
@@ -61,19 +74,19 @@
     <!-- Onboarding / Tutorial -->
     <string name="tutorial_title">DETECTIVE MANUAL</string>
     <string name="tutorial_page1_title">THE MISSION</string>
-    <string name="tutorial_page1_desc">When time runs out, the evidence will be destroyed. To solve the case, you must crack the 3-layer cipher before the evidence disappears. Don\'t panic! All digits in the secret code are unique, which will narrow down your deductions and make decoding easier.</string>
-    <string name="tutorial_page2_title">{ THE CYLINDERS }</string>
-    <string name="tutorial_page2_desc">Use the vertical cylinders to select your digits. Drag or tap them to reveal the combination you wish to test.</string>
-    <string name="tutorial_page3_title">[ CASE HISTORY ]</string>
-    <string name="tutorial_page3_desc">Stuck? Tap the top-right \'Attempts\' counter at any time to open your Case Archive. Here you can review all your previous guesses and narrow down the possibilities.</string>
-    <string name="tutorial_page4_title">[ INTELLIGENCE KEY ]</string>
-    <string name="tutorial_page4_desc">If you enable Assistance Mode from Settings, you will see color-coded intelligence data for your guesses in the archive:\n\n• GREEN: Correct digit in right spot.\n• YELLOW: Correct digit in wrong spot.</string>
-    <string name="tutorial_page5_title">> PROGRESSION</string>
-    <string name="tutorial_page5_desc">Cracking a layer grants you extra attempt rights and adds more time to the clock. Clear all 3 layers to win the case.</string>
-    <string name="tutorial_page6_title">PERFORMANCE BONUSES</string>
-    <string name="tutorial_page6_desc">Performance is evaluated across 5 Neural Pillars:\n\n• PRECISION  • VELOCITY\n• STABILITY  • INTUITION\n• CONVERGENCE\n\nEach pillar grants up to 100 PTS based on your rank. Flawless deduction and extreme speed are required for a perfect score.</string>
-    <string name="tutorial_page7_title">INVESTIGATION COSTS</string>
-    <string name="tutorial_page7_desc">Operational inefficiencies reduce your ranks and points:\n\n• MEMORY ERROR: Repeating a previous guess heavily destabilizes your score.\n• ARCHIVE RELIANCE: Checking logs reduces pure intuition.\n• LOGICAL MISTAKES: Incorrect pattern tracking reduces precision.</string>
+    <string name="tutorial_page1_desc">Welcome to the Field Operations. Evidence will be automatically incinerated when the timer expires. To resolve the case, you must crack the 3-layer encryption protocol. No digits repeat in the code, allowing for precise strategic elimination. Remember, this is more than a game—it is a cognitive reset protocol.</string>
+    <string name="tutorial_page2_title">DISCIPLINE: CYLINDERS</string>
+    <string name="tutorial_page2_desc">Manipulate the digits using the vertical synaptic cylinders. Swipe vertically or tap directly on the numbers to position your target combination within the central decryption zone.</string>
+    <string name="tutorial_page3_title">PROTOCOL: INTERROGATION LOGS</string>
+    <string name="tutorial_page3_desc">Facing a logical deadlock? Access the field archive at any time by tapping the \'Interrogation\' zone in the top-right. All previous attempts and system feedback are logged here; utilize this data to eliminate impossible combinations.</string>
+    <string name="tutorial_page4_title">ANALYSIS: INTELLIGENCE KEY</string>
+    <string name="tutorial_page4_desc">If Assisted Mode is active, archival data is marked with neural color-coding:\n\n• GREEN: Digit is correct and position is verified.\n• YELLOW: Digit is correct but position is faulty.\n\nThese data points are designed to enhance your intuitive efficiency.</string>
+    <string name="tutorial_page5_title">STRATEGY: LAYER PROGRESSION</string>
+    <string name="tutorial_page5_desc">Successfully cracking each layer triggers a system override, granting you additional attempts and operational time. To close the case, you must clear all 3 layers and reach the final core sequence.</string>
+    <string name="tutorial_page6_title">EVALUATION: NEURAL PILLARS</string>
+    <string name="tutorial_page6_desc">Your SIA performance is analyzed live via 5 core neural pillars: Precision, Velocity, Stability, Intuition, and Convergence. Each pillar generates up to 100 POINTS based on efficiency. An Elite rank requires absolute logic and agility.</string>
+    <string name="tutorial_page7_title">RISKS: OPERATIONAL WASTE</string>
+    <string name="tutorial_page7_desc">Faulty maneuvers disrupt neural synchronization and degrade your rank:\n\n• MEMORY ERROR: Repeating previous guesses.\n• ARCHIVE DEPENDENCY: Over-reliance on logs.\n• LOGICAL ERRORS: Inputs that contradict established data.</string>
     <string name="tutorial_continue_button">CONTINUE</string>
     <string name="tutorial_finish_button">ACCEPT MISSION</string>
     <string name="home_about_button">ABOUT THIS GAME</string>
@@ -111,6 +124,7 @@
     <string name="initial_intelligence_number">INITIAL INTELLIGENCE #%1$d</string>
     <string name="log_interrogation_number">INTERROGATION %1$d</string>
     <string name="case_file_level">CASE FILE: LEVEL %d</string>
+    <string name="level_progress">LAYER %1$d / 3</string>
     <string name="label_lives">LIVES</string>
     <string name="label_time">TIME REMAINING</string>
 
@@ -172,5 +186,27 @@
     <string name="sia_sync_standard">COGNITIVE SYNC: STANDARD. OPERATIONAL STABILITY MAINTAINED AT BASE LEVEL.</string>
     <string name="sia_sync_suboptimal">COGNITIVE SYNC: SUB-OPTIMAL. SIGNAL NOISE DETECTED. SYSTEM OVERHEAD OBSERVED.</string>
     <string name="sia_sync_critical">COGNITIVE SYNC: CRITICAL. NEURAL CALIBRATION RECOMMENDED FOR NEXT PHASE.</string>
+ 
+    <!-- Diagnostic Manual -->
+    <string name="manual_title">NEURAL PROTOCOL</string>
+    <string name="manual_intro_title">DA-7 DIAGNOSTIC SYSTEM</string>
+    <string name="manual_intro_desc">The Neural Diagnostic Engine evaluates your cognitive performance across 5 specific pillars. Understanding these protocols is essential for achieving the Elite rank in the SIA files.</string>
+    
+    <string name="manual_precision_title">DEDUCTIVE PRECISION</string>
+    <string name="manual_precision_desc">Evaluates the purity of your deduction and operational sharpness. Any guess that contradicts established data or provides zero new intelligence is logged as "signal waste" and degrades your precision rank. Every move must represent absolute logical progression.</string>
+    
+    <string name="manual_velocity_title">SYNAPTIC VELOCITY</string>
+    <string name="manual_velocity_desc">Measures your synaptic processing speed and decision-making under pressure. The timer is the primary evaluation variable of the DA-7 engine. Decoding layers in record time triggers neural overdrive bonuses, maximizing your point output.</string>
+    
+    <string name="manual_stability_title">NEURAL STABILITY</string>
+    <string name="manual_stability_desc">Tracks mental focus and short-term memory consistency. Repeating a previous guess (Duplicate Error) or making erratic entries outside the logical sequence causes heavy destabilization of the neural wave. A stable mind is the foundation of SIA protocols.</string>
+    
+    <string name="manual_intuition_title">NUMERICAL INTUITION</string>
+    <string name="manual_intuition_desc">Measures raw pattern recognition without system assistance. Frequent reliance on the Interrogation Logs suggests lower intuitive capacity. Decoding the sequence with minimal log interaction will elevate your intuition to the maximum rank.</string>
+    
+    <string name="manual_convergence_title">LOGICAL CONVERGENCE</string>
+    <string name="manual_convergence_desc">Analyzes the efficiency of your code narrowing strategy. Each guess should strategically converge towards the mathematical core. Drifting patterns or outlier attempts indicate a loss of logical cohesion and operational efficiency.</string>
+    
+    <string name="settings_scoring_manual">SCORING PROTOCOL</string>
 
 </resources>

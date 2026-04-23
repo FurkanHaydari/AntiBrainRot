@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -36,14 +35,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import java.util.Locale
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import com.brainfocus.numberdetective.data.model.GameState
 import com.brainfocus.numberdetective.data.model.GuessResult
-import com.brainfocus.numberdetective.data.model.Hint
 import com.brainfocus.numberdetective.data.model.HintResolver
-import com.brainfocus.numberdetective.data.model.FieldReport
 import com.brainfocus.numberdetective.core.designsystem.FieldReportOverlay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -121,7 +117,6 @@ fun GameScreen(
         contentAlignment = Alignment.TopCenter
     ) {
         val scaleFactor = (maxHeight.value / 812f).coerceIn(1.0f, 2.2f)
-        val maxWidthDp = maxWidth
         val isTablet = maxWidth > 600.dp || maxHeight > 600.dp
         val maxContentWidth = if (isTablet) 800.dp else 500.dp
 
@@ -155,7 +150,18 @@ fun GameScreen(
             DetectiveHeader(
                 title = stringResource(R.string.case_file_level, currentLevel),
                 subtitle = stringResource(R.string.score_text, score),
-                scaleFactor = scaleFactor
+                scaleFactor = scaleFactor,
+                rightContent = {
+                    Text(
+                        text = stringResource(R.string.level_progress, currentLevel),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = (1.5 * scaleFactor).sp,
+                            fontSize = (13 * scaleFactor).coerceAtMost(20f).sp
+                        ),
+                        color = SuccessGreen.copy(alpha = 0.8f)
+                    )
+                }
             )
             
             Spacer(modifier = Modifier.height(12.dp * scaleFactor))

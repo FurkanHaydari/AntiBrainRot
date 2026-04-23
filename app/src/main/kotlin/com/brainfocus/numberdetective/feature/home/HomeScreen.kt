@@ -41,6 +41,7 @@ fun HomeScreen(
     onPlayClick: () -> Unit,
     onManualClick: () -> Unit,
     onHistoryClick: () -> Unit,
+    onDiagnosticClick: () -> Unit,
     onLanguageChange: (String) -> Unit,
     currentLanguage: String
 ) {
@@ -113,6 +114,7 @@ fun HomeScreen(
                     isHelperModeEnabled = isHelperModeEnabled,
                     onHelperModeToggle = { viewModel.toggleHelperMode(it) },
                     onManualClick = onManualClick,
+                    onDiagnosticClick = onDiagnosticClick,
                     scaleFactor = scaleFactor
                 )
             }

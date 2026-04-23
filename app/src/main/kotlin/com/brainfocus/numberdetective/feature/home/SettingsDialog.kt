@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +42,7 @@ fun SettingsDialog(
     isHelperModeEnabled: Boolean,
     onHelperModeToggle: (Boolean) -> Unit,
     onManualClick: () -> Unit,
+    onDiagnosticClick: () -> Unit,
     scaleFactor: Float = 1.0f
 ) {
     var showAboutDialog by remember { mutableStateOf(false) }
@@ -208,6 +210,19 @@ fun SettingsDialog(
                         }
                     )
 
+                    Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+
+                    // Scoring Protocol Button
+                    DetectiveButton(
+                        text = "🧠 " + stringResource(R.string.settings_scoring_manual).uppercase(),
+                        isPrimary = false,
+                        scaleFactor = scaleFactor * 0.9f,
+                        onClick = {
+                            onDismiss()
+                            onDiagnosticClick()
+                        }
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp * scaleFactor))
                     
                     Text(
@@ -252,6 +267,9 @@ fun AboutGameDialog(
     val context = LocalContext.current
     val coffeeUrl = stringResource(R.string.about_buy_coffee_url)
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(24.dp * scaleFactor),
@@ -261,14 +279,17 @@ fun AboutGameDialog(
                 PrimaryCyan.copy(alpha = 0.3f)
             ),
             modifier = Modifier
-                .widthIn(max = (400.dp * scaleFactor))
-                .fillMaxWidth(0.9f)
+                .widthIn(max = if (configuration.screenWidthDp > 600) 800.dp else 440.dp * scaleFactor)
+                .fillMaxWidth(0.95f)
+                .heightIn(max = screenHeight * 0.95f)
         ) {
             Column(
                 modifier = Modifier
                     .padding(28.dp * scaleFactor)
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
                 Text(
                     text = "✦",
