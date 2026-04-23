@@ -20,10 +20,9 @@ private val EliteNoirColorScheme = darkColorScheme(
 
 @Composable
 fun NumberDetectiveTheme(
-    darkTheme: Boolean = true, // Forced dark theme for the premium noir experience
     content: @Composable () -> Unit
 ) {
-    // We strictly use the Elite Noir palette as requested for a premium experience
+    // We strictly use the Elite Noir palette for a premium, unified experience
     MaterialTheme(
         colorScheme = EliteNoirColorScheme,
         typography = Typography,

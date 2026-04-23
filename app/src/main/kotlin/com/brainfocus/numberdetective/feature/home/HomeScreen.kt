@@ -58,17 +58,17 @@ fun HomeScreen(
         
         // Derived responsive dimensions
         val isLandscape = maxWidth > maxHeight
-        val isTablet = maxWidth > 600.dp
+        val isTablet = maxWidth > 600.dp || maxHeight > 600.dp
         
         val scaleFactor = if (isLandscape) {
-            minOf(maxWidth / 720.dp, maxHeight / 400.dp).coerceIn(0.8f, 1.3f)
+            minOf(maxWidth / 800.dp, maxHeight / 450.dp).coerceIn(0.85f, 1.4f)
         } else {
-            minOf(maxWidth / 360.dp, maxHeight / 640.dp).coerceIn(1f, 1.7f)
+            minOf(maxWidth / 360.dp, maxHeight / 640.dp).coerceIn(1f, 1.8f)
         }
         
         val titleBaseSize = if (isLandscape) 28f else 34f
         val titleFontSize = (titleBaseSize * scaleFactor).sp
-        val horizontalPadding = (24.dp * scaleFactor).coerceAtMost(80.dp)
+        val horizontalPadding = if (isTablet && !isLandscape) (40.dp * scaleFactor) else (24.dp * scaleFactor).coerceAtMost(80.dp)
         val verticalPadding = (16.dp * scaleFactor).coerceAtMost(48.dp)
 
         // --- Background Layers ---
@@ -119,83 +119,92 @@ fun HomeScreen(
 
             // --- ADAPTIVE CONTENT ---
             if (isLandscape) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(32.dp * scaleFactor, Alignment.CenterHorizontally)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 16.dp * scaleFactor),
+                    contentAlignment = Alignment.Center
                 ) {
-                    // Left: Title & Status
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .padding(vertical = 16.dp * scaleFactor)
+                            .widthIn(max = 800.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(32.dp * scaleFactor, Alignment.CenterHorizontally)
                     ) {
-                        Text(
-                            text = stringResource(R.string.app_title_1).uppercase(),
-                            style = MaterialTheme.typography.headlineLarge.copy(
-                                fontSize = (titleBaseSize * scaleFactor * 0.7f).sp,
-                                fontWeight = FontWeight.ExtraLight,
-                                letterSpacing = (5 * scaleFactor).sp,
-                                fontFamily = Montserrat
-                            ),
-                            color = Color.White.copy(alpha = 0.85f),
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = stringResource(R.string.app_title_2).uppercase(),
-                            style = MaterialTheme.typography.headlineLarge.copy(
-                                fontSize = titleFontSize,
-                                fontWeight = FontWeight.Black,
-                                letterSpacing = (3 * scaleFactor).sp,
-                                fontFamily = Montserrat
-                            ),
-                            color = PrimaryCyan,
-                            textAlign = TextAlign.Center
-                        )
-                        
-                        Spacer(modifier = Modifier.weight(1f)) // Push button to bottom
-                        
-                        // --- ACTION BUTTONS WITH ANIMATION ---
-                        val infiniteTransition = rememberInfiniteTransition(label = "StartButtonAnim")
-                        val pulseScale by infiniteTransition.animateFloat(
-                            initialValue = 1f,
-                            targetValue = 1.05f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1200, easing = FastOutSlowInEasing),
-                                repeatMode = RepeatMode.Reverse
-                            ),
-                            label = "PulseScale"
-                        )
-                        val glowAlpha by infiniteTransition.animateFloat(
-                            initialValue = 0.4f,
-                            targetValue = 0.9f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1200, easing = LinearEasing),
-                                repeatMode = RepeatMode.Reverse
-                            ),
-                            label = "GlowAlpha"
-                        )
-
-                        DetectiveButton(
-                            text = stringResource(R.string.start_button),
-                            isPrimary = true,
-                            scaleFactor = scaleFactor,
-                            onClick = onPlayClick,
-                            pulseScale = pulseScale,
-                            glowAlpha = glowAlpha,
+                        // Left: Title & Status
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .widthIn(max = if (maxWidth > 600.dp) 400.dp else 240.dp)
-                                .fillMaxWidth(if (maxWidth > 600.dp) 0.85f else 0.9f)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(20.dp * scaleFactor)) // Bottom margin
-                    }
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .padding(vertical = 16.dp * scaleFactor)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.app_title_1).uppercase(),
+                                style = MaterialTheme.typography.headlineLarge.copy(
+                                    fontSize = (titleBaseSize * scaleFactor * 0.7f).sp,
+                                    fontWeight = FontWeight.ExtraLight,
+                                    letterSpacing = (5 * scaleFactor).sp,
+                                    fontFamily = Montserrat
+                                ),
+                                color = Color.White.copy(alpha = 0.85f),
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                text = stringResource(R.string.app_title_2).uppercase(),
+                                style = MaterialTheme.typography.headlineLarge.copy(
+                                    fontSize = titleFontSize,
+                                    fontWeight = FontWeight.Black,
+                                    letterSpacing = (3 * scaleFactor).sp,
+                                    fontFamily = Montserrat
+                                ),
+                                color = PrimaryCyan,
+                                textAlign = TextAlign.Center
+                            )
+                            
+                            Spacer(modifier = Modifier.weight(1f)) // Push button to bottom
+                            
+                            // --- ACTION BUTTONS WITH ANIMATION ---
+                            val infiniteTransition = rememberInfiniteTransition(label = "StartButtonAnim")
+                            val pulseScale by infiniteTransition.animateFloat(
+                                initialValue = 1f,
+                                targetValue = 1.05f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(1200, easing = FastOutSlowInEasing),
+                                    repeatMode = RepeatMode.Reverse
+                                ),
+                                label = "PulseScale"
+                            )
+                            val glowAlpha by infiniteTransition.animateFloat(
+                                initialValue = 0.4f,
+                                targetValue = 0.9f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(1200, easing = LinearEasing),
+                                    repeatMode = RepeatMode.Reverse
+                                ),
+                                label = "GlowAlpha"
+                            )
 
-                    // Right: Briefing
-                    Box(modifier = Modifier.weight(1.2f), contentAlignment = Alignment.Center) {
-                        MissionBriefingPanel(scaleFactor, maxWidth)
+                            DetectiveButton(
+                                text = stringResource(R.string.start_button),
+                                isPrimary = true,
+                                scaleFactor = scaleFactor,
+                                onClick = onPlayClick,
+                                pulseScale = pulseScale,
+                                glowAlpha = glowAlpha,
+                                modifier = Modifier
+                                    .widthIn(max = if (isTablet) 360.dp else 240.dp)
+                                    .fillMaxWidth(if (isTablet) 0.85f else 0.9f)
+                            )
+                            
+                            Spacer(modifier = Modifier.height(20.dp * scaleFactor)) // Bottom margin
+                        }
+
+                        // Right: Briefing
+                        Box(modifier = Modifier.weight(1.2f), contentAlignment = Alignment.Center) {
+                            MissionBriefingPanel(scaleFactor, maxWidth, isTablet)
+                        }
                     }
                 }
             } else {
@@ -234,7 +243,7 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.weight(1.5f)) // Decompressed title area
 
-                    MissionBriefingPanel(scaleFactor, maxWidth)
+                    MissionBriefingPanel(scaleFactor, maxWidth, isTablet)
 
                     Spacer(modifier = Modifier.weight(0.9f))
 
@@ -267,8 +276,7 @@ fun HomeScreen(
                         pulseScale = pulseScale,
                         glowAlpha = glowAlpha,
                         modifier = Modifier
-                            .widthIn(max = if (maxWidth > 600.dp) 750.dp else 500.dp)
-                            .fillMaxWidth(if (maxWidth > 600.dp) 0.95f else 0.9f)
+                            .fillMaxWidth(if (isTablet) 0.98f else 0.9f)
                             .padding(bottom = (32.dp * scaleFactor).coerceAtLeast(16.dp))
                     )
                 }
@@ -384,11 +392,11 @@ fun HomeHeader(
 }
 
 @Composable
-fun MissionBriefingPanel(scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp) {
+fun MissionBriefingPanel(scaleFactor: Float, maxWidth: androidx.compose.ui.unit.Dp, isTablet: Boolean) {
     Surface(
         modifier = Modifier
-            .widthIn(max = if (maxWidth > 600.dp) 750.dp else 500.dp)
-            .fillMaxWidth(if (maxWidth > 600.dp) 0.95f else 0.9f),
+            .widthIn(max = if (isTablet) 800.dp else 500.dp)
+            .fillMaxWidth(if (isTablet) 0.98f else 0.9f),
         color = Color.White.copy(alpha = 0.03f),
         shape = RoundedCornerShape(20.dp * scaleFactor),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))

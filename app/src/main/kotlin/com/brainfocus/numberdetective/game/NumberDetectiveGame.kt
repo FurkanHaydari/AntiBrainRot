@@ -1,8 +1,10 @@
 package com.brainfocus.numberdetective.game
 
+import javax.inject.Inject
 import kotlin.random.Random
 
-class NumberDetectiveGame {
+@Suppress("unused")
+class NumberDetectiveGame @Inject constructor() {
     companion object {
         private const val MAX_ATTEMPTS = 3
         private const val INITIAL_SCORE = 100

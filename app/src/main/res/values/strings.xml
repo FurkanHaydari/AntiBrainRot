@@ -37,16 +37,13 @@
     
     <string name="back_to_menu">MAIN MENU</string>
 
-    <string name="sia_evaluation_win">COGNITIVE SYNC: OPTIMAL. PATTERN RECOGNITION WITHIN EXPECTED PARAMETERS.</string>
-    <string name="sia_evaluation_loss">SIGNAL NOISE DETECTED. NEURAL CALIBRATION RECOMMENDED FOR NEXT PHASE.</string>
-
     <!-- Result Screen -->
-    <string name="correct_answer">Correct Answer</string>
     <string name="correct_answer_label">Answer</string>
-    <string name="attempts">Attempts</string>
-    <string name="time">Time</string>
 
-    <string name="share_score_message">I scored %1$d points in Number Detective! Used %2$d attempts in %3$s. Can you beat my score? 🎮</string>
+    <plurals name="share_score_message">
+        <item quantity="one">I scored %1$d points in Number Detective! Used %2$d attempt in %3$s. Can you beat my score? 🎮</item>
+        <item quantity="other">I scored %1$d points in Number Detective! Used %2$d attempts in %3$s. Can you beat my score? 🎮</item>
+    </plurals>
     <string name="share_score_title">Share Score</string>
 
     <!-- Home Screen Redesign -->
@@ -67,7 +64,7 @@
     <string name="tutorial_page1_desc">When time runs out, the evidence will be destroyed. To solve the case, you must crack the 3-layer cipher before the evidence disappears. Don\'t panic! All digits in the secret code are unique, which will narrow down your deductions and make decoding easier.</string>
     <string name="tutorial_page2_title">{ THE CYLINDERS }</string>
     <string name="tutorial_page2_desc">Use the vertical cylinders to select your digits. Drag or tap them to reveal the combination you wish to test.</string>
-    <string name="tutorial_page3_title">[ CASE ARCHIVE ]</string>
+    <string name="tutorial_page3_title">[ CASE HISTORY ]</string>
     <string name="tutorial_page3_desc">Stuck? Tap the top-right \'Attempts\' counter at any time to open your Case Archive. Here you can review all your previous guesses and narrow down the possibilities.</string>
     <string name="tutorial_page4_title">[ INTELLIGENCE KEY ]</string>
     <string name="tutorial_page4_desc">If you enable Assistance Mode from Settings, you will see color-coded intelligence data for your guesses in the archive:\n\n• GREEN: Correct digit in right spot.\n• YELLOW: Correct digit in wrong spot.</string>
@@ -79,7 +76,6 @@
     <string name="tutorial_page7_desc">Operational inefficiencies reduce your ranks and points:\n\n• MEMORY ERROR: Repeating a previous guess heavily destabilizes your score.\n• ARCHIVE RELIANCE: Checking logs reduces pure intuition.\n• LOGICAL MISTAKES: Incorrect pattern tracking reduces precision.</string>
     <string name="tutorial_continue_button">CONTINUE</string>
     <string name="tutorial_finish_button">ACCEPT MISSION</string>
-    <string name="home_manual_button">DETECTION GUIDE</string>
     <string name="home_about_button">ABOUT THIS GAME</string>
     <string name="about_dialog_title">A Game for Brain Health</string>
     <string name="about_dialog_body">This game was created without any commercial purpose — a gift for brain health. Its mission: to fight the attention deficit and brain rot fuelled by social media by training short-term memory, strengthening analytical intelligence, and sharpening focus and concentration.\n\nThere are no ads in this game. The reason is simple: ads are one of the very triggers of brain rot.\n\nIf you enjoyed the game, you can support its mission on Patreon 🧡</string>
@@ -101,33 +97,35 @@
     <string name="log_analysis_attempt">INTELLIGENCE ANALYSIS</string>
     <string name="log_analysis_success">ACCESS GRANTED</string>
     <string name="label_trials">TRIALS</string>
-    <string name="label_case_archive">CASE ARCHIVE</string>
+    <string name="label_case_archive">INTERROGATION LOGS</string>
     <string name="msg_analysis_active">SIA INTELLIGENCE ACTIVE</string>
-    <string name="msg_no_evidence_waiting">WAITING FOR INPUT...</string>
-    <string name="label_daily_record">DAILY RECORD</string>
-    <string name="label_all_time_record">ALL-TIME RECORD</string>
+    <string name="msg_no_evidence_waiting">WAITING FOR EVIDENCE…</string>
     
-    <string name="label_tab_briefing">BRIEFING</string>
-    <string name="label_tab_archive">CASE ARCHIVE</string>
+    <string name="label_tab_briefing">REPORT</string>
+    <string name="label_tab_archive">HISTORY</string>
 
     <string name="mission_accomplished">MISSION ACCOMPLISHED</string>
     <string name="mission_failed">MISSION FAILED</string>
     <string name="final_score">FINAL SCORE</string>
     <string name="continue_mission">CONTINUE MISSION</string>
-    <string name="initial_intelligence">INITIAL INTELLIGENCE</string>
     <string name="initial_intelligence_number">INITIAL INTELLIGENCE #%1$d</string>
-    <string name="log_analysis_number">INTELLIGENCE %1$d</string>
     <string name="log_interrogation_number">INTERROGATION %1$d</string>
     <string name="case_file_level">CASE FILE: LEVEL %d</string>
     <string name="label_lives">LIVES</string>
     <string name="label_time">TIME REMAINING</string>
 
     <string name="report_promotion_title">PROMOTION GRANTED</string>
-    <string name="report_promotion_msg">Level %1$d reached. You gained %2$d extra attempts and %3$d bonus seconds. Ready for the next phase?</string>
+    <plurals name="report_promotion_msg">
+        <item quantity="one">Level %1$d reached. You gained %2$d extra attempt and %3$d bonus seconds. Ready for the next phase?</item>
+        <item quantity="other">Level %1$d reached. You gained %2$d extra attempts and %3$d bonus seconds. Ready for the next phase?</item>
+    </plurals>
     <string name="score_points">%1$d PTS</string>
     <string name="report_compromised_title">SECURITY BREACH</string>
-    <string name="report_compromised_msg">Wrong sequence! Security is tightening. You have %d attempts remaining.</string>
-    <string name="final_report">FINAL REPORT</string>
+    <plurals name="report_compromised_msg">
+        <item quantity="one">Wrong sequence! Security is tightening. You have %d attempt remaining.</item>
+        <item quantity="other">Wrong sequence! Security is tightening. You have %d attempts remaining.</item>
+    </plurals>
+    <string name="final_report">FIELD REPORT</string>
     <string name="report_pause_title">INVESTIGATION ADJOURNED</string>
     <string name="report_pause_msg">The countdown has been halted. Your current intelligence is preserved.</string>
     <string name="exit_mission">ABORT MISSION</string>

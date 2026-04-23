@@ -138,14 +138,15 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
     val dateFormat = remember { SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()) }
     val dateString = remember(session.timestamp) { dateFormat.format(Date(session.timestamp)) }
     
+    val isTablet = maxWidth > 600.dp
     Surface(
         onClick = onClick,
         color = SurfaceCard,
         shape = RoundedCornerShape(16.dp * scaleFactor),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
         modifier = Modifier
-            .widthIn(max = (550.dp * scaleFactor).coerceAtMost(maxWidth))
-            .fillMaxWidth()
+            .widthIn(max = if (isTablet) 800.dp else 550.dp * scaleFactor)
+            .fillMaxWidth(if (isTablet) 0.9f else 1f)
     ) {
         Box {
             // Paperclip Effect from DetectiveComponents

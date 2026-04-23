@@ -266,7 +266,8 @@ fun DetectiveHintCard(
     labelColor: Color = PrimaryCyan.copy(alpha = 0.7f),
     maxWidth: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.Dp.Unspecified,
     isInterrogation: Boolean = false,
-    isFullscreenMode: Boolean = false
+    isFullscreenMode: Boolean = false,
+    showDigitColors: Boolean = true
 ) {
     val isLevel3 = hint.guess.length == 4
     val coins = (hint.correct * 2) + hint.misplaced
@@ -326,15 +327,15 @@ fun DetectiveHintCard(
                     hint.guess.forEachIndexed { digitIndex, char ->
                         val status = if (isHelperModeEnabled) hint.digitStatuses?.getOrNull(digitIndex) else null
                         val bgColor = when (status) {
-                            DigitStatus.CORRECT_POS -> SuccessGreen.copy(alpha = 0.2f)
-                            DigitStatus.WRONG_POS -> WarningYellow.copy(alpha = 0.2f)
-                            DigitStatus.INCORRECT -> ErrorRed.copy(alpha = 0.2f)
+                            DigitStatus.CORRECT_POS -> if (showDigitColors) SuccessGreen.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)
+                            DigitStatus.WRONG_POS -> if (showDigitColors) WarningYellow.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)
+                            DigitStatus.INCORRECT -> if (showDigitColors) ErrorRed.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)
                             else -> Color.White.copy(alpha = 0.05f)
                         }
                         val borderColor = when (status) {
-                            DigitStatus.CORRECT_POS -> SuccessGreen
-                            DigitStatus.WRONG_POS -> WarningYellow
-                            DigitStatus.INCORRECT -> ErrorRed
+                            DigitStatus.CORRECT_POS -> if (showDigitColors) SuccessGreen else Color.White.copy(alpha = 0.1f)
+                            DigitStatus.WRONG_POS -> if (showDigitColors) WarningYellow else Color.White.copy(alpha = 0.1f)
+                            DigitStatus.INCORRECT -> if (showDigitColors) ErrorRed else Color.White.copy(alpha = 0.1f)
                             else -> Color.White.copy(alpha = 0.1f)
                         }
 
@@ -351,7 +352,7 @@ fun DetectiveHintCard(
                                     fontSize = digitFontSize,
                                     fontWeight = FontWeight.Bold
                                 ),
-                                color = if (status != null) Color.White else PrimaryCyan
+                                color = if (status != null && showDigitColors) Color.White else PrimaryCyan
                             )
                         }
                     }
@@ -409,15 +410,15 @@ fun DetectiveHintCard(
                         hint.guess.forEachIndexed { digitIndex, char ->
                             val status = if (isHelperModeEnabled) hint.digitStatuses?.getOrNull(digitIndex) else null
                             val bgColor = when (status) {
-                                DigitStatus.CORRECT_POS -> SuccessGreen.copy(alpha = 0.2f)
-                                DigitStatus.WRONG_POS -> WarningYellow.copy(alpha = 0.2f)
-                                DigitStatus.INCORRECT -> ErrorRed.copy(alpha = 0.2f)
+                                DigitStatus.CORRECT_POS -> if (showDigitColors) SuccessGreen.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)
+                                DigitStatus.WRONG_POS -> if (showDigitColors) WarningYellow.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)
+                                DigitStatus.INCORRECT -> if (showDigitColors) ErrorRed.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)
                                 else -> Color.White.copy(alpha = 0.05f)
                             }
                             val borderColor = when (status) {
-                                DigitStatus.CORRECT_POS -> SuccessGreen
-                                DigitStatus.WRONG_POS -> WarningYellow
-                                DigitStatus.INCORRECT -> ErrorRed
+                                DigitStatus.CORRECT_POS -> if (showDigitColors) SuccessGreen else Color.White.copy(alpha = 0.1f)
+                                DigitStatus.WRONG_POS -> if (showDigitColors) WarningYellow else Color.White.copy(alpha = 0.1f)
+                                DigitStatus.INCORRECT -> if (showDigitColors) ErrorRed else Color.White.copy(alpha = 0.1f)
                                 else -> Color.White.copy(alpha = 0.1f)
                             }
 
@@ -434,7 +435,7 @@ fun DetectiveHintCard(
                                         fontSize = digitFontSize,
                                         fontWeight = FontWeight.Bold
                                     ),
-                                    color = if (status != null) Color.White else PrimaryCyan
+                                    color = if (status != null && showDigitColors) Color.White else PrimaryCyan
                                 )
                             }
                         }

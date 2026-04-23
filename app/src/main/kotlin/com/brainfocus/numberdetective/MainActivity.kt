@@ -43,7 +43,11 @@ class MainActivity : ComponentActivity() {
         
         // Initialize SoundManager and sync with settings
         soundManager.initialize()
+        
         lifecycleScope.launch {
+            // Perform one-time cleanup for version 2.1.1
+            dataStoreManager.checkAndPerformCleanup(BuildConfig.VERSION_NAME)
+            
             dataStoreManager.isSoundEnabledFlow.collect { enabled ->
                 soundManager.setSoundEnabled(enabled)
             }
@@ -70,9 +74,5 @@ class MainActivity : ComponentActivity() {
 
     private fun playButtonClickSound() {
         soundManager.playButtonClick()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }

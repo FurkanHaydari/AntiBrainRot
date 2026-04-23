@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
+@Suppress("unused")
 class HistoryViewModel @Inject constructor(
     private val dataStoreManager: DataStoreManager
 ) : ViewModel() {

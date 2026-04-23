@@ -30,7 +30,7 @@ object DiagnosticEngine {
      * Verimlilik (Sezgi/Yakınsama) indeksini hesaplayan merkezi motor fonksiyonu.
      * V2.3 Turbo: Katsayı 1.2f olarak sabitlendi.
      */
-    fun calculateEfficiencyIndex(hints: List<com.brainfocus.numberdetective.data.model.Hint>, attempts: Int, levelNumber: Int): Float {
+    fun calculateEfficiencyIndex(hints: List<Hint>, attempts: Int, levelNumber: Int): Float {
         val coins = calculateCoinsForLevel(hints, levelNumber)
         val digits = if (levelNumber == 3) 4 else 3
         return (coins.first.toFloat() / (max(1.0f, attempts.toFloat()) * digits.toFloat() * 1.2f))
@@ -245,14 +245,9 @@ object DiagnosticEngine {
         isWin: Boolean, 
         totalAttempts: Int, 
         totalTimeSeconds: Int, 
-        totalHintsFound: Int = -1,
-        isHelperModeEnabled: Boolean = false,
         logicalMistakes: Int = 0,
         totalArchiveChecks: Int = 0,
         totalDuplicateGuesses: Int = 0,
-        totalCoins: Int = -1,
-        totalMaxCoins: Int = -1,
-        levelsPlayed: Int = 1,
         levelNumber: Int = 1,
         efficiencyIdx: Float = 0.5f
     ): DiagnosticReport {

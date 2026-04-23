@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import java.util.Locale
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.core.designsystem.*
 import com.brainfocus.numberdetective.data.model.GameState
@@ -114,9 +116,14 @@ fun GameScreen(
         }
     }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
         val scaleFactor = (maxHeight.value / 812f).coerceIn(1.0f, 2.2f)
-        val maxWidth = maxWidth
+        val maxWidthDp = maxWidth
+        val isTablet = maxWidth > 600.dp || maxHeight > 600.dp
+        val maxContentWidth = if (isTablet) 800.dp else 500.dp
 
         // --- Layer 1: Background ---
         Image(
@@ -136,6 +143,7 @@ fun GameScreen(
         // --- Layer 2: UI Content ---
         Column(
             modifier = Modifier
+                .widthIn(max = maxContentWidth)
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
@@ -166,7 +174,8 @@ fun GameScreen(
                 ) {
                     DetectiveStatItem(label = stringResource(R.string.label_lives), value = "x$remainingAttempts", color = ErrorRed, scaleFactor = scaleFactor)
                     VerticalDivider(modifier = Modifier.height(24.dp * scaleFactor).width(1.dp), color = Color.White.copy(alpha = 0.1f))
-                    DetectiveStatItem(label = stringResource(R.string.label_time), value = String.format("%02d:%02d", remainingTime / 60, remainingTime % 60), color = PrimaryCyan, scaleFactor = scaleFactor)
+                    val locale = LocalConfiguration.current.locales[0]
+                    DetectiveStatItem(label = stringResource(R.string.label_time), value = "%02d:%02d".format(locale, remainingTime / 60, remainingTime % 60), color = PrimaryCyan, scaleFactor = scaleFactor)
                     VerticalDivider(modifier = Modifier.height(24.dp * scaleFactor).width(1.dp), color = Color.White.copy(alpha = 0.1f))
                     DetectiveStatItem(
                         label = stringResource(R.string.label_trials), 
@@ -256,39 +265,42 @@ fun GameScreen(
                                 isHelperModeEnabled = isHelperModeEnabled, 
                                 scaleFactor = scaleFactor,
                                 label = HintResolver.getActionLabel(hint, index, evidenceHints, context),
-                                labelColor = PrimaryCyan.copy(alpha = 0.7f)
+                                labelColor = PrimaryCyan.copy(alpha = 0.7f),
+                                showDigitColors = false
                             )
                         }
                     }
                 }
 
                 // Countdown Overlay
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = countdownValue != null,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        AnimatedContent(
-                            targetState = countdownValue,
-                            transitionSpec = {
-                                (scaleIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) + fadeIn())
-                                    .togetherWith(scaleOut(animationSpec = tween(300)) + fadeOut())
-                            },
-                            label = "CountdownAnimation"
-                        ) { value ->
-                            if (value != null) {
-                                Text(
-                                    text = if (value == 0) stringResource(R.string.countdown_go) else value.toString(),
-                                    style = MaterialTheme.typography.displayLarge.copy(
-                                        fontWeight = FontWeight.Black,
-                                        fontSize = (80 * scaleFactor).coerceAtMost(160f).sp,
-                                        fontFamily = Montserrat,
-                                        letterSpacing = (4 * scaleFactor).sp
-                                    ),
-                                    color = PrimaryCyan,
-                                    textAlign = TextAlign.Center
-                                )
+                Column {
+                    AnimatedVisibility(
+                        visible = countdownValue != null,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            AnimatedContent(
+                                targetState = countdownValue,
+                                transitionSpec = {
+                                    (scaleIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) + fadeIn())
+                                        .togetherWith(scaleOut(animationSpec = tween(300)) + fadeOut())
+                                },
+                                label = "CountdownAnimation"
+                            ) { value ->
+                                if (value != null) {
+                                    Text(
+                                        text = if (value == 0) stringResource(R.string.countdown_go) else value.toString(),
+                                        style = MaterialTheme.typography.displayLarge.copy(
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = (80 * scaleFactor).coerceAtMost(160f).sp,
+                                            fontFamily = Montserrat,
+                                            letterSpacing = (4 * scaleFactor).sp
+                                        ),
+                                        color = PrimaryCyan,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     }
@@ -393,7 +405,8 @@ fun GameScreen(
                                     scaleFactor = scaleFactor,
                                     label = HintResolver.getActionLabel(hint, index, trialHints, context),
                                     labelColor = PrimaryCyan.copy(alpha = 0.7f),
-                                    isInterrogation = true
+                                    isInterrogation = true,
+                                    showDigitColors = isHelperModeEnabled
                                 )
                             }
                         }
@@ -412,7 +425,7 @@ fun GameScreen(
                 FieldReportOverlay(
                     report = report,
                     scaleFactor = scaleFactor,
-                    maxWidth = maxWidth,
+                    maxWidth = maxContentWidth,
                     onDismiss = { viewModel.dismissReport() },
                     onExit = onNavigateBack,
                     remainingTime = remainingTime
@@ -471,10 +484,10 @@ fun GameScreen(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(
+                    // Updated Header (Title only for more space)
+                    Box(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp * scaleFactor),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
@@ -492,20 +505,6 @@ fun GameScreen(
                                     fontFamily = Montserrat
                                 ),
                                 color = PrimaryCyan
-                            )
-                        }
-                        
-                        IconButton(
-                            onClick = { isHintsFullscreen = false },
-                            modifier = Modifier
-                                .size(36.dp * scaleFactor)
-                                .background(Color.White.copy(alpha = 0.05f), CircleShape)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.FullscreenExit,
-                                contentDescription = "Exit Focus Mode",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp * scaleFactor)
                             )
                         }
                     }
@@ -529,10 +528,28 @@ fun GameScreen(
                                     .offset(y = (-8).dp * scaleFactor)
                             )
 
+                            // Close Button (Integrated into the card)
+                            IconButton(
+                                onClick = { isHintsFullscreen = false },
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp * scaleFactor)
+                                    .size(42.dp * scaleFactor) // Slightly larger for better touch target
+                                    .background(Color.White.copy(alpha = 0.05f), CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.FullscreenExit,
+                                    contentDescription = "Exit Focus Mode",
+                                    tint = PrimaryCyan,
+                                    modifier = Modifier.size(26.dp * scaleFactor)
+                                )
+                            }
+
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(16.dp * scaleFactor),
+                                    .padding(16.dp * scaleFactor)
+                                    .padding(top = 12.dp * scaleFactor), // Extra space for the button
                                 verticalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 evidenceHints.forEachIndexed { index, hint ->
@@ -542,7 +559,8 @@ fun GameScreen(
                                         isHelperModeEnabled = isHelperModeEnabled,
                                         scaleFactor = scaleFactor,
                                         label = HintResolver.getActionLabel(hint, index, evidenceHints, context),
-                                        isFullscreenMode = true
+                                        isFullscreenMode = true,
+                                        showDigitColors = false
                                     )
                                     
                                     if (index < evidenceHints.size - 1) {
@@ -620,21 +638,17 @@ fun NumberVaultPicker(value: Int, scaleFactor: Float, onValueChange: (Int) -> Un
         flingBehavior = fling
     ) { page ->
         val itemValue = page % 10
-        val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
-
-        val rotationX = pageOffset * -30f
-        val scale = 1f - (kotlin.math.abs(pageOffset).coerceIn(0f, 1f) * 0.25f)
-        val alpha = 1f - (kotlin.math.abs(pageOffset).coerceIn(0f, 1f) * 0.6f)
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(45.dp * scaleFactor)
                 .graphicsLayer {
-                    this.rotationX = rotationX
-                    scaleX = scale
-                    scaleY = scale
-                    this.alpha = alpha
+                    val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                    rotationX = pageOffset * -30f
+                    val s = 1f - (kotlin.math.abs(pageOffset).coerceIn(0f, 1f) * 0.25f)
+                    scaleX = s
+                    scaleY = s
+                    alpha = 1f - (kotlin.math.abs(pageOffset).coerceIn(0f, 1f) * 0.6f)
                     cameraDistance = (12f * scaleFactor) * density
                 },
             contentAlignment = Alignment.Center

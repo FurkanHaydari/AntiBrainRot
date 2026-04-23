@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+@Suppress("unused")
 class OnboardingViewModel @Inject constructor(
     private val dataStoreManager: DataStoreManager
 ) : ViewModel() {

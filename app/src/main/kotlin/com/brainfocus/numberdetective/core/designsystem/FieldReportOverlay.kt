@@ -1,5 +1,7 @@
 package com.brainfocus.numberdetective.core.designsystem
 
+import java.util.Locale
+
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -96,7 +100,11 @@ fun FieldReportOverlay(
                 Spacer(modifier = Modifier.height(12.dp * scaleFactor))
 
                 Text(
-                    text = stringResource(report.messageRes, *report.messageArgs.toTypedArray()),
+                    text = if (report.pluralRes != 0) {
+                        pluralStringResource(report.pluralRes, report.quantity, *report.messageArgs.toTypedArray())
+                    } else {
+                        stringResource(report.messageRes, *report.messageArgs.toTypedArray())
+                    },
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
                         lineHeight = (22 * scaleFactor).coerceAtMost(32f).sp
@@ -124,8 +132,9 @@ fun FieldReportOverlay(
                                 ),
                                 color = TextSecondary
                             )
+                            val locale = LocalConfiguration.current.locales[0]
                             Text(
-                                text = String.format("%02d:%02d", remainingTime / 60, remainingTime % 60),
+                                text = "%02d:%02d".format(locale, remainingTime / 60, remainingTime % 60),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontSize = (16 * scaleFactor).coerceAtMost(24f).sp
                                 ),

@@ -20,14 +20,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
+import java.util.Locale
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.content.res.ResourcesCompat
@@ -62,14 +64,26 @@ fun ResultScreen(
 
     val minutes = timeInSeconds / 60
     val seconds = timeInSeconds % 60
-    val formattedTime = String.format("%02d:%02d", minutes, seconds)
+    val locale = LocalConfiguration.current.locales[0]
+    val formattedTime = "%02d:%02d".format(locale, minutes, seconds)
 
     LaunchedEffect(Unit) {
         isVisible = true
     }
 
     val diagnosticReport = remember(session) {
-        session?.diagnosticReport ?: DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
+        session?.diagnosticReport ?: DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, logicalMistakes)
+    }
+
+    // Resolve strings at Composable level to avoid LocalContextGetResourceValueCall warnings
+    val shareTitle = stringResource(R.string.share_score_title)
+    val baseMessage = pluralStringResource(R.plurals.share_score_message, attempts, score, attempts, formattedTime)
+    val syncLevelStr = when(diagnosticReport.syncLevel) {
+        SyncLevel.OPTIMAL -> stringResource(R.string.sia_sync_optimal)
+        SyncLevel.STABLE -> stringResource(R.string.sia_sync_stable)
+        SyncLevel.STANDARD -> stringResource(R.string.sia_sync_standard)
+        SyncLevel.SUBOPTIMAL -> stringResource(R.string.sia_sync_suboptimal)
+        SyncLevel.CRITICAL -> stringResource(R.string.sia_sync_critical)
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
@@ -166,7 +180,7 @@ fun ResultScreen(
                     modifier = Modifier.weight(1f),
                     onClick = { selectedTab = 1 }
                 )
-            }
+             }
 
             Spacer(modifier = Modifier.height(8.dp * scaleFactor))
 
@@ -180,14 +194,8 @@ fun ResultScreen(
                     0 -> BriefingView(
                         isWin = isWin,
                         score = score,
-                        correctAnswer = correctAnswer,
                         attempts = attempts,
                         timeInSeconds = timeInSeconds,
-                        formattedTime = formattedTime,
-                        dailyHighScore = dailyHighScore,
-                        allTimeHighScore = allTimeHighScore,
-                        totalHintsFound = totalHintsFound,
-                        isHelperModeEnabled = isHelperModeEnabled,
                         logicalMistakes = logicalMistakes,
                         scaleFactor = scaleFactor,
                         maxWidth = maxWidthDp,
@@ -214,19 +222,7 @@ fun ResultScreen(
                     scaleFactor = scaleFactor,
                     onClick = {
                         val playStoreLink = "https://play.google.com/store/apps/details?id=${context.packageName}"
-                        
-                        // Localized Sync Level for the text message
-                        val syncLevelStr = when(diagnosticReport.syncLevel) {
-                            SyncLevel.OPTIMAL -> context.getString(R.string.sia_sync_optimal)
-                            SyncLevel.STABLE -> context.getString(R.string.sia_sync_stable)
-                            SyncLevel.STANDARD -> context.getString(R.string.sia_sync_standard)
-                            SyncLevel.SUBOPTIMAL -> context.getString(R.string.sia_sync_suboptimal)
-                            SyncLevel.CRITICAL -> context.getString(R.string.sia_sync_critical)
-                        }
-
-                        val baseMessage = context.getString(R.string.share_score_message, score, attempts, formattedTime)
                         val shareMessage = "$baseMessage\n\n$syncLevelStr\n\n$playStoreLink"
-                        val shareTitle = context.getString(R.string.share_score_title)
                         
                         coroutineScope.launch(Dispatchers.IO) {
                             val imageUri = ShareImageGenerator.generateShareImage(context, isWin, score, diagnosticReport)
@@ -301,22 +297,15 @@ fun TabItem(text: String, isSelected: Boolean, scaleFactor: Float, modifier: Mod
 fun BriefingView(
     isWin: Boolean,
     score: Int,
-    correctAnswer: String,
     attempts: Int,
     timeInSeconds: Int,
-    formattedTime: String,
-    dailyHighScore: Int,
-    allTimeHighScore: Int,
-    totalHintsFound: Int,
-    isHelperModeEnabled: Boolean,
     logicalMistakes: Int,
     scaleFactor: Float,
     maxWidth: androidx.compose.ui.unit.Dp,
     session: GameSession? = null,
     report: DiagnosticReport? = null
 ) {
-    val context = LocalContext.current
-    val verticalScale = (scaleFactor * 1.1f).coerceIn(1.0f, 2.5f)
+    val verticalScale = (scaleFactor * 1.05f).coerceIn(1.0f, 2.2f)
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -338,35 +327,44 @@ fun BriefingView(
             }
         )
 
-        Spacer(modifier = Modifier.height(12.dp * verticalScale))
-        // Digital Intelligence HUD (Transparent Shell)
-        Box(
-            modifier = Modifier
-                .widthIn(max = (500.dp * verticalScale).coerceAtMost(maxWidth))
-                .fillMaxWidth()
-                .fillMaxHeight(0.92f)
-                .background(Color.White.copy(alpha = 0.02f), RoundedCornerShape(16.dp * verticalScale))
-                .border(
-                    width = 1.dp,
-                    brush = Brush.verticalGradient(
-                        listOf(Color.White.copy(alpha = 0.1f), Color.Transparent)
-                    ),
-                    shape = RoundedCornerShape(16.dp * verticalScale)
-                )
-                .padding(horizontal = 24.dp * verticalScale, vertical = 12.dp * verticalScale)
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                // Cognitive diagnostic content
-                val diagnosticReport = report ?: remember(session) {
-                    session?.diagnosticReport ?: DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, totalHintsFound, isHelperModeEnabled, logicalMistakes)
-                }
+            val isTablet = this@BoxWithConstraints.maxWidth > 600.dp || maxHeight > 600.dp
+            val maxContentWidth = if (isTablet) (750.dp * verticalScale).coerceAtMost(this@BoxWithConstraints.maxWidth) 
+                                 else (500.dp * verticalScale).coerceAtMost(this@BoxWithConstraints.maxWidth)
 
-                com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
-                    report = diagnosticReport,
-                    isWin = isWin,
-                    scaleFactor = verticalScale,
-                    modifier = Modifier.weight(1f)
-                )
+            Spacer(modifier = Modifier.height(12.dp * verticalScale))
+            // Digital Intelligence HUD (Transparent Shell)
+            Box(
+                modifier = Modifier
+                    .widthIn(max = maxContentWidth)
+                    .fillMaxWidth(if (isTablet) 0.95f else 0.9f)
+                    .fillMaxHeight(0.92f)
+                    .background(Color.White.copy(alpha = 0.02f), RoundedCornerShape(16.dp * verticalScale))
+                    .border(
+                        width = 1.dp,
+                        brush = Brush.verticalGradient(
+                            listOf(Color.White.copy(alpha = 0.1f), Color.Transparent)
+                        ),
+                        shape = RoundedCornerShape(16.dp * verticalScale)
+                    )
+                    .padding(horizontal = (18.dp * verticalScale).coerceAtMost(24.dp), vertical = 12.dp * verticalScale)
+            ) {
+                Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    // Cognitive diagnostic content
+                    val diagnosticReport = report ?: remember(session) {
+                        session?.diagnosticReport ?: DiagnosticEngine.generateReport(isWin, attempts, timeInSeconds, logicalMistakes)
+                    }
+
+                    com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
+                        report = diagnosticReport,
+                        isWin = isWin,
+                        scaleFactor = verticalScale,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }
@@ -440,7 +438,7 @@ fun CaseArchiveView(scaleFactor: Float) {
                     isInterrogation = isUserGuess || hint.descriptionRes == R.string.log_analysis_success,
                     maxWidth = 550.dp * scaleFactor
                 )
-            }
+             }
         }
     }
 }

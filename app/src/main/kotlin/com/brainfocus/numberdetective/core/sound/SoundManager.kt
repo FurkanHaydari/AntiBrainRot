@@ -9,6 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+@Suppress("unused")
 class SoundManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {

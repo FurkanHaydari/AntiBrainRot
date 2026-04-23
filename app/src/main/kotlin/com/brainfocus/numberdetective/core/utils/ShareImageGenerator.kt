@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import androidx.core.graphics.toColorInt
 import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
@@ -46,7 +47,7 @@ object ShareImageGenerator {
 
             // Title Layer
             val titleStr = context.getString(if (isWin) R.string.mission_accomplished else R.string.mission_failed).uppercase()
-            val primaryColor = if (isWin) Color.parseColor("#00E5FF") else Color.parseColor("#FF3B30")
+            val primaryColor = if (isWin) "#00E5FF".toColorInt() else "#FF3B30".toColorInt()
             
             val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = primaryColor
@@ -76,7 +77,7 @@ object ShareImageGenerator {
             
             // Footer App Name
             val appLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = Color.parseColor("#7A7A7A")
+                color = "#7A7A7A".toColorInt()
                 textSize = canvas.width * 0.035f
                 typeface = typefaceBold
                 textAlign = Paint.Align.CENTER
@@ -129,7 +130,7 @@ object ShareImageGenerator {
         )
 
         val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#B0B0B0")
+            color = "#B0B0B0".toColorInt()
             textSize = canvas.width * 0.03f
             this.typeface = typeface
             textAlign = Paint.Align.RIGHT
@@ -141,7 +142,7 @@ object ShareImageGenerator {
         }
 
         val barActivePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = if (isWin) Color.parseColor("#4CAF50") else Color.parseColor("#00E5FF")
+            color = if (isWin) "#4CAF50".toColorInt() else "#00E5FF".toColorInt()
         }
 
         metrics.forEachIndexed { index, (label, value) ->
@@ -158,7 +159,7 @@ object ShareImageGenerator {
                 
                 // Color override for low levels if not win
                 if (isActive && !isWin && value <= 2) {
-                    paint.color = Color.parseColor("#F44336")
+                    paint.color = "#F44336".toColorInt()
                 }
 
                 val left = barsStartX + (i * (barWidth + barGap))
@@ -173,7 +174,7 @@ object ShareImageGenerator {
         // Final Sync Label
         val syncLabel = context.getString(R.string.eval_conclusion_label).uppercase()
         val syncPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = if (isWin) Color.parseColor("#4CAF50") else Color.parseColor("#00E5FF")
+            color = if (isWin) "#4CAF50".toColorInt() else "#00E5FF".toColorInt()
             textSize = canvas.width * 0.04f
             this.typeface = typeface
             textAlign = Paint.Align.CENTER

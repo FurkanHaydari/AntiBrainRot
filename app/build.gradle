@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = 'com.brainfocus.numberdetective'
-    compileSdk = 36
+    compileSdk = 37
 
     bundle {
         language {
@@ -18,9 +18,9 @@ android {
     defaultConfig {
         applicationId = "com.brainfocus.numberdetective"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 10
-        versionName = "2.1.1"
+        targetSdk = 37
+        versionCode = 12
+        versionName = "2.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

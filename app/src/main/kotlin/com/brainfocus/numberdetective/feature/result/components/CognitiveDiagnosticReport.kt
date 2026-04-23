@@ -123,7 +123,7 @@ fun CognitiveDiagnosticReport(
                                         text = mainValue.uppercase(),
                                         style = MaterialTheme.typography.bodyLarge.copy(
                                             fontFamily = Montserrat,
-                                            fontSize = (16 * scaleFactor).sp,
+                                            fontSize = (15 * scaleFactor).coerceAtMost(22f).sp,
                                             fontWeight = FontWeight.Black,
                                             letterSpacing = (0.5 * scaleFactor).sp,
                                             shadow = androidx.compose.ui.graphics.Shadow(

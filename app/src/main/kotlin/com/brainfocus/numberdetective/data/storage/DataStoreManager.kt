@@ -20,6 +20,7 @@ import javax.inject.Singleton
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "number_detective_prefs")
 
 @Singleton
+@Suppress("unused")
 class DataStoreManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
@@ -38,6 +39,7 @@ class DataStoreManager @Inject constructor(
         val ALL_TIME_HIGH_SCORE = intPreferencesKey("all_time_high_score")
         val LAST_SCORE_DATE = stringPreferencesKey("last_score_date")
         val SESSIONS_HISTORY = stringPreferencesKey("sessions_history")
+        val LAST_CLEANUP_VERSION = stringPreferencesKey("last_cleanup_version")
     }
 
     // High Score Flow
@@ -197,6 +199,21 @@ class DataStoreManager @Inject constructor(
             }
 
             preferences[PreferencesKeys.SESSIONS_HISTORY] = gson.toJson(limitedHistory)
+        }
+    }
+
+    suspend fun checkAndPerformCleanup(currentVersion: String) {
+        context.dataStore.edit { preferences ->
+            val lastCleanup = preferences[PreferencesKeys.LAST_CLEANUP_VERSION] ?: "0.0.0"
+            
+            // Define targeted versions for cleanup (2.1.1 to 2.1.5)
+            val cleanupTargetVersions = listOf("2.1.1", "2.1.2", "2.1.3", "2.1.4", "2.1.5")
+            
+            if (lastCleanup != currentVersion && cleanupTargetVersions.contains(currentVersion)) {
+                // Clear the session history for the specified infrastructure-rebuild versions
+                preferences.remove(PreferencesKeys.SESSIONS_HISTORY)
+                preferences[PreferencesKeys.LAST_CLEANUP_VERSION] = currentVersion
+            }
         }
     }
 }

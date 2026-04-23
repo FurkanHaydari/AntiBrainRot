@@ -19,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +32,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.brainfocus.numberdetective.data.model.Hint
 import com.brainfocus.numberdetective.data.model.HintResolver
 import com.brainfocus.numberdetective.data.storage.SyncLevel
+import java.util.Locale
 import com.brainfocus.numberdetective.R
 import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 import com.brainfocus.numberdetective.core.designsystem.*
@@ -157,7 +160,7 @@ fun HistoryDetailScreen(
                     label = "HistoryTabTransition"
                 ) { tab ->
                     when (tab) {
-                        0 -> BriefingTabContent(session, scaleFactor, maxWidthDp)
+                        0 -> BriefingTabContent(session)
                         1 -> ArchiveTabContent(session, scaleFactor)
                     }
                 }
@@ -168,12 +171,13 @@ fun HistoryDetailScreen(
 
 @Composable
 private fun BriefingTabContent(
-    session: com.brainfocus.numberdetective.data.storage.GameSession,
-    scaleFactor: Float,
-    maxWidth: androidx.compose.ui.unit.Dp
+    session: com.brainfocus.numberdetective.data.storage.GameSession
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val verticalScale = (maxHeight.value / 720f).coerceIn(1.0f, 2.5f)
+        val isTablet = this@BoxWithConstraints.maxWidth > 600.dp || maxHeight > 600.dp
+        val maxContentWidth = if (isTablet) (750.dp * verticalScale).coerceAtMost(this@BoxWithConstraints.maxWidth) 
+                             else (500.dp * verticalScale).coerceAtMost(this@BoxWithConstraints.maxWidth)
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -183,8 +187,8 @@ private fun BriefingTabContent(
             // Digital Intelligence HUD (Transparent Shell)
             Box(
                 modifier = Modifier
-                    .widthIn(max = (500.dp * verticalScale).coerceAtMost(this@BoxWithConstraints.maxWidth))
-                    .fillMaxWidth()
+                    .widthIn(max = maxContentWidth)
+                    .fillMaxWidth(if (isTablet) 0.95f else 0.9f)
                     .fillMaxHeight(0.92f)
                     .background(Color.White.copy(alpha = 0.02f), RoundedCornerShape(16.dp * verticalScale))
                     .border(
@@ -216,7 +220,22 @@ private fun BriefingTabContent(
                     val report = session.diagnosticReport ?: DiagnosticEngine.generateReport(session)
                     val context = androidx.compose.ui.platform.LocalContext.current
                     val coroutineScope = rememberCoroutineScope()
-                    val formattedTime = String.format("%02d:%02d", session.levels.sumOf { it.durationSeconds } / 60, session.levels.sumOf { it.durationSeconds } % 60)
+                    val locale = LocalConfiguration.current.locales[0]
+                    val formattedTime = "%02d:%02d".format(locale, session.levels.sumOf { it.durationSeconds } / 60, session.levels.sumOf { it.durationSeconds } % 60)
+
+                    // Resolve strings at Composable level to avoid LocalContextGetResourceValueCall warnings
+                    val shareTitle = stringResource(R.string.share_score_title)
+                    val score = session.totalScore
+                    val attempts = session.levels.sumOf { level -> level.hints.count { !it.isSystemHint } }
+                    val baseMessage = pluralStringResource(R.plurals.share_score_message, attempts, score, attempts, formattedTime)
+    
+                    val syncLevelStr = when(report.syncLevel) {
+                        SyncLevel.OPTIMAL -> stringResource(R.string.sia_sync_optimal)
+                        SyncLevel.STABLE -> stringResource(R.string.sia_sync_stable)
+                        SyncLevel.STANDARD -> stringResource(R.string.sia_sync_standard)
+                        SyncLevel.SUBOPTIMAL -> stringResource(R.string.sia_sync_suboptimal)
+                        SyncLevel.CRITICAL -> stringResource(R.string.sia_sync_critical)
+                    }
 
                     com.brainfocus.numberdetective.feature.result.components.CognitiveDiagnosticReport(
                         report = report,
@@ -234,23 +253,9 @@ private fun BriefingTabContent(
                         scaleFactor = verticalScale,
                         onClick = {
                              val playStoreLink = "https://play.google.com/store/apps/details?id=${context.packageName}"
-                             val score = session.totalScore
-                             val attempts = session.levels.sumOf { level -> level.hints.count { !it.isSystemHint } }
-                             val baseMessage = context.getString(R.string.share_score_message, score, attempts, formattedTime)
+                             val shareMessage = "$baseMessage\n\n$syncLevelStr\n\n$playStoreLink"
                              
                              coroutineScope.launch(Dispatchers.IO) {
-                                 // Localized Sync Level for the text message
-                                 val syncLevelStr = when(report.syncLevel) {
-                                     SyncLevel.OPTIMAL -> context.getString(R.string.sia_sync_optimal)
-                                     SyncLevel.STABLE -> context.getString(R.string.sia_sync_stable)
-                                     SyncLevel.STANDARD -> context.getString(R.string.sia_sync_standard)
-                                     SyncLevel.SUBOPTIMAL -> context.getString(R.string.sia_sync_suboptimal)
-                                     SyncLevel.CRITICAL -> context.getString(R.string.sia_sync_critical)
-                                 }
-
-                                 val shareMessage = "$baseMessage\n\n$syncLevelStr\n\n$playStoreLink"
-                                 val shareTitle = context.getString(R.string.share_score_title)
-                                 
                                  val imageUri = com.brainfocus.numberdetective.core.utils.ShareImageGenerator.generateShareImage(context, session.isWin, score, report)
                                  
                                  val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
@@ -318,14 +323,14 @@ private fun ArchiveTabContent(
                     context = context
                 )
 
-                val isInterrogation = !hint.isSystemHint || hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success
+                val isInterrogation = !hint.isSystemHint || hint.descriptionRes == R.string.log_analysis_success
 
                 DetectiveHintCard(
                     hint = hint,
                     isHelperModeEnabled = true,
                     scaleFactor = scaleFactor,
                     label = label,
-                    labelColor = if (hint.descriptionRes == com.brainfocus.numberdetective.R.string.log_analysis_success) SuccessGreen 
+                    labelColor = if (hint.descriptionRes == R.string.log_analysis_success) SuccessGreen
                                  else if (isInterrogation) PrimaryCyan 
                                  else TextSecondary.copy(alpha = 0.6f),
                     isInterrogation = isInterrogation,

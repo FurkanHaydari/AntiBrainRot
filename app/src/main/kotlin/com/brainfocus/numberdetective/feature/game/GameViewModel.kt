@@ -24,6 +24,7 @@ import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
 import kotlin.math.max
 
 @HiltViewModel
+@Suppress("unused")
 class GameViewModel @Inject constructor(
     application: Application,
     private val game: NumberDetectiveGame,
@@ -165,7 +166,7 @@ class GameViewModel @Inject constructor(
         
         val nextLvl = _currentLevel.value + 1
         if (nextLvl > MAX_LEVELS) {
-            _gameState.value = GameState.Win(_score.value)
+            _gameState.value = GameState.Win
             timerJob?.cancel()
             return
         }
@@ -313,7 +314,7 @@ class GameViewModel @Inject constructor(
             result.correct == requiredDigits -> {
                 if (_currentLevel.value >= MAX_LEVELS) {
                     finalizeGameSession(true)
-                    _gameState.value = GameState.Win(_score.value)
+                    _gameState.value = GameState.Win
                     soundManager.playWinSound()
                     timerJob?.cancel()
                     viewModelScope.launch { dataStoreManager.saveHighScore(_score.value) }
@@ -325,7 +326,7 @@ class GameViewModel @Inject constructor(
             }
             _remainingAttempts.value <= 0 -> {
                 finalizeGameSession(false)
-                _gameState.value = GameState.GameOver(_score.value)
+                _gameState.value = GameState.GameOver
                 soundManager.playLoseSound()
                 timerJob?.cancel()
                 viewModelScope.launch { dataStoreManager.saveHighScore(_score.value) }
@@ -335,7 +336,7 @@ class GameViewModel @Inject constructor(
                 soundManager.playPartialWrongSound()
                 _currentReport.value = FieldReport.Compromised(_remainingAttempts.value)
                 _isPaused.value = true
-                GuessResult.Partial(result.correct, result.misplaced)
+                GuessResult.Partial
             }
         }
     }
@@ -447,21 +448,15 @@ class GameViewModel @Inject constructor(
         val levelTime = getTimeInSeconds() - _levelStartSeconds
         
         // Verimlilik verisini doğrudan motor hesaplıyor.
-        val coins = DiagnosticEngine.calculateCoinsForLevel(_hints.value, _currentLevel.value)
-        val efficiencyIdx = DiagnosticEngine.calculateEfficiencyIndex(_hints.value, _attemptsInLevel.toFloat().toInt(), _currentLevel.value)
+        val efficiencyIdx = DiagnosticEngine.calculateEfficiencyIndex(_hints.value, _attemptsInLevel, _currentLevel.value)
 
         val levelReport = DiagnosticEngine.generateReport(
             isWin = true,
             totalAttempts = _attemptsInLevel,
             totalTimeSeconds = levelTime,
-            totalHintsFound = -1,
-            isHelperModeEnabled = isHelperModeEnabledLocal,
             logicalMistakes = _logicalMistakesCount.value,
             totalArchiveChecks = _archiveChecksInLevel,
             totalDuplicateGuesses = _duplicateGuessesInLevel,
-            totalCoins = coins.first,
-            totalMaxCoins = coins.second,
-            levelsPlayed = 1,
             levelNumber = _currentLevel.value,
             efficiencyIdx = efficiencyIdx
         )
@@ -497,7 +492,7 @@ class GameViewModel @Inject constructor(
                 
                 if (_remainingTime.value == 0) {
                     finalizeGameSession(false)
-                    _gameState.value = GameState.GameOver(_score.value)
+                    _gameState.value = GameState.GameOver
                     soundManager.playLoseSound()
                     viewModelScope.launch { dataStoreManager.saveHighScore(_score.value) }
                 }

@@ -130,7 +130,7 @@ fun OnboardingScreen(
                     }
                 },
                 modifier = Modifier
-                    .widthIn(max = (400.dp * scaleFactor).coerceAtMost(maxWidth))
+                    .widthIn(max = if (maxWidth > 600.dp) 800.dp else 400.dp * scaleFactor)
                     .fillMaxWidth()
                     .height(buttonHeight)
                     .clip(RoundedCornerShape(20.dp * scaleFactor)),
@@ -214,7 +214,7 @@ fun TutorialCard(page: Int, scaleFactor: Float, maxWidth: androidx.compose.ui.un
         color = SurfaceCard,
         shape = RoundedCornerShape(32.dp * scaleFactor),
         modifier = Modifier
-            .widthIn(max = (440.dp * scaleFactor).coerceAtMost(maxWidth))
+            .widthIn(max = if (maxWidth > 600.dp) 800.dp else 440.dp * scaleFactor)
             .fillMaxWidth()
             .fillMaxHeight(if (scaleFactor > 1.2f) 0.75f else 0.85f) // Adjust height on tablets to be more compact
             .padding(horizontal = 8.dp * scaleFactor),

@@ -1,7 +1,7 @@
 package com.brainfocus.numberdetective.feature.home
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -316,7 +316,7 @@ fun AboutGameDialog(
 
                 Button(
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(coffeeUrl))
+                        val intent = Intent(Intent.ACTION_VIEW, coffeeUrl.toUri())
                         context.startActivity(intent)
                     },
                     modifier = Modifier

@@ -1,7 +1,7 @@
 # Number Detective 🔍
 
-<div align="center">
-  <img src="assets/mockup.png" alt="Number Detective Mockup" width="600" />
+<p align="center">
+  <img src="assets/mockup.png" alt="Number Detective Mockup" width="1024" />
   
   <br />
 
@@ -15,7 +15,7 @@
   <a href="https://play.google.com/store/apps/details?id=com.brainfocus.numberdetective">
     <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="60" />
   </a>
-</div>
+</p>
 
 <br />
 
@@ -137,6 +137,6 @@ If you believe in an ad-free, mission-driven digital world, support the developm
 
 
 ---
-<div align="center">
+<p align="center">
   <i>"When you eliminate the impossible, whatever remains, however improbable, must be the truth."</i> — <b>Sherlock Holmes</b>
-</div>
+</p>
