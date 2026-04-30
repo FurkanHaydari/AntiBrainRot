@@ -93,7 +93,7 @@
     <string name="home_about_button">BU OYUN HAKKINDA</string>
     <string name="about_dialog_title">Zihin Sağlığı İçin Bir Oyun</string>
     <string name="about_dialog_body">Bu oyun, herhangi bir ticari amaç gözetilmeksizin zihin sağlığına bir hediye olarak yaratıldı. Misyonu: Kısa süreli hafızayı eğiterek, analitik zekayı güçlendirerek ve odaklanma yeteneğini keskinleştirerek, sosyal medyanın tetiklediği dikkat eksikliği ve zihin körelmesi (brain rot) ile mücadele etmektir.\n\nBu oyunda reklam yoktur. Sebebi basittir: Reklamlar, zihin körelmesini tetikleyen unsurlardan biridir.\n\nEğer oyunu beğendiyseniz, misyonumuzu Patreon üzerinden destekleyebilirsiniz 🧡</string>
-    <string name="about_buy_coffee">🧡 Patreon\'da Destek Ol</string>
+    <string name="about_buy_coffee">🧡 Destek Ol</string>
     <string name="about_buy_coffee_url">https://www.patreon.com/AntiBrainRot/membership</string>
 
     <!-- Validation Reports -->
@@ -209,5 +209,10 @@
     <string name="manual_convergence_desc">Hedef kodu ne kadar stratejik bir daraltma ile yakaladığınızı analiz eder. Her tahmin sizi matematiksel çekirdeğe daha da yaklaştırmalıdır. Sapan örüntüler veya hedeften uzaklaşan denemeler, mantıksal bütünlüğün kaybolduğunu ve operasyonel verimliliğin azaldığını gösterir.</string>
     
     <string name="settings_scoring_manual">SKOR PROTOKOLÜ</string>
+    <string name="settings_rate_app">UYGULAMAYI DEĞERLENDİR</string>
+    <string name="settings_privacy_policy">GİZLİLİK POLİTİKASI</string>
+
+    <string name="privacy_policy_title">Gizlilik Politikası</string>
+    <string name="privacy_policy_body">Sayı Dedektifi, gizlilik ön planda tutularak geliştirilmiş bilişsel bir bulmaca oyunudur.\n\nBu uygulama hiçbir kişisel bilgiyi, kullanım verisini veya cihaz tanımlayıcısını TOPLAMAZ, SAKLAMAZ veya PAYLAŞMAZ.\n\nUygulama içinde veri toplayan hiçbir reklam, analiz aracı veya üçüncü parti SDK bulunmamaktadır. Tüm oyun ilerlemeniz ve rekorlarınız yalnızca cihazınıza yerel olarak kaydedilir.</string>
 
 </resources>

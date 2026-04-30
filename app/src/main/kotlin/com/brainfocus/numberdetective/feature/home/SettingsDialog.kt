@@ -46,11 +46,19 @@ fun SettingsDialog(
     scaleFactor: Float = 1.0f
 ) {
     var showAboutDialog by remember { mutableStateOf(false) }
+    var showPrivacyDialog by remember { mutableStateOf(false) }
 
     if (showAboutDialog) {
         AboutGameDialog(
             scaleFactor = scaleFactor,
             onDismiss = { showAboutDialog = false }
+        )
+    }
+
+    if (showPrivacyDialog) {
+        PrivacyPolicyDialog(
+            scaleFactor = scaleFactor,
+            onDismiss = { showPrivacyDialog = false }
         )
     }
 
@@ -220,6 +228,38 @@ fun SettingsDialog(
                         onClick = {
                             onDismiss()
                             onDiagnosticClick()
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+                    
+                    val context = LocalContext.current
+                    
+                    // Rate App Button
+                    DetectiveButton(
+                        text = "⭐ " + stringResource(R.string.settings_rate_app).uppercase(),
+                        isPrimary = false,
+                        scaleFactor = scaleFactor * 0.9f,
+                        onClick = {
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=${context.packageName}"))
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}"))
+                                context.startActivity(intent)
+                            }
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp * scaleFactor))
+
+                    // Privacy Policy Button
+                    DetectiveButton(
+                        text = "📜 " + stringResource(R.string.settings_privacy_policy).uppercase(),
+                        isPrimary = false,
+                        scaleFactor = scaleFactor * 0.9f,
+                        onClick = {
+                            showPrivacyDialog = true
                         }
                     )
 
@@ -411,5 +451,90 @@ fun LanguageOption(text: String, isSelected: Boolean, scaleFactor: Float, onClic
             color = if (isSelected) PrimaryCyan else Color.Gray,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
+    }
+}
+
+@Composable
+fun PrivacyPolicyDialog(
+    scaleFactor: Float,
+    onDismiss: () -> Unit
+) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(24.dp * scaleFactor),
+            color = Color(0xFF0F1923),
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                PrimaryCyan.copy(alpha = 0.3f)
+            ),
+            modifier = Modifier
+                .widthIn(max = if (configuration.screenWidthDp > 600) 800.dp else 440.dp * scaleFactor)
+                .fillMaxWidth(0.95f)
+                .heightIn(max = screenHeight * 0.95f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(28.dp * scaleFactor)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Text(
+                    text = "📜",
+                    fontSize = (24 * scaleFactor).coerceAtMost(36f).sp,
+                    color = PrimaryCyan
+                )
+
+                Spacer(modifier = Modifier.height(8.dp * scaleFactor))
+
+                Text(
+                    text = stringResource(R.string.privacy_policy_title).uppercase(),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = (16 * scaleFactor).coerceAtMost(24f).sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (2 * scaleFactor).sp,
+                        fontFamily = Montserrat
+                    ),
+                    color = PrimaryCyan,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(PrimaryCyan.copy(alpha = 0.15f))
+                )
+
+                Spacer(modifier = Modifier.height(20.dp * scaleFactor))
+
+                Text(
+                    text = stringResource(R.string.privacy_policy_body),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = (14 * scaleFactor).coerceAtMost(22f).sp,
+                        lineHeight = (22 * scaleFactor).coerceAtMost(32f).sp,
+                        fontFamily = Montserrat
+                    ),
+                    color = Color.White.copy(alpha = 0.82f),
+                    textAlign = TextAlign.Start
+                )
+
+                Spacer(modifier = Modifier.height(28.dp * scaleFactor))
+
+                TextButton(onClick = onDismiss) {
+                    Text(
+                        text = "✕",
+                        color = Color.White.copy(alpha = 0.35f),
+                        fontSize = (13 * scaleFactor).coerceAtMost(20f).sp
+                    )
+                }
+            }
+        }
     }
 }

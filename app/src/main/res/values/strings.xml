@@ -92,7 +92,7 @@
     <string name="home_about_button">ABOUT THIS GAME</string>
     <string name="about_dialog_title">A Game for Brain Health</string>
     <string name="about_dialog_body">This game was created without any commercial purpose — a gift for brain health. Its mission: to fight the attention deficit and brain rot fuelled by social media by training short-term memory, strengthening analytical intelligence, and sharpening focus and concentration.\n\nThere are no ads in this game. The reason is simple: ads are one of the very triggers of brain rot.\n\nIf you enjoyed the game, you can support its mission on Patreon 🧡</string>
-    <string name="about_buy_coffee">🧡 Support on Patreon</string>
+    <string name="about_buy_coffee">🧡 Support</string>
     <string name="about_buy_coffee_url">https://www.patreon.com/AntiBrainRot/membership</string>
 
     <!-- Validation Reports -->
@@ -208,5 +208,10 @@
     <string name="manual_convergence_desc">Analyzes the efficiency of your code narrowing strategy. Each guess should strategically converge towards the mathematical core. Drifting patterns or outlier attempts indicate a loss of logical cohesion and operational efficiency.</string>
     
     <string name="settings_scoring_manual">SCORING PROTOCOL</string>
+    <string name="settings_rate_app">RATE APP</string>
+    <string name="settings_privacy_policy">PRIVACY POLICY</string>
+    
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_policy_body">Number Detective is a cognitive puzzle game built with privacy in mind.\n\nThis application does NOT collect, store, or share any personal information, usage data, or device identifiers.\n\nThere are no advertisements, analytics trackers, or third-party SDKs that collect data within the app. All your game progress and high scores are saved locally on your device.</string>
 
 </resources>
