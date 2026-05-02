@@ -40,6 +40,8 @@ import com.brainfocus.numberdetective.data.storage.GameSession
 import com.brainfocus.numberdetective.data.storage.SyncLevel
 import com.brainfocus.numberdetective.data.storage.DiagnosticReport
 import com.brainfocus.numberdetective.feature.result.DiagnosticEngine
+import com.brainfocus.numberdetective.util.PlayReviewManager
+import kotlinx.coroutines.delay
 
 @Composable
 fun ResultScreen(
@@ -69,6 +71,10 @@ fun ResultScreen(
 
     LaunchedEffect(Unit) {
         isVisible = true
+        if (isWin) {
+            delay(1500) // Small delay so it doesn't instantly block the success animation
+            PlayReviewManager.requestReview(context)
+        }
     }
 
     val diagnosticReport = remember(session) {

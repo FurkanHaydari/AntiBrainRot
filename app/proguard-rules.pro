@@ -19,6 +19,7 @@
 
 # Number Detective - Modern Feature-based Architecture
 -keep class com.brainfocus.numberdetective.data.model.** { *; }
+-keep class com.brainfocus.numberdetective.data.storage.** { *; }
 
 # Obfuscation settings
 -renamesourcefileattribute SourceFile

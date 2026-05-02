@@ -221,12 +221,14 @@ private fun BriefingTabContent(
                     val context = androidx.compose.ui.platform.LocalContext.current
                     val coroutineScope = rememberCoroutineScope()
                     val locale = LocalConfiguration.current.locales[0]
-                    val formattedTime = "%02d:%02d".format(locale, session.levels.sumOf { it.durationSeconds } / 60, session.levels.sumOf { it.durationSeconds } % 60)
+                    val safeLevels = session.levels.orEmpty()
+                    val totalDuration = safeLevels.sumOf { it.durationSeconds }
+                    val formattedTime = "%02d:%02d".format(locale, totalDuration / 60, totalDuration % 60)
 
                     // Resolve strings at Composable level to avoid LocalContextGetResourceValueCall warnings
                     val shareTitle = stringResource(R.string.share_score_title)
                     val score = session.totalScore
-                    val attempts = session.levels.sumOf { level -> level.hints.count { !it.isSystemHint } }
+                    val attempts = safeLevels.sumOf { level -> level.hints.orEmpty().count { !it.isSystemHint } }
                     val baseMessage = pluralStringResource(R.plurals.share_score_message, attempts, score, attempts, formattedTime)
     
                     val syncLevelStr = when(report.syncLevel) {
@@ -286,13 +288,15 @@ private fun ArchiveTabContent(
     session: com.brainfocus.numberdetective.data.storage.GameSession,
     scaleFactor: Float
 ) {
+    val safeLevels = session.levels.orEmpty()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp * scaleFactor),
         contentPadding = PaddingValues(bottom = 32.dp * scaleFactor),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        session.levels.forEach { levelResult ->
+        safeLevels.forEach { levelResult ->
+            val safeHints = levelResult.hints.orEmpty()
             item {
                 DetectiveHeader(
                     title = stringResource(R.string.case_file_level, levelResult.levelNumber),
@@ -312,14 +316,14 @@ private fun ArchiveTabContent(
                 )
             }
             
-            items(levelResult.hints.size) { globalIndex ->
-                val hint = levelResult.hints[globalIndex]
+            items(safeHints.size) { globalIndex ->
+                val hint = safeHints[globalIndex]
                 val context = androidx.compose.ui.platform.LocalContext.current
                 
                 val label = HintResolver.getActionLabel(
                     hint = hint,
                     index = globalIndex,
-                    allHints = levelResult.hints,
+                    allHints = safeHints,
                     context = context
                 )
 

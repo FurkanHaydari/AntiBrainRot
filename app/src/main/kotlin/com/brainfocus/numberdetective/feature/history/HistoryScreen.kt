@@ -116,15 +116,16 @@ fun HistoryScreen(
                 ) {
                     itemsIndexed(
                         items = history,
-                        key = { index, session -> session.id }
+                        key = { index, session -> (session.id as String?) ?: index.toString() }
                     ) { index, session ->
                         val caseNumber = history.size - index
+                        val safeId = (session.id as String?) ?: java.util.UUID.randomUUID().toString()
                         HistoryItem(
                             session = session, 
                             caseNumber = caseNumber,
                             scaleFactor = scaleFactor,
                             maxWidth = maxWidthDp,
-                            onClick = { onNavigateToDetail(session.id) }
+                            onClick = { onNavigateToDetail(safeId) }
                         )
                     }
                 }
@@ -239,7 +240,7 @@ fun HistoryItem(session: GameSession, caseNumber: Int, scaleFactor: Float, maxWi
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(bottom = 4.dp * scaleFactor)
                     ) {
-                        session.levels.forEach { level ->
+                        session.levels.orEmpty().forEach { level ->
                             LevelBadge(levelNumber = level.levelNumber, scaleFactor = scaleFactor * 0.9f)
                         }
                     }
