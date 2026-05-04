@@ -6,17 +6,17 @@ import com.brainfocus.numberdetective.R
 /**
  * HintResolver
  * 
- * Bu sınıf, Hint (İpucu) verilerini insan tarafından okunabilir 
- * metinlere ve etiketlere dönüştüren merkezi mantığı barındırır.
+ * This class contains the central logic that converts Hint data into 
+ * human-readable texts and labels.
  * 
- * SİA Protokolü v4.4: 
- * - Eylem Etiketi (Action Label) ve İpucu Açıklaması (Description) birbirinden ayrılmıştır.
+ * SIA Protocol v4.4: 
+ * - Action Label and Hint Description are separated.
  */
 object HintResolver {
 
     /**
-     * İpucunun eylemsel başlığını/etiketini çözer.
-     * Örnek: "SORGU #1", "BAŞLANGIÇ İSTİHBARATI", "ERİŞİM ONAYLANDI"
+     * Resolves the action title/label of the hint.
+     * Example: "INTERROGATION #1", "INITIAL INTELLIGENCE", "ACCESS GRANTED"
      */
     fun getActionLabel(
         hint: Hint, 
@@ -24,18 +24,18 @@ object HintResolver {
         allHints: List<Hint>, 
         context: Context
     ): String {
-        // 1. Durum: Tam Başarı (Success)
+        // Case 1: Full Success
         if (hint.descriptionRes == R.string.log_analysis_success) {
             return context.getString(R.string.log_analysis_success)
         }
 
-        // 2. Durum: Sistem İpucu (Başlangıç İstihbaratı vb.)
+        // Case 2: System Hint (Initial Intelligence, etc.)
         if (hint.isSystemHint) {
             val intelligenceNumber = allHints.take(index + 1).count { it.isSystemHint }
             return context.getString(R.string.initial_intelligence_number, intelligenceNumber)
         }
 
-        // 3. Durum: Kullanıcı Sorgulaması (Interrogation)
+        // Case 3: User Interrogation
         val interrogationNumber = allHints.take(index + 1).count { 
             !it.isSystemHint && it.descriptionRes != R.string.log_analysis_success 
         }
@@ -43,13 +43,13 @@ object HintResolver {
     }
 
     /**
-     * İpucunun mantıksal açıklamasını çözer.
-     * Örnek: "1 rakam doğru ve doğru yerde"
+     * Resolves the logical description of the hint.
+     * Example: "1 number is correct and in the right place"
      */
     fun getHintDescription(hint: Hint, context: Context): String {
         val isLevel3 = hint.guess.length == 4
         
-        // 1. Dinamik Veri Odaklı Metin Üretimi (Data-Driven Translation)
+        // 1. Data-Driven Text Generation (Data-Driven Translation)
         val resId = if (isLevel3) {
             getLevel3HintRes(hint.correct, hint.misplaced)
         } else {
@@ -69,7 +69,7 @@ object HintResolver {
             }
         }
 
-        // 2. Eğer bir kaynak ID'si (descriptionRes) zaten atanmışsa fallback olarak kullan
+        // 2. If a resource ID (descriptionRes) is already assigned, use it as a fallback
         if (hint.descriptionRes != null && hint.descriptionRes != 0) {
             return try {
                 if (hint.descriptionArgs.isNotEmpty()) {
@@ -82,7 +82,7 @@ object HintResolver {
             }
         }
 
-        // 3. Nihai Fallback: Dondurulmuş metni bas
+        // 3. Final Fallback: Print the raw text
         return hint.description
     }
 
