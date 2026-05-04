@@ -493,16 +493,17 @@ class GameViewModel @Inject constructor(
                     _remainingTime.value--
                     
                     val beepCount = when {
-                        _remainingTime.value <= 10 -> 4
-                        _remainingTime.value <= 30 -> 3
-                        _remainingTime.value <= 60 -> 2
-                        else -> 1
+                        _remainingTime.value <= 10 -> 2
+                        _remainingTime.value <= 20 -> 1
+                        else -> 0
                     }
 
-                    viewModelScope.launch {
-                        repeat(beepCount) { i ->
-                            soundManager.playBeepSound()
-                            if (beepCount > 1 && i < beepCount - 1) delay(120)
+                    if (beepCount > 0) {
+                        viewModelScope.launch {
+                            repeat(beepCount) { i ->
+                                soundManager.playBeepSound()
+                                if (beepCount > 1 && i < beepCount - 1) delay(120)
+                            }
                         }
                     }
                 }

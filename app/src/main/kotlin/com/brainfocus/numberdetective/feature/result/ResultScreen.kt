@@ -10,6 +10,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -61,7 +63,7 @@ fun ResultScreen(
     val context = LocalContext.current
     val session = GameResultStorage.lastGameSession
     var isVisible by remember { mutableStateOf(false) }
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: Briefing, 1: Archive
+    val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
 
     val minutes = timeInSeconds / 60
@@ -174,29 +176,29 @@ fun ResultScreen(
             ) {
                 TabItem(
                     text = stringResource(R.string.label_tab_briefing),
-                    isSelected = selectedTab == 0,
+                    isSelected = pagerState.currentPage == 0,
                     scaleFactor = scaleFactor,
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedTab = 0 }
+                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(0) } }
                 )
                 TabItem(
                     text = stringResource(R.string.label_tab_archive),
-                    isSelected = selectedTab == 1,
+                    isSelected = pagerState.currentPage == 1,
                     scaleFactor = scaleFactor,
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedTab = 1 }
+                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(1) } }
                 )
              }
 
             Spacer(modifier = Modifier.height(8.dp * scaleFactor))
 
             // Tab Content
-            Crossfade(
-                targetState = selectedTab, 
+            HorizontalPager(
+                state = pagerState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                label = "TabContentTransition"
-            ) { tab ->
-                when (tab) {
+                verticalAlignment = Alignment.Top
+            ) { page ->
+                when (page) {
                     0 -> BriefingView(
                         isWin = isWin,
                         score = score,

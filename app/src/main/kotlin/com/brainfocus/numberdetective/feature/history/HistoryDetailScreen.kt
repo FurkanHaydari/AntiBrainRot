@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -48,7 +49,8 @@ fun HistoryDetailScreen(
 ) {
     val history by viewModel.history.collectAsState()
     val session = remember(history, sessionId) { history.find { it.id == sessionId } }
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: Briefing, 1: Archive
+    val pagerState = rememberPagerState(pageCount = { 2 })
+    val coroutineScope = rememberCoroutineScope()
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val scaleFactor = (maxHeight.value / 720f).coerceIn(1.0f, 2.2f)
@@ -137,29 +139,29 @@ fun HistoryDetailScreen(
                 ) {
                     TabItem(
                         text = stringResource(R.string.label_tab_briefing),
-                        isSelected = selectedTab == 0,
+                        isSelected = pagerState.currentPage == 0,
                         scaleFactor = scaleFactor,
                         modifier = Modifier.weight(1f),
-                        onClick = { selectedTab = 0 }
+                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(0) } }
                     )
                     TabItem(
                         text = stringResource(R.string.label_tab_archive),
-                        isSelected = selectedTab == 1,
+                        isSelected = pagerState.currentPage == 1,
                         scaleFactor = scaleFactor,
                         modifier = Modifier.weight(1f),
-                        onClick = { selectedTab = 1 }
+                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(1) } }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp * scaleFactor))
 
                 // Tab Content Switcher
-                Crossfade(
-                    targetState = selectedTab,
+                HorizontalPager(
+                    state = pagerState,
                     modifier = Modifier.weight(1f).fillMaxWidth(),
-                    label = "HistoryTabTransition"
-                ) { tab ->
-                    when (tab) {
+                    verticalAlignment = Alignment.Top
+                ) { page ->
+                    when (page) {
                         0 -> BriefingTabContent(session)
                         1 -> ArchiveTabContent(session, scaleFactor)
                     }

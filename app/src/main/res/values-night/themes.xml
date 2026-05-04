@@ -7,7 +7,6 @@
         
         <!-- Background colors -->
         <item name="android:windowBackground">@color/colorBackground</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         
         <!-- Text colors -->
         <item name="android:textColor">@color/colorText</item>

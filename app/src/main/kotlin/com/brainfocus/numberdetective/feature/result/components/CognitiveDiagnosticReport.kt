@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,13 +47,13 @@ fun CognitiveDiagnosticReport(
         )
     }
     
-    var visibleLinesCount by remember { mutableIntStateOf(if (staggered) 0 else reportLines.size) }
+    var visibleLinesCount by rememberSaveable(report) { mutableIntStateOf(if (staggered) 0 else reportLines.size) }
 
     if (staggered) {
         LaunchedEffect(report) {
-            visibleLinesCount = 0
-            reportLines.forEachIndexed { index, _ ->
-                delay(if (index == 0) 500 else 600)
+            val startIndex = visibleLinesCount
+            for (index in startIndex until reportLines.size) {
+                delay(if (index == 0) 500L else 600L)
                 visibleLinesCount = index + 1
             }
         }
