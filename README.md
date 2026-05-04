@@ -1,10 +1,6 @@
 # Number Detective 🔍
 
 <p align="center">
-  <img src="assets/mockup.png" alt="Number Detective Mockup" width="1024" />
-  
-  <br />
-
   <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
   <img src="https://img.shields.io/badge/Kotlin-1.9+-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin" />
   <img src="https://img.shields.io/badge/UI-Jetpack_Compose-4285F4?style=for-the-badge&logo=jetpack-compose&logoColor=white" alt="Jetpack Compose" />
@@ -17,7 +13,20 @@
   </a>
 </p>
 
-<br />
+<p align="center">
+  <img src="assets/screenshots/1.png" width="18%" />
+  <img src="assets/screenshots/2.png" width="18%" />
+  <img src="assets/screenshots/3.png" width="18%" />
+  <img src="assets/screenshots/4.png" width="18%" />
+  <img src="assets/screenshots/5.png" width="18%" />
+</p>
+<p align="center">
+  <img src="assets/screenshots/6.png" width="18%" />
+  <img src="assets/screenshots/7.png" width="18%" />
+  <img src="assets/screenshots/8.png" width="18%" />
+  <img src="assets/screenshots/9.png" width="18%" />
+  <img src="assets/screenshots/10.png" width="18%" />
+</p>
 
 **Number Detective** is a premium, mission-driven puzzle game designed to reclaim mental clarity. In an age of digital "brain rot," it offers a sanctuary for deep focus, logical deduction, and memory strengthening.
 
